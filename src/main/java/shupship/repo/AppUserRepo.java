@@ -5,19 +5,19 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import shupship.domain.model.AppUser;
+import shupship.domain.model.Users;
 
 
 @Repository
-public interface AppUserRepo extends JpaRepository<AppUser, String> {
+public interface AppUserRepo extends JpaRepository<Users, String> {
 
-    AppUser findByUid(String uid);
+    Users findByUid(String uid);
 
     @Query(value = "INSERT INTO APP_USER(UID, AVATAR, BIRTHDAY, FULL_NAME, GENDER, IS_ACTIVE, IS_DELETED, MOBILE, NAME) " +
             "VALUES(:#{#appUser.getUid()}, :#{#appUser.getAvatar()}, :#{#appUser.getBirthday()}, :#{#appUser.getFullName()}, " +
             ":#{#appUser.getGender()}, :#{#appUser.getIsActive()}, :#{#appUser.getIsDeleted()}, " +
             ":#{#appUser.getMobile()}, :#{#appUser.getName()});\n"
             , nativeQuery = true)
-    AppUser insertAppUser(@Param("appUser") AppUser appUser);
+    Users insertAppUser(@Param("user") Users user);
 
 }

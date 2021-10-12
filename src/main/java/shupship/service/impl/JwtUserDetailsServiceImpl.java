@@ -16,8 +16,8 @@ import shupship.common.Const;
 import shupship.domain.dto.UserInfoDTO;
 import shupship.domain.dto.UserLoginDTO;
 
-import shupship.domain.model.AppUser;
 import shupship.domain.model.BasicLogin;
+import shupship.domain.model.Users;
 import shupship.repo.AppUserRepo;
 import shupship.repo.BasicLoginRepo;
 import shupship.service.JwtUserDetailsService;
@@ -72,10 +72,10 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         }
         log.info("Start query Table app_user at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
-        AppUser appUser = appUserRepo.findByUid(basicLogin.getUserUid());
+        Users user = appUserRepo.findByUid(basicLogin.getUserUid());
         log.info("End query Table app_user at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
-        Assert.isTrue(appUser.getIsActive().equals(Const.COMMON_CONST_VALUE.ACTIVE), "USER_NOT_ACTIVE");
+        Assert.isTrue(user.getIsActive().equals(Const.COMMON_CONST_VALUE.ACTIVE), "USER_NOT_ACTIVE");
         UserLoginDTO userLoginDTO = new UserLoginDTO();
         BeanUtils.copyProperties(basicLogin, userLoginDTO);
         return userLoginDTO;
@@ -111,7 +111,7 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         log.info("End query Table basic_login at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
         Assert.isNull(checkBasicLogin, "EMAIL_REGISTERED");
-        AppUser appUser = AppUser.builder()
+        Users appUser = Users.builder()
                 .avatar(user.getAvatar())
                 .birthday(user.getBirthday())
                 .fullName(user.getFullName())
@@ -219,7 +219,7 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
     //Update profile user
     @Override
     public boolean updateUser(String userId, UserLoginDTO userLoginDTO) {
-        AppUser userCheck = appUserRepo.findByUid(userId);
+        Users userCheck = appUserRepo.findByUid(userId);
         Assert.notNull(userCheck,"USER_NOT_FOUND");
         Assert.notNull(userLoginDTO.getBirthday(),"DATE_NOT_VALID");
         Assert.notNull(userLoginDTO.getName(),"NAME_NOT_VALID");
@@ -323,12 +323,12 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
     public UserInfoDTO getUserInfo(String userUid) {
         log.info("Start query Table app_user at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
-        AppUser appUser = appUserRepo.findByUid(userUid);
+        Users user = appUserRepo.findByUid(userUid);
         log.info("End query Table app_user at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
-        Assert.notNull(appUser, "USER_NOT_FOUND");
+        Assert.notNull(user, "USER_NOT_FOUND");
         UserInfoDTO userInfoDTO = new UserInfoDTO();
-        BeanUtils.copyProperties(appUser, userInfoDTO);
+        BeanUtils.copyProperties(user, userInfoDTO);
         log.info("Start query Table basic_login at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
         BasicLogin basicLogin = basicLoginRepo.findByUserUid(userUid);
