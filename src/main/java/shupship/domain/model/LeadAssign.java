@@ -46,7 +46,7 @@ public class LeadAssign extends AuditEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_recipient_id", referencedColumnName = "emp_system_id", nullable = true, updatable = false, insertable = false)
     @NotFound(action = NotFoundAction.IGNORE)
-    private Employee employees;
+    private Users users;
 
     private String note;
 
