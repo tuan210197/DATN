@@ -24,6 +24,7 @@ import shupship.service.JwtUserDetailsService;
 import shupship.service.MailSenderService;
 import shupship.util.ValidateUtil;
 
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -99,10 +100,10 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
     @Override
     public boolean registerUser(UserLoginDTO user) {
         Assert.hasText(user.getEmail(), "EMAIL_EMPTY");
-        Assert.hasText(user.getPassword(), "PASSWORD_EMPTY");
+//        Assert.hasText(user.getPassword(), "PASSWORD_EMPTY");
 //        Assert.notNull(user.getBirthday(),"DATE_NOT_VALID");
         Assert.isTrue(ValidateUtil.regexValidation(user.getEmail(), Const.VALIDATE_INPUT.regexEmail), "EMAIL_WRONG_FORMAT");
-        Assert.isTrue(ValidateUtil.regexValidation(user.getPassword(), Const.VALIDATE_INPUT.regexPass), "PASS_WRONG_FORMAT");
+//        Assert.isTrue(ValidateUtil.regexValidation(user.getPassword(), Const.VALIDATE_INPUT.regexPass), "PASS_WRONG_FORMAT");
 //        Assert.isTrue(ValidateUtil.regexValidation(user.getMobile(), Const.VALIDATE_INPUT.regexPhone), "PHONE_WRONG_FORMAT");
 //        Assert.isTrue(Const.VALIDATE_INPUT.phoneNum.contains(user.getMobile().substring(0, 3)),"PHONE_NOT_VALID");
         log.info("Start query Table basic_login at time: "
@@ -111,7 +112,7 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         log.info("End query Table basic_login at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
         Assert.isNull(checkBasicLogin, "EMAIL_REGISTERED");
-        Users appUser = Users.builder()
+        Users users = Users.builder()
                 .avatar(user.getAvatar())
                 .birthday(user.getBirthday())
                 .fullName(user.getFullName())
@@ -123,16 +124,16 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
                 .build();
         log.info("Start save Table app_user at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
-        appUser = userRepo.save(appUser);
+        users = userRepo.save(users);
         log.info("End save Table app_user at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
         BasicLogin basicLogin = BasicLogin.builder()
                 .email(user.getEmail())
-                .password(bcryptEncoder.encode(user.getPassword()))
-                .userUid(appUser.getUid())
+//                .password(bcryptEncoder.encode(generatePassword(10)))
+                .userUid(users.getUid())
                 .build();
         sendOTP(basicLogin, "OTP Token for Register Account");
-        return Objects.nonNull(appUser.getUid());
+        return Objects.nonNull(users.getUid());
     }
 
     //send OTP to mail when change password or forgot password
@@ -152,8 +153,10 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
     public void sendOTP(BasicLogin basicLogin, String subject) {
         Assert.notNull(basicLogin, "USER_NOT_FOUND");
         String otpToken= generateOTPToken();
+        String password = generatePassword(10);
         basicLogin.setIsVerified(Const.COMMON_CONST_VALUE.NOT_VERIFIED);
         basicLogin.setTokenCode(otpToken);
+        basicLogin.setPassword(bcryptEncoder.encode(password));
         basicLogin.setExpireDate(LocalDateTime.now().plusMinutes(15));
         basicLogin.setRetryCount(0);
         log.info("Start save Table basic_login at time: "
@@ -161,7 +164,7 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         basicLoginRepo.save(basicLogin);
         log.info("End save Table basic_login at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
-        mailSenderService.sendSimpleMessage(basicLogin.getEmail(), subject, "Your OTP Token is: " + otpToken);
+        mailSenderService.sendSimpleMessage(basicLogin.getEmail(), subject, "Your OTP Token is: " + otpToken +"Your Password is: "+password );
     }
 
     // update password when change password or forgot password
@@ -248,6 +251,31 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         int randomNumber = (int) (Math.random() * (maxNum - minNum + 1) + minNum);
         otpToken = randomNumber + "";
         return otpToken;
+    }
+    public static String generatePassword(int len)
+    {
+        // ASCII range – alphanumeric (0-9, a-z, A-Z)
+        final String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        SecureRandom random = new SecureRandom();
+        StringBuilder sb = new StringBuilder();
+
+        // each iteration of the loop randomly chooses a character from the given
+        // ASCII range and appends it to the `StringBuilder` instance
+
+        for (int i = 0; i < len; i++)
+        {
+            int randomIndex = random.nextInt(chars.length());
+            sb.append(chars.charAt(randomIndex));
+        }
+
+        return sb.toString();
+    }
+
+    public static void main(String[] args)
+    {
+        int len = 10;
+        System.out.println(generatePassword(len));
     }
 
     @Override
