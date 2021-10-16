@@ -133,6 +133,7 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
                 .userUid(users.getUid())
                 .build();
         sendOTP(basicLogin, "OTP Token for Register Account");
+        sendPassword(basicLogin, "PASSWORD FOR YOUR EMAIL");
         return Objects.nonNull(users.getUid());
     }
 
@@ -148,15 +149,16 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
         Assert.notNull(basicLogin,"EMAIL_NOT_EXIST");
         sendOTP(basicLogin, "OTP Token to Forget Password");
+
     }
 
     public void sendOTP(BasicLogin basicLogin, String subject) {
         Assert.notNull(basicLogin, "USER_NOT_FOUND");
         String otpToken= generateOTPToken();
-        String password = generatePassword(10);
+//        String password = generatePassword(10);
         basicLogin.setIsVerified(Const.COMMON_CONST_VALUE.NOT_VERIFIED);
         basicLogin.setTokenCode(otpToken);
-        basicLogin.setPassword(bcryptEncoder.encode(password));
+//        basicLogin.setPassword(bcryptEncoder.encode(password));
         basicLogin.setExpireDate(LocalDateTime.now().plusMinutes(15));
         basicLogin.setRetryCount(0);
         log.info("Start save Table basic_login at time: "
@@ -164,9 +166,24 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         basicLoginRepo.save(basicLogin);
         log.info("End save Table basic_login at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
-        mailSenderService.sendSimpleMessage(basicLogin.getEmail(), subject, "Your OTP Token is: " + otpToken +"Your Password is: "+password );
+        mailSenderService.sendSimpleMessage(basicLogin.getEmail(), subject, "Your OTP Token is: " + otpToken );
     }
-
+    public void sendPassword(BasicLogin basicLogin, String subject) {
+        Assert.notNull(basicLogin, "USER_NOT_FOUND");
+//        String otpToken= generateOTPToken();
+        String password = generatePassword(10);
+//        basicLogin.setIsVerified(Const.COMMON_CONST_VALUE.NOT_VERIFIED);
+//        basicLogin.setTokenCode(otpToken);
+        basicLogin.setPassword(bcryptEncoder.encode(password));
+//        basicLogin.setExpireDate(LocalDateTime.now().plusMinutes(15));
+//        basicLogin.setRetryCount(0);
+        log.info("Start save Table basic_login at time: "
+                + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
+        basicLoginRepo.save(basicLogin);
+        log.info("End save Table basic_login at time: "
+                + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
+        mailSenderService.sendSimpleMessage(basicLogin.getEmail(), subject,  "Your Password is: "+password );
+    }
     // update password when change password or forgot password
     @Override
     public boolean updatePassword(UserLoginDTO userLoginDTO) {
