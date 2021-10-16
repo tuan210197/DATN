@@ -36,7 +36,7 @@ import java.util.Date;
 )
 
 @Entity
-@Table(name = "user")
+@Table(name="users")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data

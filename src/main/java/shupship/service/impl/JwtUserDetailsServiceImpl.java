@@ -18,7 +18,7 @@ import shupship.domain.dto.UserLoginDTO;
 
 import shupship.domain.model.BasicLogin;
 import shupship.domain.model.Users;
-import shupship.repo.AppUserRepo;
+import shupship.repo.UserRepo;
 import shupship.repo.BasicLoginRepo;
 import shupship.service.JwtUserDetailsService;
 import shupship.service.MailSenderService;
@@ -38,7 +38,7 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
     private BasicLoginRepo basicLoginRepo;
 
     @Autowired
-    private AppUserRepo appUserRepo;
+    private UserRepo userRepo;
 
     @Autowired
     private PasswordEncoder bcryptEncoder;
@@ -72,7 +72,7 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         }
         log.info("Start query Table app_user at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
-        Users user = appUserRepo.findByUid(basicLogin.getUserUid());
+        Users user = userRepo.findByUid(basicLogin.getUserUid());
         log.info("End query Table app_user at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
         Assert.isTrue(user.getIsActive().equals(Const.COMMON_CONST_VALUE.ACTIVE), "USER_NOT_ACTIVE");
@@ -123,7 +123,7 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
                 .build();
         log.info("Start save Table app_user at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
-        appUser = appUserRepo.save(appUser);
+        appUser = userRepo.save(appUser);
         log.info("End save Table app_user at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
         BasicLogin basicLogin = BasicLogin.builder()
@@ -219,7 +219,7 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
     //Update profile user
     @Override
     public boolean updateUser(String userId, UserLoginDTO userLoginDTO) {
-        Users userCheck = appUserRepo.findByUid(userId);
+        Users userCheck = userRepo.findByUid(userId);
         Assert.notNull(userCheck,"USER_NOT_FOUND");
         Assert.notNull(userLoginDTO.getBirthday(),"DATE_NOT_VALID");
         Assert.notNull(userLoginDTO.getName(),"NAME_NOT_VALID");
@@ -235,7 +235,7 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         userCheck.setName(userLoginDTO.getName());
         log.info("Start save Table app_user at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
-        appUserRepo.save(userCheck);
+        userRepo.save(userCheck);
         log.info("End save Table app_user at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
         return true;
@@ -323,7 +323,7 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
     public UserInfoDTO getUserInfo(String userUid) {
         log.info("Start query Table app_user at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
-        Users user = appUserRepo.findByUid(userUid);
+        Users user = userRepo.findByUid(userUid);
         log.info("End query Table app_user at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
         Assert.notNull(user, "USER_NOT_FOUND");
