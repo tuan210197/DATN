@@ -65,7 +65,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/user/verify")
                 .antMatchers(HttpMethod.POST, "/user/verify-code/resend")
                 .antMatchers(HttpMethod.POST, "/user/password/change")
-                .antMatchers(HttpMethod.GET, "/sync");
+                .antMatchers(HttpMethod.GET, "/sync")
+                .antMatchers(HttpMethod.GET, "/api/lead/**");
 
     }
 
