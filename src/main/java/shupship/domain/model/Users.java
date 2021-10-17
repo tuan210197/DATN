@@ -41,7 +41,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Data
 @Builder
-public class Users {
+public class Users extends AuditEntity{
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(
