@@ -7,9 +7,7 @@ public enum LeadAsignStatus {
     NEW(1),
     CONTACTING(2),
     SUCCESS(3),
-    FAILED(4),
-    NOT_CONTACTED(5);
-
+    FAILED(4);
     private static final Map<Integer, LeadAsignStatus> MY_MAP = new HashMap<>();
 
     static {

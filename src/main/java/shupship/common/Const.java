@@ -1,9 +1,21 @@
 package shupship.common;
 
 
+import com.sun.istack.NotNull;
+import org.springframework.util.StringUtils;
+
+import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 public class Const {
+    private static final String LANGUAGE_DEFAULT = "vn";
+    private static final Const instance = new Const();
+    private static final String UTF8 = "UTF-8";
+    private static final Map<Integer, String> msg = new HashMap<>();
+
 
     public static final Integer RETRY_TIMES = 5;
     public static final String MOCK_TOKEN = "F27F4F2FA85F9C52A9F1ED5EF1EC8";
@@ -53,4 +65,57 @@ public class Const {
     }
 
 
+
+    public static Const getInstance() {
+        return instance;
+    }
+
+
+    public static ResourceBundle getBundle(String language) {
+        ResourceBundle bundle = ResourceBundle.getBundle("language_" + language );
+        return bundle;
+    }
+
+    public static String getProperty(int code, String language) {
+        String text = msg.get(code);
+        getBundle(language).keySet();
+        return getBundle(language).getString(text);
+
+    }
+
+    public static String getMessage(int code) {
+        return getMsg(code, LANGUAGE_DEFAULT);
+    }
+
+    public static String getMessage(int code, String language) {
+        if (StringUtils.isEmpty(language)) {
+            language = LANGUAGE_DEFAULT;
+        }
+
+        return getMsg(code, language);
+    }
+
+    @NotNull
+    private static String getMsg(int code, String language) {
+        if (msg.containsKey(code)) {
+            String message = getProperty(code, language);
+            try {
+                String msg;
+                if (code == 0) {
+                    msg = new String(message.getBytes(UTF8), UTF8);
+                } else {
+                    msg = "[ERR_" + code + "] " + new String(message.getBytes(UTF8), UTF8);
+                }
+                return msg;
+            } catch (UnsupportedEncodingException e) {
+                return "";
+            }
+        }
+
+        return "";
+    }
+
+    public static void main(String[] strs) {
+        System.out.println("" + getMessage(0, "vn"));
+    }
 }

@@ -14,5 +14,4 @@ public enum LeadSource {
     public String getValue() {
         return value;
     }
-
 }
