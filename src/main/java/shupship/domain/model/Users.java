@@ -11,6 +11,8 @@ import shupship.domain.dto.UserInfoDTO;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.Collection;
+import java.util.Date;
 
 @SqlResultSetMapping(
         name = Const.ResultSetMapping.USER_INFO_DTO,
@@ -39,29 +41,57 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Data
 @Builder
-public class Users {
+public class Users extends AuditEntity{
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(
             name = "UUID",
             strategy = "org.hibernate.id.UUIDGenerator"
     )
-    @Column(name="uid", columnDefinition = "CHAR(128) NOT NULL")
+    @Column(name = "uid", columnDefinition = "CHAR(128) NOT NULL")
     private String uid;
-    @Column(name="name")
+    @Column(name = "name")
     private String name;
-    @Column(name="full_name")
+    @Column(name = "full_name")
     private String fullName;
-    @Column(name="is_active")
+    @Column(name = "is_active")
     private Integer isActive;
-    @Column(name="is_deleted")
+    @Column(name = "is_deleted")
     private Integer isDeleted;
-    @Column(name="avatar")
+    @Column(name = "avatar")
     private String avatar;
-    @Column(name="gender")
+    @Column(name = "gender")
     private Integer gender;
-    @Column(name="birthday")
+    @Column(name = "birthday")
     private LocalDate birthday;
-    @Column(name="mobile")
+    @Column(name = "mobile")
     private String mobile;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "address_id", referencedColumnName = "id")
+    private Address address;
+
+    @Column(name = "post_code")
+    private String postCode;
+
+    @Column(name = "dept_code")
+    private String deptCode;
+
+    @Column(name = "employee_code")
+    private String employeeCode;
+
+    @Column(name = "emp_system_id")
+    private Long empSystemId;
+
+    @Column(name = "status_update")
+    private String status_update;
+
+    @OneToMany(mappedBy = "users")
+    Collection<LeadAssign> leadAssigns;
+
+    @OneToMany(mappedBy = "user")
+    private Collection<Schedule> schedules;
+
+    @OneToMany(mappedBy = "fileCreator")
+    private Collection<LeadAssignHis> leadsAssignHis;
 }

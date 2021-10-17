@@ -58,5 +58,5 @@ public class Schedule extends AuditEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by", referencedColumnName = "emp_system_id", insertable = false, updatable = false)
     @NotFound(action = NotFoundAction.IGNORE)
-    private Employee employee;
+    private Users user;
 }

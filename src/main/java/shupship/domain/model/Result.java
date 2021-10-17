@@ -27,25 +27,27 @@ public class Result extends AuditEntity {
     @Column(name = "reason")
     private Long reason;
 
-    @Column(name = "proposal")
+    @Column(name = "proposal")    // đề xuất
     private String proposal;
 
     @Column(name = "description")
     private String description;
 
-    @Column(name = "policy")
+    @Column(name = "policy")    // chính sách
     private String policy;
 
     @Column(name = "status")
     private Long status;
 
-    @Column(name = "district_percent")
-    private Double districtPercent;
+    private Long type;
 
-    @Column(name = "in_province_percent")
-    private Double inProvincePercent;
+    @Column(name = "in_province_price")  // giá nội tỉnh
+    private Double inProvincePrice;
 
-    @Column(name = "refund_percent")
+    @Column(name = "out_province_price")  // giá ngoại tỉnh
+    private Double outProvincePrice;
+
+    @Column(name = "refund_percent")  // phần trăm hoàn lại
     private Double refundPercent;
 
     @Column(name = "customer_code")
@@ -55,11 +57,10 @@ public class Result extends AuditEntity {
     @JoinColumn(name = "address_id", referencedColumnName = "id")
     private Address address;
 
-
     @OneToOne(mappedBy = "result")
     private Schedule schedule;
 
-    @Column(name = "discount")
+    @Column(name = "discount")      // chiếu khấu
     private Double discount;
 
 }

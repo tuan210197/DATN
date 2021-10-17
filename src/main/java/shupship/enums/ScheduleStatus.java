@@ -3,27 +3,23 @@ package shupship.enums;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum LeadStatus {
+public enum ScheduleStatus {
     NEW(1),
     CONTACTING(2),
     SUCCESS(3),
-    FAILED(4),
-    NOT_CONTACTED(5),
-    ALL(6),
-    RECALL(7);
+    FAILED(4);
 
-
-    private static final Map<Long, LeadStatus> MY_MAP = new HashMap<>();
+    private static final Map<Long, ScheduleStatus> MY_MAP = new HashMap<>();
 
     static {
-        for (LeadStatus myEnum : values()) {
+        for (ScheduleStatus myEnum : values()) {
             MY_MAP.put(myEnum.getType(), myEnum);
         }
     }
 
     private long type;
 
-    LeadStatus(long type) {
+    ScheduleStatus(long type) {
         this.type = type;
     }
 
@@ -31,7 +27,7 @@ public enum LeadStatus {
         return this.type;
     }
 
-    public static LeadStatus getByValue(long value) {
+    public static ScheduleStatus getByValue(long value) {
         return MY_MAP.get(value);
     }
 }

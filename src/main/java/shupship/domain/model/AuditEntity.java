@@ -1,10 +1,13 @@
 package shupship.domain.model;
 
+import org.jasypt.commons.CommonUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 import shupship.helper.InstantConverter;
 
 import javax.persistence.Column;
 import javax.persistence.Convert;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.PreUpdate;
 import java.io.Serializable;
 import java.time.Instant;
 
