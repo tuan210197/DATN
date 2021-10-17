@@ -5,13 +5,9 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.stereotype.Service;
-<<<<<<< HEAD
-import shupship.domain.dto.response.lead.PagingRs;
-=======
-import shupship.response.ListLeadResponse;
->>>>>>> origin/dev_tungtt
 import shupship.domain.model.Lead;
 import shupship.repo.ILeadRepository;
+import shupship.response.PagingRs;
 import shupship.service.ILeadService;
 
 import java.util.List;

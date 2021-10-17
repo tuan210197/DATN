@@ -1,6 +1,7 @@
-package shupship.domain.dto.response.lead;
+package shupship.response;
 
 import lombok.Data;
+
 import java.util.Collection;
 
 @Data
