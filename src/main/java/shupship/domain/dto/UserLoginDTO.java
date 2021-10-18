@@ -35,5 +35,6 @@ public class UserLoginDTO {
     private String newPassword;
     private String reNewPassword;
     private boolean forGotPassword;
-    private String deviceUdid;
+    private boolean status_update;
+    private String roleName;
 }

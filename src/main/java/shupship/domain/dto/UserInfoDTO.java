@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import shupship.domain.model.Address;
 
 import java.time.LocalDate;
 
@@ -30,4 +31,8 @@ public class UserInfoDTO {
     private Integer gender;
     private String mobile;
     private String name;
+    private String postCode;
+    private String deptCode;
+    private Address address;
+    private String roleName;
 }

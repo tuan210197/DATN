@@ -36,12 +36,12 @@ import java.util.Date;
 )
 
 @Entity
-@Table(name="users")
+@Table(name = "users")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Builder
-public class Users extends AuditEntity{
+public class Users extends AuditEntity {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(
@@ -84,7 +84,10 @@ public class Users extends AuditEntity{
     private Long empSystemId;
 
     @Column(name = "status_update")
-    private String status_update;
+    private Boolean status_update;
+
+    @Column(name = "role_name")
+    private String roleName;
 
     @OneToMany(mappedBy = "users")
     Collection<LeadAssign> leadAssigns;
