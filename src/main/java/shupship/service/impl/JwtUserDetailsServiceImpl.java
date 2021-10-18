@@ -121,6 +121,8 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
                 .isDeleted(Const.COMMON_CONST_VALUE.NOT_DELETED)
                 .mobile(user.getMobile())
                 .name(user.getName())
+                .status_update(false)
+               .roleName(user.getRoleName())
                 .build();
         log.info("Start save Table app_user at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
@@ -253,6 +255,7 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         userCheck.setGender(userLoginDTO.getGender());
         userCheck.setMobile(userLoginDTO.getMobile());
         userCheck.setName(userLoginDTO.getName());
+        userCheck.setStatus_update(true);
         log.info("Start save Table app_user at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
         userRepo.save(userCheck);

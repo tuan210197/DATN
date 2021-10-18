@@ -36,7 +36,7 @@ public interface JwtUserDetailsService extends UserDetailsService {
 
 	UserLoginDTO getBasicAuthByEmail(String email,  boolean forceClear);
 
-	UserInfoDTO getUserInfo(String email);
+	UserInfoDTO getUserInfo(String uid);
 
 
 	boolean logout(String token);
