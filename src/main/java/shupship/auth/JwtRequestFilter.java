@@ -5,6 +5,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -20,7 +21,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,53 +44,48 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        String deviceUdid = request.getHeader("client-id");
+
+
         String requestURL = request.getRequestURI();
         System.out.println(requestURL);
         try {
             // JWT Token is in the form "Bearer token". Remove Bearer word and get
             // only the Token
             String jwtToken = jwtTokenUtil.extractJwtFromRequest(request);
-            if(requestURL.startsWith("/user/refresh-token")) {
+            if (requestURL.startsWith("/user/refresh-token")) {
                 Claims claims = jwtTokenUtil.getAllClaimsFromToken(jwtToken);
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
                         null, null, null);
                 SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
                 request.setAttribute("claims", claims);
-            }
-//            else {
-//                if(requestURL.startsWith("/system-box") || requestURL.startsWith("/device/get-devices-entity") || requestURL.startsWith("/device/list-device")) {
-//                    if(jwtToken != null && jwtToken.equals(Const.MOCK_TOKEN)) {
-//                        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(
-//                                null, null, null));
-//                    }
-//                } else {
-//                    if (StringUtils.hasText(jwtToken)) {
-//                        String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
-//                        // Once we get the token validate it.
-//                        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-//                            UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(username);
-//                            // if token is valid configure Spring Security to manually set
-//                            // authentication
-//
-//                            if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
-//                                if(requestURL.contains("/user/sync")){
+
+            } else {
+                if (StringUtils.hasText(jwtToken)) {
+                    String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
+                    // Once we get the token validate it.
+                    if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                        UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(username);
+                        // if token is valid configure Spring Security to manually set
+                        // authentication
+
+//                        if (jwtTokenUtil.validateToken(jwtToken, userDetails)) {
+//                            if(requestURL.contains("/user/sync")){
 ////                                if(!requestURL.contains("/check-own-box")) {
-//                                    jwtUserDetailsService.getBasicAuthByEmail(username,  false);
-//                                }
-//                                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-//                                        userDetails, null, userDetails.getAuthorities());
-//                                usernamePasswordAuthenticationToken
-//                                        .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-//                                // After setting the Authentication in the context, we specify
-//                                // that the current user is authenticated. So it passes the
-//                                // Spring Security Configurations successfully.
-//                                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+//                                jwtUserDetailsService.getBasicAuthByEmail(username, false);
 //                            }
+                        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+                                userDetails, null, userDetails.getAuthorities());
+                        usernamePasswordAuthenticationToken
+                                .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        // After setting the Authentication in the context, we specify
+                        // that the current user is authenticated. So it passes the
+                        // Spring Security Configurations successfully.
+                        SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 //                        }
-//                    }
-//                }
-//            }
+                    }
+                }
+            }
+
         } catch (IllegalArgumentException e) {
             logger.error(e.getMessage());
             e.printStackTrace();

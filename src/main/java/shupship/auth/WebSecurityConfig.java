@@ -60,6 +60,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // ... whatever is here is ignored by All of Spring Security
                 .antMatchers(HttpMethod.POST, "/user/login")
                 .antMatchers(HttpMethod.GET, "/user/logout")
+//                .antMatchers(HttpMethod.GET, "/user/**")
                 .antMatchers(HttpMethod.POST, "/user/register")
                 .antMatchers(HttpMethod.POST, "/user/password/forgot")
                 .antMatchers(HttpMethod.POST, "/user/verify")
@@ -68,7 +69,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/sync")
                 .antMatchers(HttpMethod.GET, "/api/lead/**")
                 .antMatchers(HttpMethod.GET, "/province");
-
+        webSecurity.ignoring().antMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html#/**");
     }
 
     @Override
@@ -76,15 +77,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         httpSecurity.csrf().disable()
                 // dont authenticate this particular request
                 .authorizeRequests().
-//                antMatchers("/user/login"
-//                ,"/user/register"
-//                ,"/user/password/forgot"
-//                ,"/user/verify"
-//                ,"/user/verify-code/resend"
-//                ,"/user/password/change"
-//                ,"/box/create/{uid}"
-//                ,"/box/{uid}/state"
-//                ,"/box/{uid}").permitAll().
                 // all other requests need to be authenticated
                         anyRequest().authenticated().and().
                 // make sure we use stateless session; session won't be used to
