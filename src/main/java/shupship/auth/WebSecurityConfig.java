@@ -60,8 +60,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // ... whatever is here is ignored by All of Spring Security
                 .antMatchers(HttpMethod.POST, "/user/login")
                 .antMatchers(HttpMethod.GET, "/user/logout")
-//                .antMatchers(HttpMethod.GET, "/user/**")
                 .antMatchers(HttpMethod.POST, "/user/register")
+                .antMatchers(HttpMethod.POST, "/user/check-email")
+                .antMatchers(HttpMethod.POST, "/user/check-update")
                 .antMatchers(HttpMethod.POST, "/user/password/forgot")
                 .antMatchers(HttpMethod.POST, "/user/verify")
                 .antMatchers(HttpMethod.POST, "/user/verify-code/resend")
