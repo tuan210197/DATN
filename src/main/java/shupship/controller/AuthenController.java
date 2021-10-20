@@ -15,6 +15,7 @@ import shupship.domain.dto.JwtRequest;
 import shupship.domain.dto.JwtResponse;
 import shupship.domain.dto.UserInfoDTO;
 import shupship.domain.dto.UserLoginDTO;
+import shupship.domain.model.BasicLogin;
 import shupship.service.JwtUserDetailsService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -54,11 +55,9 @@ public class AuthenController extends BaseController {
 
         try {
 
-
             String requestId = request.getHeader("request-id");
             log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
                     + " [" + request.getRequestURI() + "] #START " + requestId);
-//
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getEmail(),
                     authenticationRequest.getPassword()));
             UserLoginDTO userLoginDTO = userDetailsService.getBasicAuthByEmail(authenticationRequest.getEmail(), true);
@@ -87,6 +86,49 @@ public class AuthenController extends BaseController {
         }
     }
 
+
+@PostMapping(value = "/check-email")
+public ResponseEntity<?> checkEmailVerify(HttpServletRequest request, @RequestBody UserLoginDTO userLoginDTO){
+    try {
+        String requestId = request.getHeader("request-id");
+        log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                + " [" + request.getRequestURI() + "] #START " + requestId);
+        if (userDetailsService.checkEmail(userLoginDTO)) {
+            log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                    + " [" + request.getRequestURI() + "] #END " + requestId);
+            return toSuccessResult(null, "EMAIL_VERIFY");
+        } else {
+            return toExceptionResult("EMAIL_NOT_VERIFY", Const.API_RESPONSE.RETURN_CODE_ERROR);
+        }
+    } catch (IllegalArgumentException e) {
+        e.printStackTrace();
+        return toExceptionResult(e.getMessage(), Const.API_RESPONSE.RETURN_CODE_ERROR);
+    } catch (Exception e) {
+        e.printStackTrace();
+        return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
+    }
+}
+    @PostMapping(value = "/check-update")
+    public ResponseEntity<?> checkUpdate(HttpServletRequest request, @RequestBody UserLoginDTO userLoginDTO){
+        try {
+            String requestId = request.getHeader("request-id");
+            log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                    + " [" + request.getRequestURI() + "] #START " + requestId);
+            if (userDetailsService.checkUpdate(userLoginDTO)) {
+                log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                        + " [" + request.getRequestURI() + "] #END " + requestId);
+                return toSuccessResult(null, "EMAIL_IS_UPDATED");
+            } else {
+                return toExceptionResult("EMAIL_IS_NOT_UPDATED", Const.API_RESPONSE.RETURN_CODE_SUCCESS);
+            }
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            return toExceptionResult(e.getMessage(), Const.API_RESPONSE.RETURN_CODE_ERROR);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
+        }
+    }
     /**
      * Register an user
      *
@@ -288,6 +330,7 @@ public class AuthenController extends BaseController {
 
     /**
      * get user information
+     *
      * @param request
      * @param userUid
      * @return information of user
@@ -310,8 +353,6 @@ public class AuthenController extends BaseController {
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
         }
     }
-
-
 
 
     @GetMapping("/logout")
