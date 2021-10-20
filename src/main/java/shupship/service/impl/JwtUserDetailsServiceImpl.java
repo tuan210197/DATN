@@ -54,7 +54,6 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
     private JwtTokenUtil jwtTokenUtil;
 
 
-
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         BasicLogin basicLogin = validateUserAuthen(email);
@@ -65,7 +64,7 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
     @Override
     public UserLoginDTO getBasicAuthByEmail(String email, boolean forceClear) {
         BasicLogin basicLogin = validateUserAuthen(email);
-        if(basicLogin.getIsVerified().equals(Const.COMMON_CONST_VALUE.NOT_VERIFIED)) {
+        if (basicLogin.getIsVerified().equals(Const.COMMON_CONST_VALUE.NOT_VERIFIED)) {
             log.info("User not verify. Resend OTP for verifying");
             UserLoginDTO userLoginDTO = UserLoginDTO.builder().email(email).build();
             resendOTP(userLoginDTO);
@@ -98,6 +97,37 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
     }
 
     @Override
+    public boolean checkEmail(UserLoginDTO user) {
+        Assert.hasText(user.getEmail(), "EMAIL_EMPTY");
+        Assert.isTrue(ValidateUtil.regexValidation(user.getEmail(), Const.VALIDATE_INPUT.regexEmail), "EMAIL_WRONG_FORMAT");
+        log.info("Start query Table basic_login at time: "
+                + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
+        BasicLogin checkBasicLogin = basicLoginRepo.findByEmail(user.getEmail());
+
+        log.info("End query Table basic_login at time: "
+                + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
+        int check = checkBasicLogin.getIsVerified();
+        if (check == 1) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean checkUpdate(UserLoginDTO userLoginDTO) {
+        Assert.hasText(userLoginDTO.getEmail(), "EMAIL_EMPTY");
+        Assert.isTrue(ValidateUtil.regexValidation(userLoginDTO.getEmail(), Const.VALIDATE_INPUT.regexEmail), "EMAIL_WRONG_FORMAT");
+        log.info("Start query Table basic_login at time: "
+                + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
+        BasicLogin checkBasicLogin = basicLoginRepo.findByEmail(userLoginDTO.getEmail());
+        Users user = userRepo.findByUid(checkBasicLogin.getUserUid());
+        log.info("End query Table basic_login at time: "
+                + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
+        return user.getStatus_update();
+    }
+
+    @Override
     public boolean registerUser(UserLoginDTO user) {
         Assert.hasText(user.getEmail(), "EMAIL_EMPTY");
 //        Assert.hasText(user.getPassword(), "PASSWORD_EMPTY");
@@ -122,7 +152,7 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
                 .mobile(user.getMobile())
                 .name(user.getName())
                 .status_update(false)
-               .roleName(user.getRoleName())
+                .roleName(user.getRoleName())
                 .build();
         log.info("Start save Table app_user at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
@@ -149,14 +179,14 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         BasicLogin basicLogin = basicLoginRepo.findByEmail(userLoginDTO.getEmail());
         log.info("End query Table basic_login at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
-        Assert.notNull(basicLogin,"EMAIL_NOT_EXIST");
+        Assert.notNull(basicLogin, "EMAIL_NOT_EXIST");
         sendOTP(basicLogin, "OTP Token to Forget Password");
 
     }
 
     public void sendOTP(BasicLogin basicLogin, String subject) {
         Assert.notNull(basicLogin, "USER_NOT_FOUND");
-        String otpToken= generateOTPToken();
+        String otpToken = generateOTPToken();
 //        String password = generatePassword(10);
         basicLogin.setIsVerified(Const.COMMON_CONST_VALUE.NOT_VERIFIED);
         basicLogin.setTokenCode(otpToken);
@@ -168,8 +198,9 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         basicLoginRepo.save(basicLogin);
         log.info("End save Table basic_login at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
-        mailSenderService.sendSimpleMessage(basicLogin.getEmail(), subject, "Your OTP Token is: " + otpToken );
+        mailSenderService.sendSimpleMessage(basicLogin.getEmail(), subject, "Your OTP Token is: " + otpToken);
     }
+
     public void sendPassword(BasicLogin basicLogin, String subject) {
         Assert.notNull(basicLogin, "USER_NOT_FOUND");
 //        String otpToken= generateOTPToken();
@@ -184,8 +215,9 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         basicLoginRepo.save(basicLogin);
         log.info("End save Table basic_login at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
-        mailSenderService.sendSimpleMessage(basicLogin.getEmail(), subject,  "Your Password is: "+password );
+        mailSenderService.sendSimpleMessage(basicLogin.getEmail(), subject, "Your Password is: " + password);
     }
+
     // update password when change password or forgot password
     @Override
     public boolean updatePassword(UserLoginDTO userLoginDTO) {
@@ -195,13 +227,13 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         log.info("End query Table basic_login at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
         Assert.notNull(basicLogin, "EMAIL_NOT_FOUND");
-        Assert.hasText(userLoginDTO.getNewPassword(),"NEW_PASSWORD_NOT_FOUND");
-        Assert.hasText(userLoginDTO.getReNewPassword(),"CONFIRM_PASSWORD_NOT_FOUND");
+        Assert.hasText(userLoginDTO.getNewPassword(), "NEW_PASSWORD_NOT_FOUND");
+        Assert.hasText(userLoginDTO.getReNewPassword(), "CONFIRM_PASSWORD_NOT_FOUND");
         Assert.isTrue(ValidateUtil.regexValidation(userLoginDTO.getNewPassword(), Const.VALIDATE_INPUT.regexPass), "NEW_PASS_WRONG_FORMAT");
         Assert.isTrue(ValidateUtil.regexValidation(userLoginDTO.getReNewPassword(), Const.VALIDATE_INPUT.regexPass), "CONFIRM_PASS_WRONG_FORMAT");
 
         if (userLoginDTO.isForGotPassword()) {
-            Assert.hasText(userLoginDTO.getTokenCode(),"OTP_NOT_FOUND");
+            Assert.hasText(userLoginDTO.getTokenCode(), "OTP_NOT_FOUND");
             Assert.isTrue(basicLogin.getExpireDate().isAfter(LocalDateTime.now()), "TOKEN_EXPIRED");
             Assert.isTrue(basicLogin.getRetryCount() < Const.RETRY_TIMES, "TRIED_TOO_MANY_TIMES");
             if (userLoginDTO.getTokenCode().equals(basicLogin.getTokenCode())) {
@@ -217,7 +249,7 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
                 return false;
             }
         } else {
-            Assert.hasText(userLoginDTO.getPassword(),"PASSWORD_NOT_FOUND");
+            Assert.hasText(userLoginDTO.getPassword(), "PASSWORD_NOT_FOUND");
             Assert.isTrue(bcryptEncoder.matches(userLoginDTO.getPassword(), basicLogin.getPassword()), "PASSWORD_NOT_MATCH");
             Assert.isTrue(userLoginDTO.getNewPassword().equals(userLoginDTO.getReNewPassword()), "NEW_RETYPE_PASSWORD_NOT_MATCH");
             basicLogin.setPassword(bcryptEncoder.encode(userLoginDTO.getNewPassword()));
@@ -242,13 +274,13 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
     @Override
     public boolean updateUser(String userId, UserLoginDTO userLoginDTO) {
         Users userCheck = userRepo.findByUid(userId);
-        Assert.notNull(userCheck,"USER_NOT_FOUND");
-        Assert.notNull(userLoginDTO.getBirthday(),"DATE_NOT_VALID");
-        Assert.notNull(userLoginDTO.getName(),"NAME_NOT_VALID");
-        Assert.notNull(userLoginDTO.getFullName(),"FULL_NAME_NOT_VALID");
+        Assert.notNull(userCheck, "USER_NOT_FOUND");
+        Assert.notNull(userLoginDTO.getBirthday(), "DATE_NOT_VALID");
+        Assert.notNull(userLoginDTO.getName(), "NAME_NOT_VALID");
+        Assert.notNull(userLoginDTO.getFullName(), "FULL_NAME_NOT_VALID");
         Assert.isTrue(ValidateUtil.regexValidation(userLoginDTO.getMobile(), Const.VALIDATE_INPUT.regexPhone), "PHONE_WRONG_FORMAT");
-        Assert.isTrue(Const.VALIDATE_INPUT.phoneNum.contains(userLoginDTO.getMobile().substring(0, 3)),"PHONE_NOT_VALID");
-        Assert.isTrue(userCheck.getIsActive().equals(1),"USER_NOT_ACTIVE");
+        Assert.isTrue(Const.VALIDATE_INPUT.phoneNum.contains(userLoginDTO.getMobile().substring(0, 3)), "PHONE_NOT_VALID");
+        Assert.isTrue(userCheck.getIsActive().equals(1), "USER_NOT_ACTIVE");
         userCheck.setAvatar(userLoginDTO.getAvatar());
         userCheck.setBirthday(userLoginDTO.getBirthday());
         userCheck.setFullName(userLoginDTO.getFullName());
@@ -272,8 +304,8 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         otpToken = randomNumber + "";
         return otpToken;
     }
-    public static String generatePassword(int len)
-    {
+
+    public static String generatePassword(int len) {
         // ASCII range – alphanumeric (0-9, a-z, A-Z)
         final String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
@@ -283,8 +315,7 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         // each iteration of the loop randomly chooses a character from the given
         // ASCII range and appends it to the `StringBuilder` instance
 
-        for (int i = 0; i < len; i++)
-        {
+        for (int i = 0; i < len; i++) {
             int randomIndex = random.nextInt(chars.length());
             sb.append(chars.charAt(randomIndex));
         }
@@ -292,8 +323,7 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         return sb.toString();
     }
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         int len = 10;
         System.out.println(generatePassword(len));
     }
@@ -307,7 +337,7 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         Assert.isTrue(basicLogin.getIsVerified().equals(0), "USER_VERIFIED");
         Assert.isTrue(LocalDateTime.now().isBefore(basicLogin.getExpireDate()), "TOKEN_EXPIRED");
         Assert.isTrue(basicLogin.getRetryCount() < Const.RETRY_TIMES, "TRIED_TOO_MANY_TIMES");
-        if(userLoginDTO.getTokenCode().equals(basicLogin.getTokenCode())) {
+        if (userLoginDTO.getTokenCode().equals(basicLogin.getTokenCode())) {
             basicLogin.setIsVerified(Const.COMMON_CONST_VALUE.VERIFIED);
             basicLogin.setRetryCount(0);
             log.info("Start save Table basic_login at time: "
@@ -356,7 +386,7 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         BasicLogin basicLogin = basicLoginRepo.findByEmail(email);
         log.info("End query Table basic_login at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
-        if(Objects.nonNull(basicLogin)) {
+        if (Objects.nonNull(basicLogin)) {
             int retryCount = loginFailed ? basicLogin.getRetryCount() + 1 : 0;
             basicLogin.setRetryCount(retryCount);
             log.info("Start save Table basic_login at time: "
@@ -387,13 +417,6 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
     }
 
 
-
-
-
-
-
-
-
     @Override
     public boolean logout(String token) {
 //        log.info("Start query Table basic_login at time: "
@@ -412,4 +435,6 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
 //                + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
         return true;
     }
+
+
 }
