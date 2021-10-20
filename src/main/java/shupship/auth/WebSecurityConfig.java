@@ -2,6 +2,7 @@ package shupship.auth;
 
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -16,6 +17,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import shupship.service.JwtUserDetailsService;
 
 /**
@@ -26,7 +29,7 @@ import shupship.service.JwtUserDetailsService;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @AllArgsConstructor
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
 
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
@@ -54,6 +57,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**").allowedMethods("*");
+    }
+
+    @Override
     public void configure(WebSecurity webSecurity) throws Exception {
         webSecurity
                 .ignoring()
@@ -67,23 +75,30 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/user/verify-code/resend")
                 .antMatchers(HttpMethod.POST, "/user/password/change")
                 .antMatchers(HttpMethod.GET, "/sync")
-                .antMatchers(HttpMethod.GET, "/api/lead/**");
+                .antMatchers(HttpMethod.GET, "/api/lead/**")
+                .antMatchers(HttpMethod.GET, "/province");
 
     }
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.csrf().disable()
-                // dont authenticate this particular request
-                .authorizeRequests().
-                // all other requests need to be authenticated
-                        anyRequest().authenticated().and().
-                // make sure we use stateless session; session won't be used to
-                // store user's state.
-                        exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        httpSecurity.authorizeRequests()
+                .antMatchers("/swagger-ui/index.html", "/v2/api-docs/**", "/swagger-ui.html", "/csrf", "/swagger-resources", "/api-docs/*", "/uploads/**", "/resources/**", "/js/**", "/css/**", "/images/**", "/fonts/**", "/scss/**", "/index", "/", "/login")
+                .permitAll().and().authorizeRequests()
+                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll().anyRequest().authenticated().and().formLogin().loginPage("/login").permitAll()
+                .defaultSuccessUrl("/home", true).and().logout().logoutSuccessUrl("/").logoutUrl("/signout");
 
-        // Add a filter to validate the tokens with every request
+//        httpSecurity.csrf().disable()
+//                // dont authenticate this particular request
+//                .authorizeRequests().
+//                // all other requests need to be authenticated
+//                        anyRequest().authenticated().and().
+//                // make sure we use stateless session; session won't be used to
+//                // store user's state.
+//                        exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
+//                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+//
+//        // Add a filter to validate the tokens with every request
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
