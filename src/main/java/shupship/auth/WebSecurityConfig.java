@@ -69,9 +69,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/user/password/change")
                 .antMatchers(HttpMethod.GET, "/sync")
                 .antMatchers(HttpMethod.GET, "/api/lead/filter")
-                .antMatchers(HttpMethod.POST, "/api/lead/evtp");
-
-                .antMatchers(HttpMethod.GET, "/api/lead/**")
+                .antMatchers(HttpMethod.POST, "/api/lead/evtp")
                 .and();
 
     }
