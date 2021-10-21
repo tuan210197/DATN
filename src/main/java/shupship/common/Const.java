@@ -32,6 +32,7 @@ public class Const {
         public static final String DESCRIPTION_DEFAULT = "error";
         public static final String INTERNAL_SERVER_ERROR = "internal server error";
 
+
         private API_RESPONSE() {
             throw new IllegalStateException();
         }

@@ -9,6 +9,7 @@ public class Constants {
 
     public final static String QUERY_POSTOFFICE = "SELECT BUUCUC, TINH, QUANHUYEN, PHUONGXA, NAME, LATITUDE, LONGITUDE, PHONE FROM VTP.DM_BUUCUCQUANLYVIEW";
 
+    public final static int ERR_002 = 900;
     //Page
     public final static int PAGE_SIZE = 10;
 
