@@ -128,21 +128,24 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
     }
 
     @Override
-    public boolean deleteUser(String uid) {
-        Users userCheck = userRepo.findByUid(uid);
-        Assert.notNull(userCheck, "USER_NOT_FOUND");
+    public boolean banUser(UserLoginDTO userLoginDTO) {
+        String email = userLoginDTO.getEmail();
+        String uid = userLoginDTO.getUserUid();
 
-        log.info("Start query Table basic_login at time: "
-                + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
-         basicLoginRepo.deleteById(uid);
-        log.info("End query Table basic_login at time: "
-                + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
-        log.info("Start save Table user at time: "
-                + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
-        userRepo.deleteById(uid);
-        log.info("End save Table user at time: "
-                + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
-        return true;
+        if (uid != null) {
+            Users users = userRepo.findByUid(uid);
+            users.setIsActive(0);
+            userRepo.save(users);
+            return true;
+        } else if (email != null) {
+            BasicLogin basicLogin = basicLoginRepo.findByEmail(email);
+            basicLogin.setIsVerified(0);
+            basicLoginRepo.save(basicLogin);
+            return true;
+        } else {
+            return false;
+        }
+
     }
 
     @Override

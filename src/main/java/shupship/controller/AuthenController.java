@@ -98,7 +98,7 @@ public ResponseEntity<?> checkEmailVerify(HttpServletRequest request, @RequestBo
                     + " [" + request.getRequestURI() + "] #END " + requestId);
             return toSuccessResult(null, "EMAIL_VERIFY");
         } else {
-            return toExceptionResult("EMAIL_NOT_VERIFY", Const.API_RESPONSE.RETURN_CODE_ERROR);
+            return toExceptionResult("EMAIL_NOT_VERIFY", Const.API_RESPONSE.RETURN_CODE_SUCCESS);
         }
     } catch (IllegalArgumentException e) {
         e.printStackTrace();
@@ -210,7 +210,27 @@ public ResponseEntity<?> checkEmailVerify(HttpServletRequest request, @RequestBo
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
         }
     }
-
+    @PostMapping("/ban-user")
+    public ResponseEntity<?>banUser(HttpServletRequest request, @RequestBody UserLoginDTO userLoginDTO){
+        try {
+            String requestId = request.getHeader("request-id");
+            log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                    + " [" + request.getRequestURI() + "] #START " + requestId);
+            if (userDetailsService.banUser(userLoginDTO)) {
+                log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                        + " [" + request.getRequestURI() + "] #END " + requestId);
+                return toSuccessResult(null, "BAN_SUCCESS");
+            } else {
+                return toExceptionResult("BAN_FAILED", Const.API_RESPONSE.RETURN_CODE_ERROR);
+            }
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            return toExceptionResult(e.getMessage(), Const.API_RESPONSE.RETURN_CODE_ERROR);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
+        }
+    }
     /**
      * Update profile in app_user table
      *
@@ -239,27 +259,7 @@ public ResponseEntity<?> checkEmailVerify(HttpServletRequest request, @RequestBo
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
         }
     }
-    @PostMapping(value = "/delete/{uid}")
-    public ResponseEntity<?> deleteUser(HttpServletRequest request,@PathVariable("uid") String uid){
-        try {
-            String requestId = request.getHeader("request-id");
-            log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-                    + " [" + request.getRequestURI() + "] #START " + requestId);
-            if (userDetailsService.deleteUser(uid)) {
-                log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-                        + " [" + request.getRequestURI() + "] #END " + requestId);
-                return toSuccessResult(null, "DELETE_USER_SUCCESS");
-            } else {
-                return toExceptionResult("DELETE_USER_FAIL", Const.API_RESPONSE.RETURN_CODE_ERROR);
-            }
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-            return toExceptionResult(e.getMessage(), Const.API_RESPONSE.RETURN_CODE_ERROR);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
-        }
-    }
+
     /**
      * Get refresh token after token has expired
      *
@@ -374,6 +374,7 @@ public ResponseEntity<?> checkEmailVerify(HttpServletRequest request, @RequestBo
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
         }
     }
+
 
 
     @GetMapping("/logout")
