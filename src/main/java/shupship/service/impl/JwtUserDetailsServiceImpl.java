@@ -129,19 +129,17 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
 
     @Override
     public boolean banUser(UserLoginDTO userLoginDTO) {
+
         String email = userLoginDTO.getEmail();
-        String uid = userLoginDTO.getUserUid();
+        BasicLogin basicLogin = basicLoginRepo.findByEmail(email);
+        String uid = basicLogin.getUserUid();
 
         if (uid != null) {
             Users users = userRepo.findByUid(uid);
             users.setIsActive(0);
             userRepo.save(users);
             return true;
-        } else if (email != null) {
-            BasicLogin basicLogin = basicLoginRepo.findByEmail(email);
-            basicLogin.setIsVerified(0);
-            basicLoginRepo.save(basicLogin);
-            return true;
+
         } else {
             return false;
         }
