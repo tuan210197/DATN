@@ -61,6 +61,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/user/login")
                 .antMatchers(HttpMethod.GET, "/user/logout")
                 .antMatchers(HttpMethod.POST, "/user/register")
+                .antMatchers(HttpMethod.POST, "/user/check-email")
+                .antMatchers(HttpMethod.POST, "/user/check-update")
                 .antMatchers(HttpMethod.POST, "/user/password/forgot")
                 .antMatchers(HttpMethod.POST, "/user/verify")
                 .antMatchers(HttpMethod.POST, "/user/verify-code/resend")
@@ -69,25 +71,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/api/lead/filter")
                 .antMatchers(HttpMethod.POST, "/api/lead/evtp");
 
+                .antMatchers(HttpMethod.GET, "/api/lead/**")
+                .and();
 
     }
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.csrf().disable()
+        httpSecurity.csrf().disable().cors().and()
                 // dont authenticate this particular request
-                .authorizeRequests().
-//                antMatchers("/user/login"
-//                ,"/user/register"
-//                ,"/user/password/forgot"
-//                ,"/user/verify"
-//                ,"/user/verify-code/resend"
-//                ,"/user/password/change"
-//                ,"/box/create/{uid}"
-//                ,"/box/{uid}/state"
-//                ,"/box/{uid}").permitAll().
+                .authorizeRequests()
+//                .antMatchers("/user/**").allowAll ()
+
                 // all other requests need to be authenticated
-                        anyRequest().authenticated().and().
+                .anyRequest().authenticated().and().
                 // make sure we use stateless session; session won't be used to
                 // store user's state.
                         exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()

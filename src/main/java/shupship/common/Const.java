@@ -20,6 +20,12 @@ public class Const {
     public static final Integer RETRY_TIMES = 5;
     public static final String MOCK_TOKEN = "F27F4F2FA85F9C52A9F1ED5EF1EC8";
 
+    public static class ROLE_NAME{
+        public static final String TCT ="TỔNG CÔNG TY";
+        public static final String CN ="CHI NHÁNH";
+        public static final String TBC ="TRƯỞNG BƯU CỤC";
+        public static final String NV ="NHÂN VIÊN";
+    }
 
     public static class API_RESPONSE {
         public static final int RETURN_CODE_SUCCESS = 200;
