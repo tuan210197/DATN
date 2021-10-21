@@ -157,6 +157,7 @@ public ResponseEntity<?> checkEmailVerify(HttpServletRequest request, @RequestBo
         }
     }
 
+
     /**
      * User has forgotten their password. Request for changing password with email
      *
@@ -238,7 +239,27 @@ public ResponseEntity<?> checkEmailVerify(HttpServletRequest request, @RequestBo
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
         }
     }
-
+    @PostMapping(value = "/delete/{uid}")
+    public ResponseEntity<?> deleteUser(HttpServletRequest request,@PathVariable("uid") String uid){
+        try {
+            String requestId = request.getHeader("request-id");
+            log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                    + " [" + request.getRequestURI() + "] #START " + requestId);
+            if (userDetailsService.deleteUser(uid)) {
+                log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                        + " [" + request.getRequestURI() + "] #END " + requestId);
+                return toSuccessResult(null, "DELETE_USER_SUCCESS");
+            } else {
+                return toExceptionResult("DELETE_USER_FAIL", Const.API_RESPONSE.RETURN_CODE_ERROR);
+            }
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            return toExceptionResult(e.getMessage(), Const.API_RESPONSE.RETURN_CODE_ERROR);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
+        }
+    }
     /**
      * Get refresh token after token has expired
      *

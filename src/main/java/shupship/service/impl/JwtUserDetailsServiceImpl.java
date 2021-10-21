@@ -70,10 +70,10 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
             resendOTP(userLoginDTO);
             return null;
         }
-        log.info("Start query Table app_user at time: "
+        log.info("Start query Table user at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
         Users user = userRepo.findByUid(basicLogin.getUserUid());
-        log.info("End query Table app_user at time: "
+        log.info("End query Table user at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
         Assert.isTrue(user.getIsActive().equals(Const.COMMON_CONST_VALUE.ACTIVE), "USER_NOT_ACTIVE");
         UserLoginDTO userLoginDTO = new UserLoginDTO();
@@ -128,6 +128,24 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
     }
 
     @Override
+    public boolean deleteUser(String uid) {
+        Users userCheck = userRepo.findByUid(uid);
+        Assert.notNull(userCheck, "USER_NOT_FOUND");
+
+        log.info("Start query Table basic_login at time: "
+                + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
+         basicLoginRepo.deleteById(uid);
+        log.info("End query Table basic_login at time: "
+                + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
+        log.info("Start save Table user at time: "
+                + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
+        userRepo.deleteById(uid);
+        log.info("End save Table user at time: "
+                + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
+        return true;
+    }
+
+    @Override
     public boolean registerUser(UserLoginDTO user) {
         Assert.hasText(user.getEmail(), "EMAIL_EMPTY");
 //        Assert.hasText(user.getPassword(), "PASSWORD_EMPTY");
@@ -154,10 +172,10 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
                 .status_update(false)
                 .roleName(user.getRoleName())
                 .build();
-        log.info("Start save Table app_user at time: "
+        log.info("Start save Table user at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
         users = userRepo.save(users);
-        log.info("End save Table app_user at time: "
+        log.info("End save Table user at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
         BasicLogin basicLogin = BasicLogin.builder()
                 .email(user.getEmail())
@@ -288,10 +306,10 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         userCheck.setMobile(userLoginDTO.getMobile());
         userCheck.setName(userLoginDTO.getName());
         userCheck.setStatus_update(true);
-        log.info("Start save Table app_user at time: "
+        log.info("Start save Table user at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
         userRepo.save(userCheck);
-        log.info("End save Table app_user at time: "
+        log.info("End save Table user at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
         return true;
     }
