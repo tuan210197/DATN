@@ -39,11 +39,11 @@ public interface JwtUserDetailsService extends UserDetailsService {
 
 	UserInfoDTO getUserInfo(String uid);
 
-
-
 	boolean logout(String token);
 
 	boolean checkEmail(UserLoginDTO userLoginDTO);
 
 	boolean checkUpdate(UserLoginDTO userLoginDTO);
+
+	boolean banUser(UserLoginDTO userLoginDTO);
 }
