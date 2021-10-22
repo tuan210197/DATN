@@ -69,17 +69,26 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/user/verify-code/resend")
                 .antMatchers(HttpMethod.POST, "/user/password/change")
                 .antMatchers(HttpMethod.GET, "/sync")
-//                .antMatchers(HttpMethod.GET, "/api/lead/**")
-                .antMatchers(HttpMethod.GET, "/province");
+                .antMatchers(HttpMethod.GET, "/api/**")
+                .antMatchers(HttpMethod.GET, "/province")
+                .antMatchers(HttpMethod.GET, "/district")
+                .antMatchers(HttpMethod.GET, "/ward");
     }
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.authorizeRequests()
-                .antMatchers("/swagger-ui/index.html", "/v2/api-docs/**", "/swagger-ui.html", "/csrf", "/swagger-resources", "/api-docs/*", "/uploads/**", "/resources/**", "/js/**", "/css/**", "/images/**", "/fonts/**", "/scss/**", "/index", "/", "/login")
-                .permitAll().and().authorizeRequests()
-                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll().anyRequest().authenticated().and().formLogin().loginPage("/login").permitAll()
-                .defaultSuccessUrl("/home", true).and().logout().logoutSuccessUrl("/").logoutUrl("/signout");
+
+        httpSecurity.csrf().disable().cors().and()
+                // dont authenticate this particular request
+                .authorizeRequests()
+//                .antMatchers("/user/**").allowAll ()
+
+                // all other requests need to be authenticated
+                .anyRequest().authenticated().and().
+                // make sure we use stateless session; session won't be used to
+                // store user's state.
+                        exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
 //        httpSecurity.csrf().disable()
 //                // dont authenticate this particular request

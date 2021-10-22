@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.io.Serializable;
 
 /**
- * @author tuanda
+ * @author tuandv
  * This class will extend Spring's AuthenticationEntryPoint class and override its method commence.
  * It rejects every unauthenticated request and send error code 401
  */

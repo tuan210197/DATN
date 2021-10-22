@@ -11,11 +11,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableEncryptableProperties
 public class SecurityConfiguration {
-    @Bean
-    @ConditionalOnMissingBean
-    public CORSFilter corsFilter() {
-        return new CORSFilter();
-    }
+//    @Bean
+//    @ConditionalOnMissingBean
+//    public CORSFilter corsFilter() {
+//        return new CORSFilter();
+//    }
 
     @Bean(name = "jasyptStringEncryptor")
     public StringEncryptor stringEncryptor() {
