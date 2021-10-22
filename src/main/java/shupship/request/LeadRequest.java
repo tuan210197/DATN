@@ -16,7 +16,7 @@ public class LeadRequest extends BaseRequest{
 
     private static final long serialVersionUID = 1L;
 
-    private Long id;
+    //private Long id;
 
     private String salutation;
 

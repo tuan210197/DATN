@@ -10,11 +10,12 @@ import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import shupship.common.Const;
 import shupship.common.Constants;
+import shupship.domain.message.MessageResponse;
 import shupship.domain.model.Lead;
 import shupship.enums.LeadSource;
 import shupship.request.LeadRequest;
+import shupship.request.LeadUpdateRequest;
 import shupship.response.LeadResponse;
 import shupship.response.PagingRs;
 import shupship.service.ILeadService;
@@ -44,26 +45,28 @@ public class LeadController extends BaseController {
         return new ResponseEntity<>(pagingRs, HttpStatus.OK);
     }
 
-    @PostMapping(value = "/evtp")
+    @PostMapping(value = "/createEvtp")
     public ResponseEntity createLeadOnEVTP(HttpServletRequest request, @Valid @RequestBody LeadRequest inputData) throws Exception {
-        ///Users user = getCurrentUser(request, inputData);
-        //validateLeadSource
-//        if (!validateIndustry(inputData.getLeadSource())) {
-//            throw new ApplicationException(Constants.ERR_002);
-//        }
-
         Lead data = leadService.insertLead(inputData);
         BeanUtils.copyProperties(inputData, data);
         LeadResponse response = LeadResponse.leadModelToDto(data);
-//        HashMap phoneEvtp = getPhoneEVTP(inputData.getPhone());
-//
-//        if (phoneEvtp != null && phoneEvtp.size() != 0) {
-//            LeadHadPhoneResponseDto responseDto = new LeadHadPhoneResponseDto();
-//            responseDto.setErrorCode(HAD_PHONE_EVTP);
-//            responseDto.setMessage("Khách hàng đã sử dụng dịch vụ của Viettel Post.");
-//            responseDto.setCustomerCode((String) phoneEvtp.get("MA_KH"));
-//            return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
-//        }
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+    @PutMapping(value = "evtp/{leadId}")
+    public ResponseEntity<LeadResponse> updateLeadOnEVTP(@RequestBody LeadUpdateRequest inputData, @PathVariable(value = "leadId") Long leadId) throws ApplicationException {
+        //validateLeadSource
+//        if (!validateIndustry(inputData.getLeadSource())) {
+//            throw new BusinessException(new ErrorMessage("ERR_002", "Industry code is not defined"));
+//        }
+
+        Lead data = leadService.updateLead(leadId, inputData);
+        LeadResponse response = LeadResponse.leadModelToDto(data);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+    @DeleteMapping(value = "/evtp/{leadId}")
+    public ResponseEntity deleteLeadOnEVTP(@PathVariable(value = "leadId") Long leadId) throws Exception {
+        Lead data = leadService.deleteLeadOnEVTP(leadId);
+        return new ResponseEntity(new MessageResponse((true)), HttpStatus.OK);
     }
 }

@@ -5,6 +5,7 @@ import lombok.Data;
 import org.springframework.messaging.support.ErrorMessage;
 import org.springframework.util.StringUtils;
 import shupship.common.Const;
+import shupship.util.CommonUtils;
 
 /**
  * @author MSI
@@ -12,7 +13,6 @@ import shupship.common.Const;
 @Data
 public class ApplicationException extends Exception {
 
-    //public static final int ERROR = 2;
     private int code;
     private String errorCode;
     private String message;
@@ -24,10 +24,10 @@ public class ApplicationException extends Exception {
         this.code = code;
     }
 
-//    public ApplicationException(String errorCode,String message) {
-//        this.errorCode = errorCode;
-//        this.message = message;
-//    }
+    public ApplicationException(String errorCode) {
+        super(errorCode);
+        this.errorCode = errorCode;
+    }
 
     public ApplicationException(int code, String message) {
         this.code = code;

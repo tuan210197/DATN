@@ -16,4 +16,8 @@ public interface ILeadRepository extends PagingAndSortingRepository<Lead, Long>,
     @Query(value = "select l from Lead l ")
     Page<Lead> getListLead(Pageable pageable);
 
+    @Query("Select a from Lead a where a.id = :id")
+    Lead findLeadById(Long id);
+    @Query("select l from Lead l where l.deletedStatus = 0 and l.phone = :phone")
+    List<Lead> findLeadWithPhoneOnEVTP(String phone);
 }
