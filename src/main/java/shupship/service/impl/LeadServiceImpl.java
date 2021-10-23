@@ -9,14 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shupship.common.Const;
 import shupship.common.Constants;
 import shupship.domain.model.Lead;
 import shupship.domain.model.Schedule;
-import shupship.domain.model.Users;
 import shupship.enums.CommonEnums;
 import shupship.enums.LeadSource;
 import shupship.enums.LeadStatus;
@@ -158,6 +156,14 @@ public class LeadServiceImpl implements ILeadService {
         existData.setDeletedStatus(Constants.DELETE_LEAD);
         Lead lead = iLeadRepository.save(existData);
         return lead;
+    }
+
+    @Override
+    public LeadResponse detailLead(Long id) throws ApplicationException {
+        LeadResponse leadResponse = new LeadResponse();
+        Lead existData = iLeadRepository.findLeadById(id);
+        BeanUtils.copyProperties(existData, leadResponse);
+        return leadResponse;
     }
 
 }

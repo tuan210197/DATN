@@ -71,6 +71,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/api/lead/filter")
                 .antMatchers(HttpMethod.POST, "/api/lead/evtp")
                 .antMatchers(HttpMethod.PUT, "/api/lead/evtp/{leadId}")
+                .antMatchers(HttpMethod.PUT, "/api/lead/evtp/{leadId}")
+                .antMatchers(HttpMethod.DELETE, "/api/lead/evtp/{leadId}")
+                .antMatchers(HttpMethod.GET, "/api/lead/evtp/{leadId}")
                 .and();
 
     }

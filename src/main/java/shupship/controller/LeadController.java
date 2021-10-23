@@ -69,4 +69,10 @@ public class LeadController extends BaseController {
         Lead data = leadService.deleteLeadOnEVTP(leadId);
         return new ResponseEntity(new MessageResponse((true)), HttpStatus.OK);
     }
+
+    @GetMapping(value = "/evtp/{leadId}")
+    public ResponseEntity detailLead(@PathVariable(value = "leadId") Long leadId) throws Exception {
+        LeadResponse data = leadService.detailLead(leadId);
+        return new ResponseEntity<>(data, HttpStatus.OK);
+    }
 }
