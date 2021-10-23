@@ -7,8 +7,8 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-import shupship.domain.dto.AddressMapDto;
 import shupship.domain.model.Users;
+import shupship.util.exception.ApplicationException;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -17,10 +17,10 @@ import java.util.Locale;
 import java.util.regex.Pattern;
 
 public class CommonUtils {
-    public static Users getCurrentUser() {
+    public static Users getCurrentUser() throws ApplicationException {
         Users user = (Users) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (user == null) {
-          ///  throw new ApplicationException(Applica);
+            throw new ApplicationException("User is null");
         }
         return user;
     }
@@ -48,9 +48,6 @@ public class CommonUtils {
 
         if (end > strText.length())
             end = strText.length();
-
-//        if (start > end)
-//            throw new Exception("End index cannot be greater than start index");
 
         int maskLength = end - start;
 
@@ -109,19 +106,7 @@ public class CommonUtils {
         } else return false;
     }
 
-    public static AddressMapDto[] validAddress(String address) {
 
-        final String uri = "https://location.okd.viettelpost.vn/location/v1.0/addresses?shortForm=true&system=VTP";
-        RestTemplate restTemplate = new RestTemplate();
-
-        MappingJackson2HttpMessageConverter jsonHttpMessageConverter = new MappingJackson2HttpMessageConverter();
-        jsonHttpMessageConverter.getObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        restTemplate.getMessageConverters().add(jsonHttpMessageConverter);
-
-        ArrayList<String> arrays = new ArrayList<>();
-        arrays.add(address);
-        return restTemplate.postForObject(uri, arrays, AddressMapDto[].class);
-    }
 
     public static String generateUri(String baseUrl, String queryParam, String value) {
         if (StringUtils.isNotBlank(value)) {

@@ -5,7 +5,6 @@ import lombok.Data;
 import org.springframework.messaging.support.ErrorMessage;
 import org.springframework.util.StringUtils;
 import shupship.common.Const;
-import shupship.util.CommonUtils;
 
 /**
  * @author MSI

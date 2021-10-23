@@ -10,13 +10,15 @@ import shupship.response.LeadResponse;
 import shupship.response.PagingRs;
 import shupship.util.exception.ApplicationException;
 
-@Service
 public interface ILeadService {
 
     PagingRs getListLead(Pageable pageable) throws ApplicationContextException;
 
     Lead insertLead(LeadRequest leadRequest) throws ApplicationContextException;
+
     Lead updateLead(Long id, LeadUpdateRequest leadRequest) throws ApplicationException;
+
     Lead deleteLeadOnEVTP(Long leadId) throws  ApplicationException;
+
     LeadResponse detailLead(Long id) throws  ApplicationException;
 }

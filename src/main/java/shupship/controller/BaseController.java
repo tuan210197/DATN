@@ -3,8 +3,11 @@ package shupship.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import shupship.common.Const;
 import shupship.domain.message.ResponseMessage;
+import shupship.domain.model.Users;
+import shupship.util.exception.ApplicationException;
 
 /**
  * CommonController
@@ -34,5 +37,15 @@ public abstract class BaseController {
         message.setMessage(errorMessage);
 
         return new ResponseEntity<>(message, HttpStatus.valueOf(code));
+    }
+
+    protected Users getCurrentUser() throws Exception {
+        Users user = (Users) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (user == null) {
+            throw new ApplicationException("User is null");
+        }
+        return user;
+
     }
 }

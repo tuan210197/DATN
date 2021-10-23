@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import shupship.common.Constants;
 import shupship.domain.message.MessageResponse;
 import shupship.domain.model.Lead;
+import shupship.domain.model.Users;
 import shupship.enums.LeadSource;
 import shupship.request.LeadRequest;
 import shupship.request.LeadUpdateRequest;
@@ -45,13 +46,14 @@ public class LeadController extends BaseController {
         return new ResponseEntity<>(pagingRs, HttpStatus.OK);
     }
 
-    @PostMapping(value = "/createEvtp")
+    @PostMapping(value = "/createWeb")
     public ResponseEntity createLeadOnEVTP(HttpServletRequest request, @Valid @RequestBody LeadRequest inputData) throws Exception {
+//        Users users = getCurrentUser();
         Lead data = leadService.insertLead(inputData);
-        BeanUtils.copyProperties(inputData, data);
         LeadResponse response = LeadResponse.leadModelToDto(data);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
     @PutMapping(value = "evtp/{leadId}")
     public ResponseEntity<LeadResponse> updateLeadOnEVTP(@RequestBody LeadUpdateRequest inputData, @PathVariable(value = "leadId") Long leadId) throws ApplicationException {
         //validateLeadSource

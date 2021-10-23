@@ -88,21 +88,11 @@ public class LeadRequest extends BaseRequest{
 
     private String subscriptionStatus;
 
-    private String rating;
-
     private String leadSource;
-
-    private Long ownerId;
 
     private String ownerBranchCode;
 
     private String website;
-
-    private String facebookId;
-
-    private String zaloId;
-
-    private String skypeId;
 
     private Long status;
 

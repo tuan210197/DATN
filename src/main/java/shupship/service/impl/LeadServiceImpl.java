@@ -13,14 +13,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shupship.common.Const;
 import shupship.common.Constants;
+import shupship.domain.model.Address;
 import shupship.domain.model.Lead;
 import shupship.domain.model.Schedule;
-import shupship.enums.CommonEnums;
 import shupship.enums.LeadSource;
 import shupship.enums.LeadStatus;
 import shupship.enums.LeadType;
+import shupship.exception.ErrorMessage;
+import shupship.exception.HieuDzException;
 import shupship.repo.ILeadRepository;
 import shupship.repo.IScheduleRepository;
+import shupship.request.AddressRequest;
 import shupship.request.LeadRequest;
 import shupship.request.LeadUpdateRequest;
 import shupship.response.LeadResponse;
@@ -29,7 +32,6 @@ import shupship.service.ILeadService;
 import shupship.util.CommonUtils;
 import shupship.util.exception.ApplicationException;
 
-import java.time.Instant;
 import java.util.List;
 
 
@@ -60,8 +62,10 @@ public class LeadServiceImpl implements ILeadService {
     @Override
     public Lead insertLead(LeadRequest leadRequest) throws ApplicationContextException {
         Lead data = new Lead();
-        data.setTitle(leadRequest.getTitle());
-        data.setRepresentation(leadRequest.getRepresentation());
+        if (StringUtils.isNotEmpty(leadRequest.getTitle()))
+            data.setTitle(leadRequest.getTitle());
+        else throw new HieuDzException(new ErrorMessage("ERR002", "Không được để trống tille"));
+//        data.setRepresentation(leadRequest.getRepresentation());
         if (StringUtils.isNotEmpty(leadRequest.getFullName())) {
             data.setFullName(leadRequest.getFullName());
             data.setCompanyName(leadRequest.getFullName());
@@ -70,30 +74,38 @@ public class LeadServiceImpl implements ILeadService {
             data.setFullName(leadRequest.getCompanyName());
             data.setCompanyName(leadRequest.getCompanyName());
         }
-        data.setConvertStatus(CommonEnums.LeadConvertStatus.NORMAL);
+        data.setSalutation(leadRequest.getSalutation());
+//        data.setConvertStatus(CommonEnums.LeadConvertStatus.NORMAL);
         data.setStatus(LeadStatus.NEW.getType());
         data.setLeadSource(LeadSource.valueOf(leadRequest.getLeadSource()).name());
-
+        data.setEmail(leadRequest.getEmail());
         data.setPhone(CommonUtils.convertPhone(leadRequest.getPhone()));
         data.setType(LeadType.TU_NHAP.getType());
         // Neu duoc tao tu EVTP -> isFromEVTP = 1
         data.setIsFromEVTP(1L);
-        data.setCreatedDate(Instant.now());
+        data.setDescription(leadRequest.getDescription());
+        data.setQuantityMonth(leadRequest.getQuantityMonth());
+        data.setWeight(leadRequest.getWeight());
+        data.setQuality(leadRequest.getQuality());
+        data.setCompensation(leadRequest.getCompensation());
+        data.setPayment(leadRequest.getPayment());
+        data.setOther(leadRequest.getOther());
+        data.setExpectedRevenue(leadRequest.getExpectedRevenue());
+        data.setRepresentation(leadRequest.getRepresentation());
+        data.setStatus(LeadStatus.NEW.getType());
+        Address address = AddressRequest.addressDtoToModel(leadRequest.getAddress());
+        data.setAddress(address);
         Lead lead = iLeadRepository.save(data);
-        BeanUtils.copyProperties(leadRequest, data);
         lead.setCustomerCode("KH".concat(String.valueOf(lead.getId())));
-
-//        activityLogService.createActivityLog(user, data, lead, actionType);
-        // Logobject
         return lead;
     }
 
     @Override
     @Transactional
     public Lead updateLead(Long id, LeadUpdateRequest leadRequest) throws ApplicationException {
-     PagingRs pagingRs = new PagingRs();
+        PagingRs pagingRs = new PagingRs();
         Lead existData = iLeadRepository.findLeadById(id);
-        try{
+        try {
             if (existData == null) {
                 throw new ApplicationException(Const.LEAD_NOT_EXIT);
             }
@@ -135,11 +147,11 @@ public class LeadServiceImpl implements ILeadService {
 //        existData.setPayment(inputData.getPayment());
 //        existData.setOther(inputData.getOther());
 //        existData.setQuantityMonth(inputData.getQuantityMonth());
-        }catch (Exception e){
+        } catch (Exception e) {
             e.getLocalizedMessage();
             throw e;
         }
-       return iLeadRepository.save(existData);
+        return iLeadRepository.save(existData);
     }
 
     @Override
@@ -151,7 +163,7 @@ public class LeadServiceImpl implements ILeadService {
         }
         List<Schedule> schedules = scheduleRepository.getSchedulesByLeadId(leadId);
         if (CollectionUtils.isNotEmpty(schedules)) {
-           throw  new ApplicationException(Const.SCHEDULE_PHONE_ONLY);
+            throw new ApplicationException(Const.SCHEDULE_PHONE_ONLY);
         }
         existData.setDeletedStatus(Constants.DELETE_LEAD);
         Lead lead = iLeadRepository.save(existData);

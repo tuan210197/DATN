@@ -50,14 +50,14 @@ public class LeadResponse{
         data.setCustomerCode(model.getCustomerCode());
         data.setQuantityMonth(model.getQuantityMonth());
         data.setType(model.getType());
-        data.setDescription(model.getDescription());
-        data.setGender(model.getGender());
+//        data.setDescription(model.getDescription());
+//        data.setGender(model.getGender());
         data.setPhone(model.getPhone());
         data.setEmail(model.getEmail());
         data.setFullName(model.getFullName());
         data.setLastName(model.getLastName());
         data.setFirstName(model.getFirstName());
-        data.setSalutation(model.getSalutation());
+//        data.setSalutation(model.getSalutation());
         data.setId(model.getId());
         return data;
     }
