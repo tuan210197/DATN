@@ -5,15 +5,16 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+import shupship.auth.JwtTokenUtil;
 import shupship.common.Const;
 import shupship.service.JwtUserDetailsService;
+
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -21,17 +22,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-/**
- * @author tuanda
- * The JwtRequestFilter extends the Spring Web Filter OncePerRequestFilter class. For any incoming request this Filter class gets executed.
- * It checks if the request has a valid JWT token. If it has a valid JWT Token then it sets the Authentication in the context,
- * to specify that the current user is authenticated.
- */
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 
@@ -43,7 +36,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
-            throws ServletException, IOException {
+            throws ServletException, IOException, IOException {
+
+
         String requestURL = request.getRequestURI();
         System.out.println(requestURL);
         try {
