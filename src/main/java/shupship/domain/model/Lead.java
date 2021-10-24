@@ -51,6 +51,12 @@ public class Lead extends AuditEntity implements Serializable {
     @Column(name = "quality")
     private String quality;
 
+    @Column(name = "in_province_price")
+    private Double inProvincePrice;
+
+    @Column(name = "out_province_price")
+    private Double outProvincePrice;
+
     @Column(name = "compensation")
     private String compensation;
 
