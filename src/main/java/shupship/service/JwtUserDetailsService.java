@@ -46,4 +46,6 @@ public interface JwtUserDetailsService extends UserDetailsService {
 	boolean checkUpdate(UserLoginDTO userLoginDTO);
 
 	boolean banUser(UserLoginDTO userLoginDTO);
+
+	boolean unlockUser(UserLoginDTO userLoginDTO);
 }
