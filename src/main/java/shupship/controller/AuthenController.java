@@ -231,6 +231,28 @@ public ResponseEntity<?> checkEmailVerify(HttpServletRequest request, @RequestBo
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
         }
     }
+    @PostMapping("/unlock-user")
+    public ResponseEntity<?>unlockUser(HttpServletRequest request, @RequestBody UserLoginDTO userLoginDTO){
+
+        try {
+            String requestId = request.getHeader("request-id");
+            log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                    + " [" + request.getRequestURI() + "] #START " + requestId);
+            if (userDetailsService.unlockUser(userLoginDTO)) {
+                log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                        + " [" + request.getRequestURI() + "] #END " + requestId);
+                return toSuccessResult(null, "UNLOCK_SUCCESS");
+            } else {
+                return toExceptionResult("UNLOCK_FAILED", Const.API_RESPONSE.RETURN_CODE_ERROR);
+            }
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            return toExceptionResult(e.getMessage(), Const.API_RESPONSE.RETURN_CODE_ERROR);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
+        }
+    }
     /**
      * Update profile in app_user table
      *
