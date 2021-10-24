@@ -47,7 +47,7 @@ public class PDWController {
     }
 
     @GetMapping(value = "/district")
-    public ResponseEntity getDistrictbyProvince(@RequestParam(required = true) String provinceCode){
+    public ResponseEntity getDistrictbyProvince(HttpServletRequest request, @RequestParam(required = true) String provinceCode){
 
         if (StringUtils.isEmpty(provinceCode))
             throw new HieuDzException(new ErrorMessage("ERR001","Bắt buộc phải chọn Tỉnh/TP"));
@@ -57,7 +57,7 @@ public class PDWController {
     }
 
     @GetMapping(value = "/ward")
-    public ResponseEntity getWardByDistrict(@RequestParam(required = true) String districtCode){
+    public ResponseEntity getWardByDistrict(HttpServletRequest request, @RequestParam(required = true) String districtCode){
 
         if (StringUtils.isEmpty(districtCode))
             throw new HieuDzException(new ErrorMessage("ERR001","Bắt buộc phải chọn Quận/Huyện"));
