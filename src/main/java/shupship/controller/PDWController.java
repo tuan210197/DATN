@@ -3,6 +3,7 @@ package shupship.controller;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,8 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import shupship.domain.model.District;
 import shupship.domain.model.Province;
 import shupship.domain.model.Ward;
-import shupship.exception.ErrorMessage;
-import shupship.exception.HieuDzException;
 import shupship.repo.IWardRepository;
 import shupship.response.DistrictResponse;
 import shupship.response.LeadResponse;
@@ -20,7 +19,10 @@ import shupship.response.ProvinceResponse;
 import shupship.response.WardResponse;
 import shupship.service.IDistrictService;
 import shupship.service.IProvinceService;
+import shupship.util.exception.ErrorMessage;
+import shupship.util.exception.HieuDzException;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,7 +40,7 @@ public class PDWController {
     IWardRepository wardRepository;
 
     @GetMapping(value = "/province")
-    public ResponseEntity getListProvince(){
+    public ResponseEntity getListProvince(HttpServletRequest request){
         List<Province> list = provinceService.listProvince();
         List<ProvinceResponse> listProvinceResponses = list.stream().map(ProvinceResponse::leadModelToDto).collect(Collectors.toList());
         return new ResponseEntity<>(listProvinceResponses, HttpStatus.OK);

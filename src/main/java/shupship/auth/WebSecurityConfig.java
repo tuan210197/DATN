@@ -68,11 +68,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/user/verify")
                 .antMatchers(HttpMethod.POST, "/user/verify-code/resend")
                 .antMatchers(HttpMethod.POST, "/user/password/change")
-                .antMatchers(HttpMethod.GET, "/sync")
-                .antMatchers(HttpMethod.GET, "/api/**")
-                .antMatchers(HttpMethod.GET, "/province")
-                .antMatchers(HttpMethod.GET, "/district")
-                .antMatchers(HttpMethod.GET, "/ward");
+                .antMatchers(HttpMethod.GET, "/sync");
+//                .antMatchers(HttpMethod.GET, "/api/**")
+//                .antMatchers(HttpMethod.GET, "/province")
+//                .antMatchers(HttpMethod.GET, "/district")
+//                .antMatchers(HttpMethod.GET, "/ward");
     }
 
     @Override

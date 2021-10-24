@@ -1,9 +1,4 @@
-package shupship.exception;
-
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+package shupship.util.exception;
 
 
 public class HieuDzException extends RuntimeException {
