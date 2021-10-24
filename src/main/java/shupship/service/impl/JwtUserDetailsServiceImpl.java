@@ -147,6 +147,23 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
     }
 
     @Override
+    public boolean unlockUser(UserLoginDTO userLoginDTO) {
+        String email = userLoginDTO.getEmail();
+        BasicLogin basicLogin = basicLoginRepo.findByEmail(email);
+        String uid = basicLogin.getUserUid();
+
+        if (uid != null) {
+            Users users = userRepo.findByUid(uid);
+            users.setIsActive(1);
+            userRepo.save(users);
+            return true;
+
+        } else {
+            return false;
+        }
+    }
+
+    @Override
     public boolean registerUser(UserLoginDTO user) {
         Assert.hasText(user.getEmail(), "EMAIL_EMPTY");
 //        Assert.hasText(user.getPassword(), "PASSWORD_EMPTY");
