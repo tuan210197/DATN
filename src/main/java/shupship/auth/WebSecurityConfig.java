@@ -74,11 +74,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements W
                 .antMatchers(HttpMethod.POST, "/user/verify")
                 .antMatchers(HttpMethod.POST, "/user/verify-code/resend")
                 .antMatchers(HttpMethod.POST, "/user/password/change")
-                .antMatchers(HttpMethod.GET, "/sync")
-                .antMatchers(HttpMethod.GET, "/api/**")
-                .antMatchers(HttpMethod.POST, "/api/**")
-                .antMatchers(HttpMethod.PUT, "/api/**")
-                .antMatchers(HttpMethod.DELETE, "/api/**");
+                .antMatchers(HttpMethod.GET, "/sync");
+
     }
 
     @Override
