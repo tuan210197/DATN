@@ -76,9 +76,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements W
                 .antMatchers(HttpMethod.POST, "/user/password/change")
                 .antMatchers(HttpMethod.GET, "/sync")
                 .antMatchers(HttpMethod.GET, "/api/**")
-                .antMatchers(HttpMethod.GET, "/province")
-                .antMatchers(HttpMethod.GET, "/district")
-                .antMatchers(HttpMethod.GET, "/ward");
+                .antMatchers(HttpMethod.POST, "/api/**")
+                .antMatchers(HttpMethod.PUT, "/api/**")
+                .antMatchers(HttpMethod.DELETE, "/api/**");
     }
 
     @Override
@@ -95,17 +95,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements W
                         exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-//        httpSecurity.csrf().disable()
-//                // dont authenticate this particular request
-//                .authorizeRequests().
-//                // all other requests need to be authenticated
-//                        anyRequest().authenticated().and().
-//                // make sure we use stateless session; session won't be used to
-//                // store user's state.
-//                        exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
-//                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-//
-//        // Add a filter to validate the tokens with every request
+        // Add a filter to validate the tokens with every request
         httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
     }
 

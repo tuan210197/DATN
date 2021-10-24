@@ -1,13 +1,11 @@
 package shupship.domain.model;
 
-import org.jasypt.commons.CommonUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import shupship.helper.InstantConverter;
+import shupship.util.CommonUtils;
+import shupship.util.exception.ApplicationException;
 
-import javax.persistence.Column;
-import javax.persistence.Convert;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.PreUpdate;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
 
@@ -104,29 +102,29 @@ public abstract class AuditEntity implements Serializable {
         this.deletedDate = deletedDate;
     }
 
-//    @PrePersist
-//    void prePersit() {
-//        this.createdDate = Instant.now();
-//        try {
-//            if (createdBy == null) {
-//                this.createdBy = CommonUtils.getCurrentUser().getId();
-//            }
-//        } catch (Exception e) {
-//            this.createdBy = -1L;
-//        }
-//        this.deletedStatus = 0L;
-//        this.lastModifiedDate = createdDate;
-//        this.lastModifiedBy = createdBy;
-//    }
+    @PrePersist
+    void prePersit() {
+        this.createdDate = Instant.now();
+        try {
+            if (createdBy == null) {
+                this.createdBy = CommonUtils.getCurrentUser().getEmpSystemId();
+            }
+        } catch (Exception e) {
+            this.createdBy = -1L;
+        }
+        this.deletedStatus = 0L;
+        this.lastModifiedDate = createdDate;
+        this.lastModifiedBy = createdBy;
+    }
 
-//    @PreUpdate
-//    void preUpdate() {
-//        if (SecurityContextHolder.getContext() !=null && SecurityContextHolder.getContext().getAuthentication() !=null && SecurityContextHolder.getContext().getAuthentication().getPrincipal() != null) {
-//            this.lastModifiedBy = CommonUtils.getCurrentUser().getId();
-//        }else{
-//            this.lastModifiedBy = -1L;
-//        }
-//
-//        this.lastModifiedDate = Instant.now();
-//    }
+    @PreUpdate
+    void preUpdate() throws ApplicationException {
+        if (SecurityContextHolder.getContext() !=null && SecurityContextHolder.getContext().getAuthentication() !=null && SecurityContextHolder.getContext().getAuthentication().getPrincipal() != null) {
+            this.lastModifiedBy = CommonUtils.getCurrentUser().getEmpSystemId();
+        }else{
+            this.lastModifiedBy = -1L;
+        }
+
+        this.lastModifiedDate = Instant.now();
+    }
 }

@@ -6,7 +6,7 @@ import java.util.Collection;
 
 @Data
 public class PagingRs {
-    private int totalItem;
+    private long totalItem;
     private int totalPage;
     Collection<?> data;
 }
