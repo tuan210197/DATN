@@ -20,11 +20,7 @@ public class CommonUtils {
     public static Users getCurrentUser() throws ApplicationException {
         Users user = (Users) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (user == null) {
-<<<<<<< HEAD
             throw new ApplicationException("Users is null");
-=======
-            throw new ApplicationException("User is null");
->>>>>>> origin/dev_tungtt
         }
         return user;
     }
@@ -53,12 +49,6 @@ public class CommonUtils {
         if (end > strText.length())
             end = strText.length();
 
-<<<<<<< HEAD
-//        if (start > end)
-//            throw new Exception("End index cannot be greater than start index");
-
-=======
->>>>>>> origin/dev_tungtt
         int maskLength = end - start;
 
         if (maskLength == 0)
@@ -116,11 +106,6 @@ public class CommonUtils {
         } else return false;
     }
 
-<<<<<<< HEAD
-=======
-
-
->>>>>>> origin/dev_tungtt
     public static String generateUri(String baseUrl, String queryParam, String value) {
         if (StringUtils.isNotBlank(value)) {
             return UriComponentsBuilder.fromUriString(baseUrl).queryParam(queryParam, value).toUriString();

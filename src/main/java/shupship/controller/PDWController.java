@@ -50,7 +50,7 @@ public class PDWController {
     public ResponseEntity getDistrictbyProvince(HttpServletRequest request, @RequestParam(required = true) String provinceCode){
 
         if (StringUtils.isEmpty(provinceCode))
-            throw new HieuDzException(new ErrorMessage("ERR001","Bắt buộc phải chọn Tỉnh/TP"));
+            throw new HieuDzException("Bắt buộc phải chọn Tỉnh/TP");
         List<District> districts = districtService.getDistrictByProvinceCode(provinceCode);
         List<DistrictResponse> districtResponses = districts.stream().map(DistrictResponse::leadModelToDto).collect(Collectors.toList());
         return new ResponseEntity<>(districtResponses, HttpStatus.OK);
@@ -60,7 +60,7 @@ public class PDWController {
     public ResponseEntity getWardByDistrict(HttpServletRequest request, @RequestParam(required = true) String districtCode){
 
         if (StringUtils.isEmpty(districtCode))
-            throw new HieuDzException(new ErrorMessage("ERR001","Bắt buộc phải chọn Quận/Huyện"));
+            throw new HieuDzException("Bắt buộc phải chọn Quận/Huyện");
         List<Ward> wards = wardRepository.getWardByDistrictCode(districtCode);
         List<WardResponse> wardResponses = wards.stream().map(WardResponse::leadModelToDto).collect(Collectors.toList());
         return new ResponseEntity<>(wardResponses, HttpStatus.OK);

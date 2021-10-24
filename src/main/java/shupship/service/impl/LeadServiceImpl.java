@@ -64,7 +64,7 @@ public class LeadServiceImpl implements ILeadService {
         Lead data = new Lead();
         if (StringUtils.isNotEmpty(leadRequest.getTitle()))
             data.setTitle(leadRequest.getTitle());
-        else throw new HieuDzException(new ErrorMessage("ERR002", "Không được để trống tille"));
+        else throw new HieuDzException("Không được để trống tille");
 //        data.setRepresentation(leadRequest.getRepresentation());
         if (StringUtils.isNotEmpty(leadRequest.getFullName())) {
             data.setFullName(leadRequest.getFullName());
@@ -107,19 +107,19 @@ public class LeadServiceImpl implements ILeadService {
         Lead existData = iLeadRepository.findLeadById(id);
         try {
             if (existData == null) {
-                throw new HieuDzException(new ErrorMessage("ERR002", "ok"));
+                throw new HieuDzException("Khách hàng không tồn tại");
             }
             if (StringUtils.isNotBlank(leadRequest.getPhone())) {
                 if (!existData.getPhone().equals(leadRequest.getPhone())) {
                     List<Schedule> schedules = scheduleRepository.getSchedulesByLeadId(id);
                     if (CollectionUtils.isNotEmpty(schedules)) {
-                        throw new HieuDzException(new ErrorMessage("ERR002", "ok"));
+                        throw new HieuDzException("LeadService dòng 116");
                     } else {
                         if (existData.getPhone().equals(CommonUtils.convertPhone(leadRequest.getPhone()))) {
                             existData.setPhone(CommonUtils.convertPhone(leadRequest.getPhone()));
                         } else {
                             if (CollectionUtils.isNotEmpty(iLeadRepository.findLeadWithPhoneOnEVTP(CommonUtils.convertPhone(leadRequest.getPhone()))))
-                                throw new HieuDzException(new ErrorMessage("ERR002", "ok"));
+                                throw new HieuDzException("LeadService dong 122");
                             else existData.setPhone(CommonUtils.convertPhone(leadRequest.getPhone()));
                         }
                     }
@@ -159,11 +159,11 @@ public class LeadServiceImpl implements ILeadService {
         Lead existData = iLeadRepository.findLeadById(leadId);
 
         if (existData == null) {
-            throw new HieuDzException(new ErrorMessage("ERR002", "ok"));
+            throw new HieuDzException( "dòng 162");
         }
         List<Schedule> schedules = scheduleRepository.getSchedulesByLeadId(leadId);
         if (CollectionUtils.isNotEmpty(schedules)) {
-            throw new HieuDzException(new ErrorMessage("ERR002", "ok"));
+            throw new HieuDzException( "dòng 166");
         }
         existData.setDeletedStatus(Constants.DELETE_LEAD);
         Lead lead = iLeadRepository.save(existData);
