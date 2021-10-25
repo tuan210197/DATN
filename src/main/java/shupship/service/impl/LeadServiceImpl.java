@@ -11,14 +11,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import shupship.common.Const;
 import shupship.common.Constants;
 import shupship.domain.model.Address;
+import shupship.domain.model.Industry;
 import shupship.domain.model.Lead;
 import shupship.domain.model.Schedule;
 import shupship.enums.LeadSource;
 import shupship.enums.LeadStatus;
 import shupship.enums.LeadType;
+import shupship.repo.IIndustryRepository;
 import shupship.repo.ILeadRepository;
 import shupship.repo.IScheduleRepository;
 import shupship.request.AddressRequest;
@@ -29,7 +30,6 @@ import shupship.response.PagingRs;
 import shupship.service.ILeadService;
 import shupship.util.CommonUtils;
 import shupship.util.exception.ApplicationException;
-import shupship.util.exception.ErrorMessage;
 import shupship.util.exception.HieuDzException;
 
 import java.util.List;
@@ -40,8 +40,12 @@ import java.util.List;
 public class LeadServiceImpl implements ILeadService {
     @Autowired
     ILeadRepository iLeadRepository;
+
     @Autowired
     IScheduleRepository scheduleRepository;
+
+    @Autowired
+    IIndustryRepository industryRepository;
 
     @Override
     public PagingRs getListLead(Pageable pageable) throws ApplicationContextException {
@@ -65,7 +69,7 @@ public class LeadServiceImpl implements ILeadService {
         if (StringUtils.isNotEmpty(leadRequest.getTitle()))
             data.setTitle(leadRequest.getTitle());
         else throw new HieuDzException("Không được để trống tille");
-//        data.setRepresentation(leadRequest.getRepresentation());
+
         if (StringUtils.isNotEmpty(leadRequest.getFullName())) {
             data.setFullName(leadRequest.getFullName());
             data.setCompanyName(leadRequest.getFullName());
@@ -75,7 +79,6 @@ public class LeadServiceImpl implements ILeadService {
             data.setCompanyName(leadRequest.getCompanyName());
         }
         data.setSalutation(leadRequest.getSalutation());
-//        data.setConvertStatus(CommonEnums.LeadConvertStatus.NORMAL);
         data.setStatus(LeadStatus.NEW.getType());
         data.setLeadSource(LeadSource.valueOf(leadRequest.getLeadSource()).name());
         data.setEmail(leadRequest.getEmail());
@@ -95,6 +98,14 @@ public class LeadServiceImpl implements ILeadService {
         data.setStatus(LeadStatus.NEW.getType());
         Address address = AddressRequest.addressDtoToModel(leadRequest.getAddress());
         data.setAddress(address);
+
+//        if (CollectionUtils.isNotEmpty(leadRequest.getIndustries())) {
+//            List<Industry> industries = industryRepository.findIndustriesByCodeIn(leadRequest.getIndustries());
+//            if (CollectionUtils.isNotEmpty(industries)) {
+//                data.setIndustries(industries);
+//            }
+//        }
+
         Lead lead = iLeadRepository.save(data);
         lead.setCustomerCode("KH".concat(String.valueOf(lead.getId())));
         return lead;
@@ -159,11 +170,11 @@ public class LeadServiceImpl implements ILeadService {
         Lead existData = iLeadRepository.findLeadById(leadId);
 
         if (existData == null) {
-            throw new HieuDzException( "dòng 162");
+            throw new HieuDzException("dòng 162");
         }
         List<Schedule> schedules = scheduleRepository.getSchedulesByLeadId(leadId);
         if (CollectionUtils.isNotEmpty(schedules)) {
-            throw new HieuDzException( "dòng 166");
+            throw new HieuDzException("dòng 166");
         }
         existData.setDeletedStatus(Constants.DELETE_LEAD);
         Lead lead = iLeadRepository.save(existData);
