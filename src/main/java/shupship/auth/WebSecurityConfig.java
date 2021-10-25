@@ -16,6 +16,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import shupship.service.JwtUserDetailsService;
 
 /**
@@ -26,7 +28,7 @@ import shupship.service.JwtUserDetailsService;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @AllArgsConstructor
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements WebMvcConfigurer {
 
     private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
@@ -54,6 +56,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**").allowedMethods("*");
+    }
+
+    @Override
     public void configure(WebSecurity webSecurity) throws Exception {
         webSecurity
                 .ignoring()
@@ -68,6 +75,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/user/verify-code/resend")
                 .antMatchers(HttpMethod.POST, "/user/password/change")
                 .antMatchers(HttpMethod.GET, "/sync");
+
     }
 
     @Override
