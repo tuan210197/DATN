@@ -74,8 +74,6 @@ public class LeadRequest extends BaseRequest{
 
     private AddressRequest companyAddress;
 
-    private String industry;
-
     private Long numOfEmp;
 
     private Long annualQuantity;
@@ -106,6 +104,6 @@ public class LeadRequest extends BaseRequest{
 
     private List<String> products;
 
-    private List<String> industries;
+    private List<String> industry;
 
 }

@@ -73,7 +73,6 @@ public class PDWController {
         List<Industry> industries = industryRepository.findAll();
         List<IndustryResponse> industries1 = industries.stream().map(IndustryResponse::leadModelToDto).collect(Collectors.toList());
         return new ResponseEntity<>(industries1, HttpStatus.OK);
-
     }
 
 }

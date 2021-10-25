@@ -25,4 +25,9 @@ public class Industry extends BaseObject {
 
     private String name;
 
+    @ManyToMany(mappedBy = "industries")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    private Collection<Lead> leads;
+
 }

@@ -15,7 +15,7 @@ public interface IIndustryRepository extends PagingAndSortingRepository<Industry
     @Query("Select a from  Industry a where a.id = :id and a.deletedStatus = 0")
     public Industry getProductById(Long id);
 
-    @Query("Select a from  Industry a where a.deletedStatus = 0")
+    @Query("Select a from  Industry a")
     public List<Industry> findAll();
 
     Industry findByCode(String code);

@@ -117,4 +117,13 @@ public class Lead extends AuditEntity implements Serializable {
     @OneToMany(mappedBy = "leads")
     Collection<LeadAssign> leadAssigns;
 
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @JoinTable(name = "industry_detail",
+            joinColumns = @JoinColumn(name = "related_to_id"),
+            inverseJoinColumns = @JoinColumn(name = "industry_id")
+    )
+    private Collection<Industry> industries;
+
 }

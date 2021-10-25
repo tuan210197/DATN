@@ -99,13 +99,12 @@ public class LeadServiceImpl implements ILeadService {
         Address address = AddressRequest.addressDtoToModel(leadRequest.getAddress());
         data.setAddress(address);
 
-//        if (CollectionUtils.isNotEmpty(leadRequest.getIndustries())) {
-//            List<Industry> industries = industryRepository.findIndustriesByCodeIn(leadRequest.getIndustries());
-//            if (CollectionUtils.isNotEmpty(industries)) {
-//                data.setIndustries(industries);
-//            }
-//        }
-
+        if (CollectionUtils.isNotEmpty(leadRequest.getIndustry())) {
+            List<Industry> industries = industryRepository.findIndustriesByCodeIn(leadRequest.getIndustry());
+            if (CollectionUtils.isNotEmpty(industries)) {
+                data.setIndustries(industries);
+            }
+        }
         Lead lead = iLeadRepository.save(data);
         lead.setCustomerCode("KH".concat(String.valueOf(lead.getId())));
         return lead;
