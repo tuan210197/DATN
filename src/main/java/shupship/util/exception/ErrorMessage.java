@@ -1,4 +1,4 @@
-package shupship.exception;
+package shupship.util.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

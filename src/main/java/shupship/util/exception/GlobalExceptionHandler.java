@@ -1,4 +1,4 @@
-package shupship.exception;
+package shupship.util.exception;
 
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;

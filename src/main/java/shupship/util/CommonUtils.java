@@ -20,7 +20,7 @@ public class CommonUtils {
     public static Users getCurrentUser() throws ApplicationException {
         Users user = (Users) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (user == null) {
-            throw new ApplicationException("User is null");
+            throw new ApplicationException("Users is null");
         }
         return user;
     }
@@ -105,8 +105,6 @@ public class CommonUtils {
 
         } else return false;
     }
-
-
 
     public static String generateUri(String baseUrl, String queryParam, String value) {
         if (StringUtils.isNotBlank(value)) {
