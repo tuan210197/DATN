@@ -10,13 +10,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import shupship.domain.model.District;
+import shupship.domain.model.Industry;
 import shupship.domain.model.Province;
 import shupship.domain.model.Ward;
+import shupship.repo.IIndustryRepository;
 import shupship.repo.IWardRepository;
-import shupship.response.DistrictResponse;
-import shupship.response.LeadResponse;
-import shupship.response.ProvinceResponse;
-import shupship.response.WardResponse;
+import shupship.response.*;
 import shupship.service.IDistrictService;
 import shupship.service.IProvinceService;
 import shupship.util.exception.ErrorMessage;
@@ -38,6 +37,9 @@ public class PDWController {
 
     @Autowired
     IWardRepository wardRepository;
+
+    @Autowired
+    IIndustryRepository industryRepository;
 
     @GetMapping(value = "/province")
     public ResponseEntity getListProvince(HttpServletRequest request){
@@ -64,6 +66,14 @@ public class PDWController {
         List<Ward> wards = wardRepository.getWardByDistrictCode(districtCode);
         List<WardResponse> wardResponses = wards.stream().map(WardResponse::leadModelToDto).collect(Collectors.toList());
         return new ResponseEntity<>(wardResponses, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/industry")
+    public ResponseEntity getIndustry(HttpServletRequest request){
+        List<Industry> industries = industryRepository.findAll();
+        List<IndustryResponse> industries1 = industries.stream().map(IndustryResponse::leadModelToDto).collect(Collectors.toList());
+        return new ResponseEntity<>(industries1, HttpStatus.OK);
+
     }
 
 }

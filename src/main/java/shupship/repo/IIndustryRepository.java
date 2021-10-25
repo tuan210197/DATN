@@ -16,7 +16,7 @@ public interface IIndustryRepository extends PagingAndSortingRepository<Industry
     public Industry getProductById(Long id);
 
     @Query("Select a from  Industry a where a.deletedStatus = 0")
-    public Page<Industry> findAll(Pageable pageable);
+    public List<Industry> findAll();
 
     Industry findByCode(String code);
 
