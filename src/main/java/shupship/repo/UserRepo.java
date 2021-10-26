@@ -7,13 +7,16 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import shupship.domain.model.Users;
 
+import java.util.List;
+
 
 @Repository
 public interface UserRepo extends JpaRepository<Users, String> {
 
     Users findByUid(String uid);
 //    Users findByEmail(String email);
-
+    @Query(value = "select u.role_name from users u where uid =?1", nativeQuery = true)
+    List<String> findRoleNameByUid(String uid);
 
 
 //    @Query(value = "INSERT INTO APP_USER(UID, AVATAR, BIRTHDAY, FULL_NAME, GENDER, IS_ACTIVE, IS_DELETED, MOBILE, NAME) " +
