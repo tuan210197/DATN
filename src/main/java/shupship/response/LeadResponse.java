@@ -36,7 +36,9 @@ public class LeadResponse{
     List<LeadAssign> leadAssigns;
 
     public static LeadResponse leadModelToDto(Lead model) {
+
         LeadResponse data = new LeadResponse();
+        data.setLeadSource(model.getLeadSource());
         data.setId(model.getId());
         data.setFullName(model.getFullName());
         data.setIsFromEVTP(model.getIsFromEVTP());
@@ -50,15 +52,17 @@ public class LeadResponse{
         data.setCustomerCode(model.getCustomerCode());
         data.setQuantityMonth(model.getQuantityMonth());
         data.setType(model.getType());
-//        data.setDescription(model.getDescription());
-//        data.setGender(model.getGender());
         data.setPhone(model.getPhone());
-        data.setEmail(model.getEmail());
         data.setFullName(model.getFullName());
+
+        /***
+        data.setDescription(model.getDescription());
+        data.setGender(model.getGender());
+        data.setEmail(model.getEmail());
         data.setLastName(model.getLastName());
         data.setFirstName(model.getFirstName());
-//        data.setSalutation(model.getSalutation());
-        data.setId(model.getId());
+        data.setSalutation(model.getSalutation());
+        */
         return data;
     }
 }
