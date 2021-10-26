@@ -5,8 +5,11 @@ import io.jsonwebtoken.lang.Assert;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -57,7 +60,11 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         BasicLogin basicLogin = validateUserAuthen(email);
+//        String uid = basicLogin.getUserUid();
+//        Users users = userRepo.findByUid(uid);
+
         return new User(basicLogin.getEmail(), basicLogin.getPassword(),
+
                 new ArrayList<>());
     }
 
@@ -120,11 +127,16 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         Assert.isTrue(ValidateUtil.regexValidation(userLoginDTO.getEmail(), Const.VALIDATE_INPUT.regexEmail), "EMAIL_WRONG_FORMAT");
         log.info("Start query Table basic_login at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
+
         BasicLogin checkBasicLogin = basicLoginRepo.findByEmail(userLoginDTO.getEmail());
         Users user = userRepo.findByUid(checkBasicLogin.getUserUid());
         log.info("End query Table basic_login at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
-        return user.getStatus_update();
+        if(user.getStatus_update() == 1){
+            return true;
+        }else {
+            return false;
+        }
     }
 
     @Override
@@ -187,8 +199,9 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
                 .isDeleted(Const.COMMON_CONST_VALUE.NOT_DELETED)
                 .mobile(user.getMobile())
                 .name(user.getName())
-                .status_update(false)
-                .roleName(user.getRoleName())
+                .status_update(0)
+                .roles(user.getRoles())
+//                .roleName(user.getRoleName())
                 .build();
         log.info("Start save Table user at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
@@ -323,7 +336,7 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         userCheck.setGender(userLoginDTO.getGender());
         userCheck.setMobile(userLoginDTO.getMobile());
         userCheck.setName(userLoginDTO.getName());
-        userCheck.setStatus_update(true);
+        userCheck.setStatus_update(1);
         log.info("Start save Table user at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
         userRepo.save(userCheck);

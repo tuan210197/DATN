@@ -35,4 +35,5 @@ public abstract class BaseController {
 
         return new ResponseEntity<>(message, HttpStatus.valueOf(code));
     }
+
 }

@@ -66,7 +66,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/user/password/forgot")
                 .antMatchers(HttpMethod.POST, "/user/verify")
                 .antMatchers(HttpMethod.POST, "/user/verify-code/resend")
-                .antMatchers(HttpMethod.POST, "/user/password/change")
+//                .antMatchers(HttpMethod.POST, "/user/password/change")
                 .antMatchers(HttpMethod.GET, "/sync")
                 .antMatchers(HttpMethod.GET, "/api/lead/**")
                 .and();
@@ -78,7 +78,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         httpSecurity.csrf().disable().cors().and()
                 // dont authenticate this particular request
                 .authorizeRequests()
-//                .antMatchers("/user/**").allowAll ()
+//                .antMatchers("/user/**").permitAll ()
+                .antMatchers("/user/register").hasAnyRole("TỔNG CÔNG TY")
 
                 // all other requests need to be authenticated
                 .anyRequest().authenticated().and().

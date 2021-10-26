@@ -46,16 +46,16 @@ public class ApplicationException extends Exception {
   
     @Override
     public String getMessage() {
-        if(!StringUtils.hasText(message)){
-           return Const.getMessage(code);
-        }
+//        if(!StringUtils.hasText(message)){
+//           return Const.getMessage(code);
+//        }
         return message;
     }
 
     public String getMessage(String language) {
-        if(!StringUtils.hasText(message)){
-           return Const.getMessage(code);
-        }
+//        if(!StringUtils.hasText(message)){
+//           return Const.getMessage(code);
+//        }
         return message;
     }
 
