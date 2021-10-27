@@ -18,6 +18,7 @@ import shupship.domain.dto.JwtRequest;
 import shupship.domain.dto.JwtResponse;
 import shupship.domain.dto.UserInfoDTO;
 import shupship.domain.dto.UserLoginDTO;
+import shupship.domain.model.Users;
 import shupship.service.JwtUserDetailsService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -296,8 +297,10 @@ public class AuthenController extends BaseController {
          * @param request
          * @return new token
          */
+
         @RequestMapping(value = "/refresh-token", method = RequestMethod.GET)
         public ResponseEntity<?> refreshToken (HttpServletRequest request){
+
             try {
                 String requestId = request.getHeader("request-id");
                 log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
