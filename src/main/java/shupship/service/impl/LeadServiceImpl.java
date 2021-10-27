@@ -32,6 +32,7 @@ import shupship.util.CommonUtils;
 import shupship.util.exception.ApplicationException;
 import shupship.util.exception.HieuDzException;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 
@@ -111,7 +112,7 @@ public class LeadServiceImpl implements ILeadService {
     }
 
     @Override
-    @Transactional
+//    @Transactional
     public Lead updateLead(Long id, LeadUpdateRequest leadRequest) throws ApplicationException {
         PagingRs pagingRs = new PagingRs();
         Lead existData = iLeadRepository.findLeadById(id);

@@ -54,8 +54,8 @@ public class LeadController extends BaseController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @PutMapping(value = "evtp/{leadId}")
-    public ResponseEntity<LeadResponse> updateLeadOnEVTP(@RequestBody LeadUpdateRequest inputData, @PathVariable(value = "leadId") Long leadId) throws ApplicationException {
+    @PostMapping(value = "/evtp/{leadId}")
+    public ResponseEntity<LeadResponse> updateLeadOnEVTP(HttpServletRequest request, @RequestBody LeadUpdateRequest inputData, @PathVariable(value = "leadId") Long leadId) throws ApplicationException {
         //validateLeadSource
 //        if (!validateIndustry(inputData.getLeadSource())) {
 //            throw new BusinessException(new ErrorMessage("ERR_002", "Industry code is not defined"));
