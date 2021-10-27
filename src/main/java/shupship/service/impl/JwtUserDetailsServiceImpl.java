@@ -324,9 +324,9 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
     public boolean updateUser(String userId, UserLoginDTO userLoginDTO) {
         Users userCheck = userRepo.findByUid(userId);
         Assert.notNull(userCheck, "USER_NOT_FOUND");
-        Assert.notNull(userLoginDTO.getBirthday(), "DATE_NOT_VALID");
-        Assert.notNull(userLoginDTO.getName(), "NAME_NOT_VALID");
-        Assert.notNull(userLoginDTO.getFullName(), "FULL_NAME_NOT_VALID");
+//        Assert.notNull(userLoginDTO.getBirthday(), "DATE_NOT_VALID");
+//        Assert.notNull(userLoginDTO.getName(), "NAME_NOT_VALID");
+//        Assert.notNull(userLoginDTO.getFullName(), "FULL_NAME_NOT_VALID");
         Assert.isTrue(ValidateUtil.regexValidation(userLoginDTO.getMobile(), Const.VALIDATE_INPUT.regexPhone), "PHONE_WRONG_FORMAT");
         Assert.isTrue(Const.VALIDATE_INPUT.phoneNum.contains(userLoginDTO.getMobile().substring(0, 3)), "PHONE_NOT_VALID");
         Assert.isTrue(userCheck.getIsActive().equals(1), "USER_NOT_ACTIVE");

@@ -67,8 +67,9 @@ public class AuthenController extends BaseController {
             if (Objects.isNull(userLoginDTO)) {
                 return toExceptionResult("USER_NOT_VERIFY_RESEND_OTP", Const.API_RESPONSE.RETURN_CODE_ERROR);
             }
-            String token = jwtTokenUtil.generateToken(new User(userLoginDTO.getEmail(), userLoginDTO.getPassword(),
-                    new ArrayList<>()));
+            String uid = userLoginDTO.getUserUid();
+            UserInfoDTO userInfoDTO = userDetailsService.getUserInfo(uid);
+            String token = jwtTokenUtil.generateToken(userInfoDTO);
             userDetailsService.loginFailRetryCount(authenticationRequest.getEmail(), false);
             log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
                     + " [" + request.getRequestURI() + "] #END " + requestId);

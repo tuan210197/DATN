@@ -34,5 +34,5 @@ public class UserInfoDTO {
     private String postCode;
     private String deptCode;
     private Address address;
-    private String roleName;
+    private String role;
 }
