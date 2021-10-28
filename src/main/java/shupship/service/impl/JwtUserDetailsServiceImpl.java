@@ -60,12 +60,14 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         BasicLogin basicLogin = validateUserAuthen(email);
-//        String uid = basicLogin.getUserUid();
-//        Users users = userRepo.findByUid(uid);
+        String uid = basicLogin.getUserUid();
+        Users users = userRepo.findByUid(uid);
+        String role = users.getRoles();
+        UserDetails userDetails = User.withUsername(basicLogin.getEmail()).password(basicLogin.getPassword()).authorities(role).build();
 
-        return new User(basicLogin.getEmail(), basicLogin.getPassword(),
-
-                new ArrayList<>());
+        return userDetails;
+//                new User(basicLogin.getEmail(), basicLogin.getPassword(),
+//                new ArrayList<>());
     }
 
     @Override
@@ -132,9 +134,9 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         Users user = userRepo.findByUid(checkBasicLogin.getUserUid());
         log.info("End query Table basic_login at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
-        if(user.getStatus_update() == 1){
+        if (user.getStatus_update() == 1) {
             return true;
-        }else {
+        } else {
             return false;
         }
     }

@@ -16,7 +16,7 @@ import shupship.domain.model.Address;
 import java.time.LocalDate;
 
 @Data
-//@Builder
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -38,5 +38,5 @@ public class UserInfoDTO {
     private String postCode;
     private String deptCode;
     private Address address;
-    private String role;
+    private String roles;
 }

@@ -7,12 +7,14 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import shupship.domain.dto.UserInfoDTO;
 import shupship.domain.dto.UserLoginDTO;
 import shupship.domain.model.Users;
+import shupship.util.exception.ApiException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
@@ -74,7 +76,7 @@ public class JwtTokenUtil implements Serializable {
 //        claims.put("uid", users.getUid());
         claims.put("postCode", users.getPostCode());
         claims.put("deptCode", users.getDeptCode());
-        claims.put("role", users.getRole());
+        claims.put("role", users.getRoles());
         return doGenerateToken(claims, users.getEmail());
     }
 
@@ -112,4 +114,5 @@ public class JwtTokenUtil implements Serializable {
         }
         return null;
     }
+
 }

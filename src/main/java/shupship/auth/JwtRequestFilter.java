@@ -14,6 +14,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import shupship.common.Const;
 import shupship.service.JwtUserDetailsService;
+//import shupship.service.impl.UserDetailsImpl;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -62,7 +63,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                     String username = jwtTokenUtil.getUsernameFromToken(jwtToken);
                     // Once we get the token validate it.
                     if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                        UserDetails userDetails = jwtUserDetailsService.loadUserByUsername(username);
+                        UserDetails userDetails =  jwtUserDetailsService.loadUserByUsername(username);
                         // if token is valid configure Spring Security to manually set
                         // authentication
 

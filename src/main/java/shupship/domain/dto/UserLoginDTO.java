@@ -38,5 +38,5 @@ public class UserLoginDTO {
     private String reNewPassword;
     private boolean forGotPassword;
     private boolean status_update;
-    private Set<Role> roles;
+    private String roles;
 }
