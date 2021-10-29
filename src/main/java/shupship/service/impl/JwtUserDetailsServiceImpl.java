@@ -57,8 +57,13 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         BasicLogin basicLogin = validateUserAuthen(email);
-        return new User(basicLogin.getEmail(), basicLogin.getPassword(),
-                new ArrayList<>());
+        String uid = basicLogin.getUserUid();
+        Users users = userRepo.findByUid(uid);
+        String role = users.getRoles();
+
+        return User.withUsername(basicLogin.getEmail()).password(basicLogin.getPassword()).authorities(role).build();
+//                new User(basicLogin.getEmail(), basicLogin.getPassword(),
+//                new ArrayList<>());
     }
 
     @Override
@@ -120,11 +125,16 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         Assert.isTrue(ValidateUtil.regexValidation(userLoginDTO.getEmail(), Const.VALIDATE_INPUT.regexEmail), "EMAIL_WRONG_FORMAT");
         log.info("Start query Table basic_login at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
+
         BasicLogin checkBasicLogin = basicLoginRepo.findByEmail(userLoginDTO.getEmail());
         Users user = userRepo.findByUid(checkBasicLogin.getUserUid());
         log.info("End query Table basic_login at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
-        return user.getStatus_update();
+        if (user.getStatus_update() == 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
@@ -187,8 +197,10 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
                 .isDeleted(Const.COMMON_CONST_VALUE.NOT_DELETED)
                 .mobile(user.getMobile())
                 .name(user.getName())
-                .status_update(false)
-                .roleName(user.getRoleName())
+                .status_update(0)
+                .roles(user.getRoles())
+                .empSystemId(sysid())
+//                .roleName(user.getRoleName())
                 .build();
         log.info("Start save Table user at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
@@ -311,19 +323,19 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
     public boolean updateUser(String userId, UserLoginDTO userLoginDTO) {
         Users userCheck = userRepo.findByUid(userId);
         Assert.notNull(userCheck, "USER_NOT_FOUND");
-        Assert.notNull(userLoginDTO.getBirthday(), "DATE_NOT_VALID");
-        Assert.notNull(userLoginDTO.getName(), "NAME_NOT_VALID");
-        Assert.notNull(userLoginDTO.getFullName(), "FULL_NAME_NOT_VALID");
+//        Assert.notNull(userLoginDTO.getBirthday(), "DATE_NOT_VALID");
+//        Assert.notNull(userLoginDTO.getName(), "NAME_NOT_VALID");
+//        Assert.notNull(userLoginDTO.getFullName(), "FULL_NAME_NOT_VALID");
         Assert.isTrue(ValidateUtil.regexValidation(userLoginDTO.getMobile(), Const.VALIDATE_INPUT.regexPhone), "PHONE_WRONG_FORMAT");
         Assert.isTrue(Const.VALIDATE_INPUT.phoneNum.contains(userLoginDTO.getMobile().substring(0, 3)), "PHONE_NOT_VALID");
         Assert.isTrue(userCheck.getIsActive().equals(1), "USER_NOT_ACTIVE");
-        userCheck.setAvatar(userLoginDTO.getAvatar());
+//        userCheck.setAvatar(userLoginDTO.getAvatar());
         userCheck.setBirthday(userLoginDTO.getBirthday());
         userCheck.setFullName(userLoginDTO.getFullName());
         userCheck.setGender(userLoginDTO.getGender());
         userCheck.setMobile(userLoginDTO.getMobile());
-        userCheck.setName(userLoginDTO.getName());
-        userCheck.setStatus_update(true);
+        userCheck.setAddress(userLoginDTO.getAddress());
+        userCheck.setStatus_update(1);
         log.info("Start save Table user at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
         userRepo.save(userCheck);
@@ -359,10 +371,23 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         return sb.toString();
     }
 
-    public static void main(String[] args) {
-        int len = 10;
-        System.out.println(generatePassword(len));
+    public Long sysid() {
+
+        long minNum = 1;
+        long maxNum = 999999999;
+        long randomNumber = (int) (Math.random() * (maxNum - minNum + 1) + minNum);
+        Long users = userRepo.getSysId(randomNumber);
+        if ( users == null) {
+
+            return randomNumber;
+        } else {
+            return sysid();
+        }
     }
+//    public static void main(String[] args) {
+//        int len = 10;
+//        System.out.println(generatePassword(len));
+//    }
 
     @Override
     public boolean checkTokenForUser(UserLoginDTO userLoginDTO) {

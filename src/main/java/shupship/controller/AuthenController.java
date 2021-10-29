@@ -6,8 +6,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.*;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import shupship.auth.JwtTokenUtil;
 import shupship.common.Const;
@@ -15,8 +18,9 @@ import shupship.domain.dto.JwtRequest;
 import shupship.domain.dto.JwtResponse;
 import shupship.domain.dto.UserInfoDTO;
 import shupship.domain.dto.UserLoginDTO;
-import shupship.domain.model.BasicLogin;
+import shupship.domain.model.Users;
 import shupship.service.JwtUserDetailsService;
+import shupship.util.exception.ApiException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
@@ -44,6 +48,7 @@ public class AuthenController extends BaseController {
     @Autowired
     private JwtUserDetailsService userDetailsService;
 
+
     /**
      * Authenticate for User to login to system
      *
@@ -64,8 +69,9 @@ public class AuthenController extends BaseController {
             if (Objects.isNull(userLoginDTO)) {
                 return toExceptionResult("USER_NOT_VERIFY_RESEND_OTP", Const.API_RESPONSE.RETURN_CODE_ERROR);
             }
-            String token = jwtTokenUtil.generateToken(new User(userLoginDTO.getEmail(), userLoginDTO.getPassword(),
-                    new ArrayList<>()));
+            String uid = userLoginDTO.getUserUid();
+            UserInfoDTO userInfoDTO = userDetailsService.getUserInfo(uid);
+            String token = jwtTokenUtil.generateToken(userInfoDTO);
             userDetailsService.loginFailRetryCount(authenticationRequest.getEmail(), false);
             log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
                     + " [" + request.getRequestURI() + "] #END " + requestId);
@@ -87,29 +93,30 @@ public class AuthenController extends BaseController {
     }
 
 
-@PostMapping(value = "/check-email")
-public ResponseEntity<?> checkEmailVerify(HttpServletRequest request, @RequestBody UserLoginDTO userLoginDTO){
-    try {
-        String requestId = request.getHeader("request-id");
-        log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-                + " [" + request.getRequestURI() + "] #START " + requestId);
-        if (userDetailsService.checkEmail(userLoginDTO)) {
+    @PostMapping(value = "/check-email")
+    public ResponseEntity<?> checkEmailVerify(HttpServletRequest request, @RequestBody UserLoginDTO userLoginDTO) {
+        try {
+            String requestId = request.getHeader("request-id");
             log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-                    + " [" + request.getRequestURI() + "] #END " + requestId);
-            return toSuccessResult(null, "EMAIL_VERIFY");
-        } else {
-            return toExceptionResult("EMAIL_NOT_VERIFY", Const.API_RESPONSE.RETURN_CODE_SUCCESS);
+                    + " [" + request.getRequestURI() + "] #START " + requestId);
+            if (userDetailsService.checkEmail(userLoginDTO)) {
+                log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                        + " [" + request.getRequestURI() + "] #END " + requestId);
+                return toSuccessResult(null, "EMAIL_VERIFY");
+            } else {
+                return toExceptionResult("EMAIL_NOT_VERIFY", Const.API_RESPONSE.RETURN_CODE_SUCCESS);
+            }
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+            return toExceptionResult(e.getMessage(), Const.API_RESPONSE.RETURN_CODE_ERROR);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
         }
-    } catch (IllegalArgumentException e) {
-        e.printStackTrace();
-        return toExceptionResult(e.getMessage(), Const.API_RESPONSE.RETURN_CODE_ERROR);
-    } catch (Exception e) {
-        e.printStackTrace();
-        return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
     }
-}
+
     @PostMapping(value = "/check-update")
-    public ResponseEntity<?> checkUpdate(HttpServletRequest request, @RequestBody UserLoginDTO userLoginDTO){
+    public ResponseEntity<?> checkUpdate(HttpServletRequest request, @RequestBody UserLoginDTO userLoginDTO) {
         try {
             String requestId = request.getHeader("request-id");
             log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
@@ -129,34 +136,41 @@ public ResponseEntity<?> checkEmailVerify(HttpServletRequest request, @RequestBo
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
         }
     }
+
     /**
      * Register an user
      *
      * @param userLoginDTO
      * @return Success or fail
      */
+
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public ResponseEntity<?> saveUser(HttpServletRequest request, @RequestBody UserLoginDTO userLoginDTO) {
-        try {
-            String requestId = request.getHeader("request-id");
-            log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-                    + " [" + request.getRequestURI() + "] #START " + requestId);
-            if (userDetailsService.registerUser(userLoginDTO)) {
+    public ResponseEntity<?> saveUser(HttpServletRequest request, @RequestBody UserLoginDTO userLoginDTO, Authentication authentication) throws Exception {
+        UserDetails auth = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("TCT"))) {
+
+            try {
+                String requestId = request.getHeader("request-id");
                 log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-                        + " [" + request.getRequestURI() + "] #END " + requestId);
-                return toSuccessResult(null, "REGISTER_COMPLETED");
-            } else {
-                return toExceptionResult("REGISTER_FAILED", Const.API_RESPONSE.RETURN_CODE_ERROR);
+                        + " [" + request.getRequestURI() + "] #START " + requestId);
+                if (userDetailsService.registerUser(userLoginDTO)) {
+                    log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                            + " [" + request.getRequestURI() + "] #END " + requestId);
+                    return toSuccessResult(null, "REGISTER_COMPLETED");
+                } else {
+                    return toExceptionResult("REGISTER_FAILED", Const.API_RESPONSE.RETURN_CODE_ERROR);
+                }
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+                return toExceptionResult(e.getMessage(), Const.API_RESPONSE.RETURN_CODE_ERROR);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
             }
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-            return toExceptionResult(e.getMessage(), Const.API_RESPONSE.RETURN_CODE_ERROR);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
+        } else {
+            return toExceptionResult("NO_PERMISSION", Const.API_RESPONSE.RETURN_CODE_ERROR_NOTFOUND);
         }
     }
-
 
     /**
      * User has forgotten their password. Request for changing password with email
@@ -210,49 +224,63 @@ public ResponseEntity<?> checkEmailVerify(HttpServletRequest request, @RequestBo
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
         }
     }
-    @PostMapping("/ban-user")
-    public ResponseEntity<?>banUser(HttpServletRequest request, @RequestBody UserLoginDTO userLoginDTO){
-        try {
-            String requestId = request.getHeader("request-id");
-            log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-                    + " [" + request.getRequestURI() + "] #START " + requestId);
-            if (userDetailsService.banUser(userLoginDTO)) {
-                log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-                        + " [" + request.getRequestURI() + "] #END " + requestId);
-                return toSuccessResult(null, "BAN_SUCCESS");
-            } else {
-                return toExceptionResult("BAN_FAILED", Const.API_RESPONSE.RETURN_CODE_ERROR);
-            }
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-            return toExceptionResult(e.getMessage(), Const.API_RESPONSE.RETURN_CODE_ERROR);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
-        }
-    }
-    @PostMapping("/unlock-user")
-    public ResponseEntity<?>unlockUser(HttpServletRequest request, @RequestBody UserLoginDTO userLoginDTO){
 
-        try {
-            String requestId = request.getHeader("request-id");
-            log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-                    + " [" + request.getRequestURI() + "] #START " + requestId);
-            if (userDetailsService.unlockUser(userLoginDTO)) {
+    @PostMapping("/ban-user")
+    public ResponseEntity<?> banUser(HttpServletRequest request, @RequestBody UserLoginDTO userLoginDTO) {
+        UserDetails auth = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("TCT"))) {
+            try {
+                String requestId = request.getHeader("request-id");
                 log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-                        + " [" + request.getRequestURI() + "] #END " + requestId);
-                return toSuccessResult(null, "UNLOCK_SUCCESS");
-            } else {
-                return toExceptionResult("UNLOCK_FAILED", Const.API_RESPONSE.RETURN_CODE_ERROR);
+                        + " [" + request.getRequestURI() + "] #START " + requestId);
+                if (userDetailsService.banUser(userLoginDTO)) {
+                    log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                            + " [" + request.getRequestURI() + "] #END " + requestId);
+                    return toSuccessResult(null, "BAN_SUCCESS");
+                } else {
+                    return toExceptionResult("BAN_FAILED", Const.API_RESPONSE.RETURN_CODE_ERROR);
+                }
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+                return toExceptionResult(e.getMessage(), Const.API_RESPONSE.RETURN_CODE_ERROR);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
             }
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-            return toExceptionResult(e.getMessage(), Const.API_RESPONSE.RETURN_CODE_ERROR);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
+
+        } else {
+            return toExceptionResult("NO_PERMISSION", Const.API_RESPONSE.RETURN_CODE_ERROR_NOTFOUND);
         }
     }
+
+    @PostMapping("/unlock-user")
+    public ResponseEntity<?> unlockUser(HttpServletRequest request, @RequestBody UserLoginDTO userLoginDTO) {
+        UserDetails auth = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("TCT"))) {
+            try {
+                String requestId = request.getHeader("request-id");
+                log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                        + " [" + request.getRequestURI() + "] #START " + requestId);
+                if (userDetailsService.unlockUser(userLoginDTO)) {
+                    log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+                            + " [" + request.getRequestURI() + "] #END " + requestId);
+                    return toSuccessResult(null, "UNLOCK_SUCCESS");
+                } else {
+                    return toExceptionResult("UNLOCK_FAILED", Const.API_RESPONSE.RETURN_CODE_ERROR);
+                }
+            } catch (IllegalArgumentException e) {
+                e.printStackTrace();
+                return toExceptionResult(e.getMessage(), Const.API_RESPONSE.RETURN_CODE_ERROR);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
+            }
+
+        } else {
+            return toExceptionResult("NO_PERMISSION", Const.API_RESPONSE.RETURN_CODE_ERROR_NOTFOUND);
+        }
+    }
+
     /**
      * Update profile in app_user table
      *
@@ -261,7 +289,8 @@ public ResponseEntity<?> checkEmailVerify(HttpServletRequest request, @RequestBo
      * @return Success or fail
      */
     @RequestMapping(value = "/{uid}/update", method = RequestMethod.POST)
-    public ResponseEntity<?> updateUser(HttpServletRequest request, @PathVariable("uid") String userId, @RequestBody UserLoginDTO userLoginDTO) {
+    public ResponseEntity<?> updateUser(HttpServletRequest request, @PathVariable("uid") String
+            userId, @RequestBody UserLoginDTO userLoginDTO) {
         try {
             String requestId = request.getHeader("request-id");
             log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
@@ -288,8 +317,10 @@ public ResponseEntity<?> checkEmailVerify(HttpServletRequest request, @RequestBo
      * @param request
      * @return new token
      */
+
     @RequestMapping(value = "/refresh-token", method = RequestMethod.GET)
     public ResponseEntity<?> refreshToken(HttpServletRequest request) {
+
         try {
             String requestId = request.getHeader("request-id");
             log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
@@ -378,6 +409,7 @@ public ResponseEntity<?> checkEmailVerify(HttpServletRequest request, @RequestBo
      * @param userUid
      * @return information of user
      */
+
     @GetMapping("/{userUid}")
     public ResponseEntity<?> getUserInfo(HttpServletRequest request, @PathVariable("userUid") String userUid) {
         try {
@@ -396,7 +428,6 @@ public ResponseEntity<?> checkEmailVerify(HttpServletRequest request, @RequestBo
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
         }
     }
-
 
 
     @GetMapping("/logout")
@@ -418,4 +449,5 @@ public ResponseEntity<?> checkEmailVerify(HttpServletRequest request, @RequestBo
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
         }
     }
+
 }

@@ -5,14 +5,17 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import shupship.common.Const;
 import shupship.domain.dto.UserInfoDTO;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.Date;
+import java.util.*;
 
 @SqlResultSetMapping(
         name = Const.ResultSetMapping.USER_INFO_DTO,
@@ -40,6 +43,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@Accessors(chain = true)
 @Builder
 public class Users extends AuditEntity {
     @Id
@@ -84,10 +88,11 @@ public class Users extends AuditEntity {
     private Long empSystemId;
 
     @Column(name = "status_update")
-    private Boolean status_update;
+    private Integer status_update;
 
-    @Column(name = "role_name")
-    private String roleName;
+
+
+    private Boolean enabled;
 
     @OneToMany(mappedBy = "users")
     Collection<LeadAssign> leadAssigns;
@@ -97,4 +102,51 @@ public class Users extends AuditEntity {
 
     @OneToMany(mappedBy = "fileCreator")
     private Collection<LeadAssignHis> leadsAssignHis;
+
+    //    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+//    @JoinTable(
+//            name = "users_roles",
+//            joinColumns = @JoinColumn(name = "user_id"),
+//            inverseJoinColumns = @JoinColumn(name = "role_id")
+//    )
+    @Column(name = "roles")
+    private String roles;
+//    = new HashSet<>();
+
+    public <E> Users(String email, String password, ArrayList<E> es) {
+    }
+
+//    public void addRole(Role role) {
+//        roles.add(role);
+//        role.getUsers().add(this);
+//    }
+
+//    public void removeRole(Role role) {
+//        roles.remove(role);
+//        role.getUsers().remove(this);
+//    }
+
+//    public Collection<? extends GrantedAuthority> getAuthorities() {
+//        Set<GrantedAuthority> authorities = new HashSet<>();
+//        for (Role role : roles) {
+//            authorities.add(new SimpleGrantedAuthority(role.getName()));
+//        }
+//        return authorities;
+//    }
+
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    public boolean isEnabled() {
+        return this.enabled;
+    }
 }
