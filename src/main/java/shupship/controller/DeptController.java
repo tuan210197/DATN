@@ -25,7 +25,7 @@ public class DeptController extends BaseController {
 
     @GetMapping("/list")
     public ResponseEntity<?> getAllDept(HttpServletRequest request) {
-       List<DeptOfficeDTO> deptOfficeList = deptService.getAll();
+       List<DeptOffice> deptOfficeList = deptService.getAll();
        return ResponseEntity.ok(deptOfficeList);
     }
 }

@@ -5,11 +5,8 @@ import io.jsonwebtoken.lang.Assert;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -63,9 +60,8 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         String uid = basicLogin.getUserUid();
         Users users = userRepo.findByUid(uid);
         String role = users.getRoles();
-        UserDetails userDetails = User.withUsername(basicLogin.getEmail()).password(basicLogin.getPassword()).authorities(role).build();
 
-        return userDetails;
+        return User.withUsername(basicLogin.getEmail()).password(basicLogin.getPassword()).authorities(role).build();
 //                new User(basicLogin.getEmail(), basicLogin.getPassword(),
 //                new ArrayList<>());
     }
@@ -134,7 +130,7 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         Users user = userRepo.findByUid(checkBasicLogin.getUserUid());
         log.info("End query Table basic_login at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
-        if (user.getStatus_update() == 1) {
+        if (user.getStatus_update() == 0) {
             return true;
         } else {
             return false;
@@ -203,6 +199,7 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
                 .name(user.getName())
                 .status_update(0)
                 .roles(user.getRoles())
+                .empSystemId(sysid())
 //                .roleName(user.getRoleName())
                 .build();
         log.info("Start save Table user at time: "
@@ -332,12 +329,12 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         Assert.isTrue(ValidateUtil.regexValidation(userLoginDTO.getMobile(), Const.VALIDATE_INPUT.regexPhone), "PHONE_WRONG_FORMAT");
         Assert.isTrue(Const.VALIDATE_INPUT.phoneNum.contains(userLoginDTO.getMobile().substring(0, 3)), "PHONE_NOT_VALID");
         Assert.isTrue(userCheck.getIsActive().equals(1), "USER_NOT_ACTIVE");
-        userCheck.setAvatar(userLoginDTO.getAvatar());
+//        userCheck.setAvatar(userLoginDTO.getAvatar());
         userCheck.setBirthday(userLoginDTO.getBirthday());
         userCheck.setFullName(userLoginDTO.getFullName());
         userCheck.setGender(userLoginDTO.getGender());
         userCheck.setMobile(userLoginDTO.getMobile());
-        userCheck.setName(userLoginDTO.getName());
+        userCheck.setAddress(userLoginDTO.getAddress());
         userCheck.setStatus_update(1);
         log.info("Start save Table user at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
@@ -374,10 +371,23 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         return sb.toString();
     }
 
-    public static void main(String[] args) {
-        int len = 10;
-        System.out.println(generatePassword(len));
+    public Long sysid() {
+
+        long minNum = 1;
+        long maxNum = 999999999;
+        long randomNumber = (int) (Math.random() * (maxNum - minNum + 1) + minNum);
+        Long users = userRepo.getSysId(randomNumber);
+        if ( users == null) {
+
+            return randomNumber;
+        } else {
+            return sysid();
+        }
     }
+//    public static void main(String[] args) {
+//        int len = 10;
+//        System.out.println(generatePassword(len));
+//    }
 
     @Override
     public boolean checkTokenForUser(UserLoginDTO userLoginDTO) {

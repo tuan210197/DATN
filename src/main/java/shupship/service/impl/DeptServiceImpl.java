@@ -1,11 +1,8 @@
 package shupship.service.impl;
 
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import shupship.domain.dto.DeptOfficeDTO;
 import shupship.domain.model.DeptOffice;
-import shupship.domain.model.Users;
 import shupship.repo.DeptOffciveRepository;
 import shupship.service.DeptService;
 
@@ -16,15 +13,11 @@ public class DeptServiceImpl implements DeptService {
     private DeptOffciveRepository deptOffciveRepository;
 
     @Override
-    public List<DeptOfficeDTO> getAll() {
+    public List<DeptOffice> getAll() {
 
-        DeptOffice deptOffice = (DeptOffice) deptOffciveRepository.getAllDeptOffice();
+        return deptOffciveRepository.findAll();
 
-        DeptOfficeDTO dto = new DeptOfficeDTO();
-        BeanUtils.copyProperties(deptOffice, dto);
 
-        dto.setDeptCode(deptOffice.getDeptCode());
-        dto.setDeptName(deptOffice.getDeptName());
-        return (List<DeptOfficeDTO>) dto;
+
     }
 }

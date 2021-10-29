@@ -91,6 +91,7 @@ public class Users extends AuditEntity {
     private Integer status_update;
 
 
+
     private Boolean enabled;
 
     @OneToMany(mappedBy = "users")
