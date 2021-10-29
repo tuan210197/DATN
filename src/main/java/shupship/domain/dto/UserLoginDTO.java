@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import shupship.domain.model.Address;
 import shupship.domain.model.Role;
 
 import java.time.LocalDate;
@@ -39,4 +40,5 @@ public class UserLoginDTO {
     private boolean forGotPassword;
     private boolean status_update;
     private String roles;
+    private Address address;
 }

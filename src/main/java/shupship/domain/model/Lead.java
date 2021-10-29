@@ -13,6 +13,7 @@ import java.util.Date;
  * The persistent class for the lead database table.
  */
 @Entity
+@Table(name = "lead")
 @Data
 public class Lead extends AuditEntity implements Serializable {
     private static final long serialVersionUID = 1L;

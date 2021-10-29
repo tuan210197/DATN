@@ -3,15 +3,17 @@ package shupship.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import shupship.domain.dto.DeptOfficeDTO;
 import shupship.domain.model.DeptOffice;
-import shupship.domain.model.Users;
-import shupship.service.DeptService;
+import shupship.repo.IDeptOffciveRepository;
+import shupship.response.DeptOfficeResponse;
+import shupship.service.IDeptService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin
@@ -21,11 +23,12 @@ import java.util.List;
 public class DeptController extends BaseController {
 
     @Autowired
-    private DeptService deptService;
+    private IDeptService deptService;
 
     @GetMapping("/list")
-    public ResponseEntity<?> getAllDept(HttpServletRequest request) {
-       List<DeptOfficeDTO> deptOfficeList = deptService.getAll();
-       return ResponseEntity.ok(deptOfficeList);
+    public ResponseEntity getAllDept(HttpServletRequest request) {
+       List<DeptOffice> deptOfficeList = deptService.getListDeptCode();
+       List<DeptOfficeResponse> deptOfficeResponses = deptOfficeList.stream().map(DeptOfficeResponse::leadModelToDto).collect(Collectors.toList());
+       return new ResponseEntity<>(deptOfficeResponses, HttpStatus.OK);
     }
 }

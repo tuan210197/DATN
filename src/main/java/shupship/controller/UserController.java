@@ -36,4 +36,5 @@ public class UserController extends BaseController {
         Page<UserInfoDTO> pages = userService.list(pageable).map(mapper::toDto);
         return ResponseEntity.ok(pages);
     }
+
 }
