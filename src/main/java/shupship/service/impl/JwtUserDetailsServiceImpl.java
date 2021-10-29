@@ -60,12 +60,14 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         BasicLogin basicLogin = validateUserAuthen(email);
-//        String uid = basicLogin.getUserUid();
-//        Users users = userRepo.findByUid(uid);
+        String uid = basicLogin.getUserUid();
+        Users users = userRepo.findByUid(uid);
+        String role = users.getRoles();
+        UserDetails userDetails = User.withUsername(basicLogin.getEmail()).password(basicLogin.getPassword()).authorities(role).build();
 
-        return new User(basicLogin.getEmail(), basicLogin.getPassword(),
-
-                new ArrayList<>());
+        return userDetails;
+//                new User(basicLogin.getEmail(), basicLogin.getPassword(),
+//                new ArrayList<>());
     }
 
     @Override
@@ -132,9 +134,9 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         Users user = userRepo.findByUid(checkBasicLogin.getUserUid());
         log.info("End query Table basic_login at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
-        if(user.getStatus_update() == 1){
+        if (user.getStatus_update() == 1) {
             return true;
-        }else {
+        } else {
             return false;
         }
     }
@@ -324,9 +326,9 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
     public boolean updateUser(String userId, UserLoginDTO userLoginDTO) {
         Users userCheck = userRepo.findByUid(userId);
         Assert.notNull(userCheck, "USER_NOT_FOUND");
-        Assert.notNull(userLoginDTO.getBirthday(), "DATE_NOT_VALID");
-        Assert.notNull(userLoginDTO.getName(), "NAME_NOT_VALID");
-        Assert.notNull(userLoginDTO.getFullName(), "FULL_NAME_NOT_VALID");
+//        Assert.notNull(userLoginDTO.getBirthday(), "DATE_NOT_VALID");
+//        Assert.notNull(userLoginDTO.getName(), "NAME_NOT_VALID");
+//        Assert.notNull(userLoginDTO.getFullName(), "FULL_NAME_NOT_VALID");
         Assert.isTrue(ValidateUtil.regexValidation(userLoginDTO.getMobile(), Const.VALIDATE_INPUT.regexPhone), "PHONE_WRONG_FORMAT");
         Assert.isTrue(Const.VALIDATE_INPUT.phoneNum.contains(userLoginDTO.getMobile().substring(0, 3)), "PHONE_NOT_VALID");
         Assert.isTrue(userCheck.getIsActive().equals(1), "USER_NOT_ACTIVE");

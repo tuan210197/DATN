@@ -1,17 +1,27 @@
 package shupship.auth;
 
+import com.google.gson.JsonObject;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import shupship.domain.dto.UserInfoDTO;
+import shupship.domain.dto.UserLoginDTO;
+import shupship.domain.model.Users;
+import shupship.util.exception.ApiException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.Serializable;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -60,9 +70,14 @@ public class JwtTokenUtil implements Serializable {
     }
 
     //generate token for user
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(UserInfoDTO users) {
         Map<String, Object> claims = new HashMap<>();
-        return doGenerateToken(claims, userDetails.getUsername());
+//        claims.put("username", users.getEmail());
+//        claims.put("uid", users.getUid());
+        claims.put("postCode", users.getPostCode());
+        claims.put("deptCode", users.getDeptCode());
+        claims.put("role", users.getRoles());
+        return doGenerateToken(claims, users.getEmail());
     }
 
     //while creating the token -
@@ -99,4 +114,5 @@ public class JwtTokenUtil implements Serializable {
         }
         return null;
     }
+
 }
