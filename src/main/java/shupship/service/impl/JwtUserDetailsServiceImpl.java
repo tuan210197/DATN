@@ -130,7 +130,7 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         Users user = userRepo.findByUid(checkBasicLogin.getUserUid());
         log.info("End query Table basic_login at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
-        if (user.getStatus_update() == 1) {
+        if (user.getStatus_update() == 0) {
             return true;
         } else {
             return false;

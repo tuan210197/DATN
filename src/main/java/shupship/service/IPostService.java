@@ -3,9 +3,9 @@ package shupship.service;
 import org.springframework.stereotype.Service;
 import shupship.domain.model.PostOffice;
 
+import java.util.List;
 import java.util.Optional;
 
-@Service
-public interface PostService {
-    Optional<PostOffice> getPostByDeptId(Long id);
+public interface IPostService {
+    List<PostOffice> getPostByDeptId(Long id);
 }

@@ -3,13 +3,15 @@ package shupship.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shupship.domain.model.PostOffice;
-import shupship.service.PostService;
+import shupship.response.PostOfficeResponse;
+import shupship.service.IPostService;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -18,13 +20,14 @@ import java.util.Optional;
 @Slf4j
 @RequestMapping("/post")
 public class PostController {
+
     @Autowired
-    private PostService postService;
+    private IPostService postService;
 
-    @GetMapping("/{dept_id}/list")
-    public ResponseEntity<?> getPostByDeptId(@PathVariable Long dept_id) {
-        Optional<PostOffice> postOffices = postService.getPostByDeptId(dept_id);
-        return ResponseEntity.ok(postOffices);
+    @GetMapping("/list/{deptId}")
+    public ResponseEntity getPostByDeptId(@PathVariable Long deptId) {
+        List<PostOffice> postOffices = postService.getPostByDeptId(deptId);
+        List<PostOfficeResponse> postOfficeResponses = postOffices.stream().map(PostOfficeResponse::leadModelToDto).collect(Collectors.toList());
+        return new ResponseEntity<>(postOfficeResponses, HttpStatus.OK);
     }
-
 }

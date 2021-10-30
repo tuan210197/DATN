@@ -3,8 +3,15 @@ package shupship.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import shupship.common.Const;
 import shupship.domain.message.ResponseMessage;
+import shupship.domain.model.Users;
+<<<<<<<<< Temporary merge branch 1
+import shupship.util.exception.ApplicationException;
+=========
+import shupship.util.exception.ApiException;
+>>>>>>>>> Temporary merge branch 2
 
 /**
  * CommonController
@@ -35,4 +42,17 @@ public abstract class BaseController {
 
         return new ResponseEntity<>(message, HttpStatus.valueOf(code));
     }
+
+<<<<<<<<< Temporary merge branch 1
+    protected Users getCurrentUser() throws Exception {
+        Users user = (Users) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (user == null) {
+            throw new ApplicationException("User is null");
+        }
+        return user;
+
+    }
+=========
+>>>>>>>>> Temporary merge branch 2
 }

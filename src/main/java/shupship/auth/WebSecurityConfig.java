@@ -74,7 +74,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements W
                 .antMatchers(HttpMethod.POST, "/user/verify")
                 .antMatchers(HttpMethod.POST, "/user/verify-code/resend")
                 .antMatchers(HttpMethod.POST, "/user/password/change")
-                .antMatchers(HttpMethod.GET, "/sync");
+                .antMatchers(HttpMethod.GET, "/sync").and();
 
     }
 
@@ -85,6 +85,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements W
                 .authorizeRequests()
 //                .antMatchers("/user/**").permitAll ()
                 .antMatchers("/role/**").permitAll()
+
 
                 .anyRequest().authenticated().and().
                 // make sure we use stateless session; session won't be used to

@@ -16,7 +16,8 @@ import lombok.NoArgsConstructor;
 public class Role implements Serializable{
     private static final long serialVersionUID = -5204391003825277886L;
 
-    @Id  @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     private String name;

@@ -8,6 +8,12 @@ public class Constants {
     public final static String API_STREET = "https://location.okd.viettelpost.vn/location/v1.0/autocomplete?system=VTP&ctx=SUBWARD&ctx={wardId}";
 
     public final static String QUERY_POSTOFFICE = "SELECT BUUCUC, TINH, QUANHUYEN, PHUONGXA, NAME, LATITUDE, LONGITUDE, PHONE FROM VTP.DM_BUUCUCQUANLYVIEW";
+
+<<<<<<<<< Temporary merge branch 1
+    //Page
+    public final static int PAGE_SIZE = 10;
     public final static Long DELETE_LEAD = 1L;
-    public final static int PAGE_SIZE = 15;
+=========
+>>>>>>>>> Temporary merge branch 2
+
 }
