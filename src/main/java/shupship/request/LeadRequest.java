@@ -10,7 +10,7 @@ public class LeadRequest extends BaseRequest {
     private static final long serialVersionUID = 1L;
     private int page;
     private int pageSize;
-
+    private Long id;
     private String representation;
     @Size(max = 100)
     private String fullName;

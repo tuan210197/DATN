@@ -90,6 +90,14 @@ public class LeadServiceImpl implements ILeadService {
         if (StringUtils.isNotEmpty(leadRequest.getPhone())) {
             data.setPhone(CommonUtils.convertPhone(leadRequest.getPhone()));
         } else throw new HieuDzException("Không được để trống số điện thoại");
+
+        if(StringUtils.isEmpty(leadRequest.getPhone())){
+            throw new HieuDzException("Không được để trống số điện thoại");
+        }
+        if (CollectionUtils.isNotEmpty(iLeadRepository.findLeadWithPhoneOnEVTP(CommonUtils.convertPhone(leadRequest.getPhone()))))
+            throw new HieuDzException("Số điện thoại đã tồn tại trên hệ thống!");
+        else data.setPhone(CommonUtils.convertPhone(leadRequest.getPhone()));
+
         data.setType(LeadType.TU_NHAP.getType());
         data.setIsFromEVTP(1L);
         data.setRepresentation(leadRequest.getRepresentation());
@@ -106,10 +114,9 @@ public class LeadServiceImpl implements ILeadService {
         } else {
             throw new HieuDzException("Lỗi bỏ trống sp");
         }
-
-
         Lead lead = iLeadRepository.save(data);
         lead.setCustomerCode("KH".concat(String.valueOf(lead.getId())));
+        BeanUtils.copyProperties(data,lead);
         return lead;
     }
 
