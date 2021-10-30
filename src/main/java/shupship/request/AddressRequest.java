@@ -15,7 +15,7 @@ public class AddressRequest extends BaseRequest {
     @Size(max = 100)
     private String homeNo;
 
-    private String street;
+    ////private String street;
 
     private String ward;
 
@@ -39,9 +39,10 @@ public class AddressRequest extends BaseRequest {
         Address address = new Address();
         address.setHomeNo(addressRequest.getHomeNo());
         address.setWard(addressRequest.getWard());
-        address.setStreet(addressRequest.getStreet());
+        ///address.setStreet(addressRequest.getStreet());
         address.setDistrict(addressRequest.getDistrict());
         address.setProvince(addressRequest.getProvince());
+
         return address;
     }
 
@@ -49,7 +50,6 @@ public class AddressRequest extends BaseRequest {
         AddressRequest addressRequest = new AddressRequest();
         addressRequest.setHomeNo(address.getHomeNo());
         addressRequest.setWard(address.getWard());
-        addressRequest.setStreet(address.getStreet());
         addressRequest.setDistrict(address.getDistrict());
         addressRequest.setProvince(address.getProvince());
         return addressRequest;

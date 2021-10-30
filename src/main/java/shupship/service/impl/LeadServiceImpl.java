@@ -44,6 +44,7 @@ public class LeadServiceImpl implements ILeadService {
     @Autowired
     IScheduleRepository scheduleRepository;
 
+    ///@MockBean
     @Autowired
     IIndustryRepository industryRepository;
 
@@ -84,25 +85,15 @@ public class LeadServiceImpl implements ILeadService {
         data.setStatus(LeadStatus.NEW.getType());
         if (StringUtils.isNotEmpty(LeadSource.valueOf(leadRequest.getLeadSource()).name())) {
             data.setLeadSource(LeadSource.valueOf(leadRequest.getLeadSource()).name());
-        }else throw new HieuDzException("Chưa chọn phân loại khách hàng");
+        } else throw new HieuDzException("Chưa chọn phân loại khách hàng");
 
-        data.setEmail(leadRequest.getEmail());
-        if(StringUtils.isNotEmpty(leadRequest.getPhone())){
+        if (StringUtils.isNotEmpty(leadRequest.getPhone())) {
             data.setPhone(CommonUtils.convertPhone(leadRequest.getPhone()));
-        }else throw new HieuDzException("Không được để trống số điện thoại");
-
+        } else throw new HieuDzException("Không được để trống số điện thoại");
         data.setType(LeadType.TU_NHAP.getType());
-        // Neu duoc tao tu EVTP -> isFromEVTP = 1
         data.setIsFromEVTP(1L);
-        data.setDescription(leadRequest.getDescription());
-        data.setQuantityMonth(leadRequest.getQuantityMonth());
-        data.setWeight(leadRequest.getWeight());
-        data.setQuality(leadRequest.getQuality());
-        data.setCompensation(leadRequest.getCompensation());
-        data.setPayment(leadRequest.getPayment());
-        data.setOther(leadRequest.getOther());
-        data.setExpectedRevenue(leadRequest.getExpectedRevenue());
         data.setRepresentation(leadRequest.getRepresentation());
+
         data.setStatus(LeadStatus.NEW.getType());
         Address address = AddressRequest.addressDtoToModel(leadRequest.getAddress());
         data.setAddress(address);
@@ -112,7 +103,11 @@ public class LeadServiceImpl implements ILeadService {
             if (CollectionUtils.isNotEmpty(industries)) {
                 data.setIndustries(industries);
             }
+        } else {
+            throw new HieuDzException("Lỗi bỏ trống sp");
         }
+
+
         Lead lead = iLeadRepository.save(data);
         lead.setCustomerCode("KH".concat(String.valueOf(lead.getId())));
         return lead;
@@ -147,31 +142,32 @@ public class LeadServiceImpl implements ILeadService {
             if (StringUtils.isNotEmpty(leadRequest.getFullName())) {
                 existData.setFullName(leadRequest.getFullName());
                 existData.setCompanyName(leadRequest.getFullName());
-            }else throw new HieuDzException("Không được để trống tên");
+            } else throw new HieuDzException("Không được để trống tên");
 
             if (StringUtils.isNotEmpty(leadRequest.getCompanyName())) {
                 existData.setFullName(leadRequest.getCompanyName());
                 existData.setCompanyName(leadRequest.getCompanyName());
-            } else  throw new HieuDzException("Không được để trống tên công ty");
+            } else throw new HieuDzException("Không được để trống tên công ty");
             existData.setRepresentation(leadRequest.getRepresentation());
 
-            if(StringUtils.isNotEmpty(leadRequest.getTitle())){
+            if (StringUtils.isNotEmpty(leadRequest.getTitle())) {
                 existData.setTitle(leadRequest.getTitle());
-            } else throw  new HieuDzException("Không được để trống title");
+            } else throw new HieuDzException("Không được để trống title");
+            existData.setLeadSource(leadRequest.getLeadSource());
 
-/*
-        existData.setAnnualQuantity(inputData.getAnnualQuantity());
-        existData.setWeight(inputData.getWeight());
-        existData.setExpectedRevenue(inputData.getExpectedRevenue());
-        existData.setLeadSource(inputData.getLeadSource());
-        existData.setInProvincePrice(inputData.getInProvincePrice());
-        existData.setOutProvincePrice(inputData.getOutProvincePrice());
-        existData.setQuality(inputData.getQuality());
-        existData.setCompensation(inputData.getCompensation());
-        existData.setPayment(inputData.getPayment());
-        existData.setOther(inputData.getOther());
-        existData.setQuantityMonth(inputData.getQuantityMonth());
- ***/
+            if (leadRequest.getAddress() != null) {
+                Address address = AddressRequest.addressDtoToModel(leadRequest.getAddress());
+                existData.setAddress(address);
+            }
+
+            if (CollectionUtils.isNotEmpty(leadRequest.getIndustry())) {
+                List<Industry> industries = industryRepository.findIndustriesByCodeIn(leadRequest.getIndustry());
+                if (CollectionUtils.isNotEmpty(industries)) {
+                    existData.setIndustries(industries);
+                }
+            } else {
+                throw new HieuDzException("Chưa chọn sản phẩm kinh doanh");
+            }
         } catch (Exception e) {
             e.getLocalizedMessage();
             throw e;
@@ -196,9 +192,12 @@ public class LeadServiceImpl implements ILeadService {
     }
 
     @Override
-    public LeadResponse detailLead(Long id) throws ApplicationException {
-        LeadResponse leadResponse = new LeadResponse();
-        Lead existData = iLeadRepository.findLeadById(id);
+    public LeadResponse detailLead(Long leadId) throws ApplicationException {
+        Lead existData = iLeadRepository.findLeadById(leadId);
+        if (existData == null) {
+            throw new HieuDzException("Khách hàng không tồn tại");
+        }
+        LeadResponse leadResponse = LeadResponse.leadModelToDto(existData);
         BeanUtils.copyProperties(existData, leadResponse);
         return leadResponse;
     }

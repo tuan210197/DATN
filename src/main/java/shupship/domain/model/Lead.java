@@ -84,14 +84,9 @@ public class Lead extends AuditEntity implements Serializable {
     @Column(name = "company_name")
     private String companyName;
 
-    @Column(name = "num_of_emp")
-    private Long numOfEmp;
 
     @Column(name = "annual_quantity")
     private Long annualQuantity;
-
-    @Column(name = "lead_score")
-    private Long leadScore;
 
     @Column(name = "lead_source")
     private String leadSource;

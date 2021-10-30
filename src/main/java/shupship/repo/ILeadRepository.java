@@ -13,11 +13,12 @@ import java.util.List;
 @Repository
 public interface ILeadRepository extends PagingAndSortingRepository<Lead, Long>, JpaSpecificationExecutor<Lead> {
 
-    @Query(value = "select l from Lead l ")
+    @Query(value = "select l from Lead l where l.deletedStatus <> 1")
     Page<Lead> getListLead(Pageable pageable);
 
     @Query("Select a from Lead a where a.id = :id")
     Lead findLeadById(Long id);
+
     @Query("select l from Lead l where l.deletedStatus = 0 and l.phone = :phone")
     List<Lead> findLeadWithPhoneOnEVTP(String phone);
 }

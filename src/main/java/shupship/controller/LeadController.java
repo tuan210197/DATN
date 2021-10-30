@@ -48,14 +48,15 @@ public class LeadController extends BaseController {
 
     @PostMapping(value = "/createWeb")
     public ResponseEntity createLeadOnEVTP(HttpServletRequest request, @Valid @RequestBody LeadRequest inputData) throws Exception {
-//        Users users = getCurrentUser();
+        ///Users users = getCurrentUser();
         Lead data = leadService.insertLead(inputData);
         LeadResponse response = LeadResponse.leadModelToDto(data);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PutMapping(value = "evtp/{leadId}")
-    public ResponseEntity<LeadResponse> updateLeadOnEVTP(@RequestBody LeadUpdateRequest inputData, @PathVariable(value = "leadId") Long leadId) throws ApplicationException {
+    public ResponseEntity<LeadResponse> updateLeadOnEVTP(@RequestBody LeadUpdateRequest inputData, @PathVariable(value = "leadId") Long leadId)
+            throws ApplicationException {
         //validateLeadSource
 //        if (!validateIndustry(inputData.getLeadSource())) {
 //            throw new BusinessException(new ErrorMessage("ERR_002", "Industry code is not defined"));
@@ -63,7 +64,6 @@ public class LeadController extends BaseController {
 
         Lead data = leadService.updateLead(leadId, inputData);
         LeadResponse response = LeadResponse.leadModelToDto(data);
-
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @DeleteMapping(value = "/evtp/{leadId}")

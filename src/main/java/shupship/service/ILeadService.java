@@ -2,7 +2,6 @@ package shupship.service;
 
 import org.springframework.context.ApplicationContextException;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
 import shupship.domain.model.Lead;
 import shupship.request.LeadRequest;
 import shupship.request.LeadUpdateRequest;

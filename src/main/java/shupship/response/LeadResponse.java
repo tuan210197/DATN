@@ -3,66 +3,58 @@ package shupship.response;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import shupship.domain.model.*;
+
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
-public class LeadResponse{
+public class LeadResponse {
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    List<LeadAssign> leadAssigns;
+
     private Long id;
-    private String salutation;
-    private String firstName;
-    private String lastName;
-    private String fullName;
-    private String email;
     private String phone;
-    private String gender;
-    private String description;
     private Long type;
-    private Double quantityMonth;
+    private String fullName;
     private String customerCode;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<Schedule> schedules;
     private String companyName;
-    private Long leadScore;
-    private String leadStage;
     private String subscriptionStatus;
     private String leadSource;
     private Long convertStatus;
     private Long status;
     private String representation;
     private String title;
-    private Double expectedRevenue;
     private Long isFromEVTP;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    List<LeadAssign> leadAssigns;
+    private AddressResponse addressResponse;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Collection<IndustryResponse> industries;
 
     public static LeadResponse leadModelToDto(Lead model) {
-
         LeadResponse data = new LeadResponse();
-        data.setLeadSource(model.getLeadSource());
         data.setId(model.getId());
+        data.setLeadSource(model.getLeadSource());
         data.setFullName(model.getFullName());
         data.setIsFromEVTP(model.getIsFromEVTP());
-        data.setExpectedRevenue(model.getExpectedRevenue());
         data.setTitle(model.getTitle());
         data.setRepresentation(model.getRepresentation());
         data.setStatus(model.getStatus());
-        data.setConvertStatus(model.getConvertStatus());
-        data.setLeadScore(model.getLeadScore());
         data.setCompanyName(model.getCompanyName());
         data.setCustomerCode(model.getCustomerCode());
-        data.setQuantityMonth(model.getQuantityMonth());
         data.setType(model.getType());
         data.setPhone(model.getPhone());
         data.setFullName(model.getFullName());
+        Address address = model.getAddress();
+        if (address != null)
+            data.setAddressResponse(AddressResponse.leadModelToDto(address));
 
-        /***
-        data.setDescription(model.getDescription());
-        data.setGender(model.getGender());
-        data.setEmail(model.getEmail());
-        data.setLastName(model.getLastName());
-        data.setFirstName(model.getFirstName());
-        data.setSalutation(model.getSalutation());
-        */
+       List<IndustryResponse> industryResponses = model.getIndustries().stream().map(e -> new IndustryResponse(e.getCode(),e.getName())).collect(Collectors.toList());
+       data.setIndustries(industryResponses);
         return data;
     }
 }

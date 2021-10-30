@@ -1,13 +1,16 @@
 package shupship.response;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import shupship.domain.model.District;
+import lombok.NoArgsConstructor;
 import shupship.domain.model.Industry;
-
+@AllArgsConstructor
 @Data
+@NoArgsConstructor
 public class IndustryResponse {
     private String code;
     private String name;
+
 
     public static IndustryResponse leadModelToDto(Industry industry){
         IndustryResponse model = new IndustryResponse();
