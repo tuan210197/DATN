@@ -1,18 +1,18 @@
 package shupship.domain.model;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
+@Data
 @Entity
-@Getter
-@Setter
 @Table(name = "post_office")
-public class PostOffice extends AuditEntity {
+public class PostOffice extends AuditEntity implements Serializable {
 
     @Id
-    @Column(columnDefinition = "serial")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -23,7 +23,7 @@ public class PostOffice extends AuditEntity {
     private String postPhone;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "dept_office_id")
+    @JoinColumn(name = "dept_office_id", referencedColumnName = "id")
     private DeptOffice deptOffice;
 
     //kinh do

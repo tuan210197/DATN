@@ -1,20 +1,17 @@
 package shupship.domain.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
+import lombok.Data;
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Collection;
 
+
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "dept_office")
 @Entity
-public class DeptOffice {
+public class DeptOffice implements Serializable {
     @Id
-    @Column(columnDefinition = "serial")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

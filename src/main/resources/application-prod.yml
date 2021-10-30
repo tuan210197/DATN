@@ -37,7 +37,7 @@ spring:
 
 jwt:
   secret: supship
-  expireToken:  3600
+  expireToken:  3600000
 
 server:
   port: 8085
