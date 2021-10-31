@@ -7,5 +7,5 @@ import java.util.List;
 import java.util.Optional;
 
 public interface IPostService {
-    List<PostOffice> getPostByDeptId(Long id);
+    List<PostOffice> getPostByDeptCode(String id);
 }
