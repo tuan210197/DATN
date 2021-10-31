@@ -3,50 +3,44 @@ package shupship.request;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.validation.constraints.Size;
 import java.util.List;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class LeadUpdateRequest extends BaseRequest {
     private static final long serialVersionUID = 1L;
+    private int page;
+    private int pageSize;
+
+    private String representation;
+    @Size(max = 100)
     private String fullName;
 
     private String phone;
 
-    private String representation;
-
-    private String title;
-
-    private String companyName;
-
-    private Long annualQuantity;
-
-    private Double expectedRevenue;
-
-    private Double inProvincePrice;
-
-    private Double outProvincePrice;
-
-    private String leadSource;
-
-    private Double quantityMonth;
-
-    private Double weight;
-
-    private String quality;
-
-    private String compensation;
-
-    private String payment;
-
-    private String other;
+    private String description;
 
     private AddressRequest address;
 
-    private List<String> competitors;
+    @Size(max = 100)
+    private String title;
 
-    private List<String> products;
+    @Size(max = 100)
+    private String companyName;
 
-    private List<String> industries;
+    private String industrys;
+
+    private Long leadScore;
+
+    private String leadStage;
+
+    private String subscriptionStatus;
+
+    private String leadSource;
+
+    private Long status;
+
+    private List<String> industry;
 
 }
