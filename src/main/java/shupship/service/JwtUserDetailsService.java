@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import shupship.domain.dto.UserInfoDTO;
 import shupship.domain.dto.UserLoginDTO;
 import shupship.domain.model.BasicLogin;
+import shupship.domain.model.Users;
 
 /**
  * @author tuandv
@@ -48,4 +49,6 @@ public interface JwtUserDetailsService extends UserDetailsService {
 	boolean banUser(UserLoginDTO userLoginDTO);
 
 	boolean unlockUser(UserLoginDTO userLoginDTO);
+
+	Users getCurrentUser();
 }

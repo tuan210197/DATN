@@ -5,6 +5,7 @@ import io.jsonwebtoken.lang.Assert;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,6 +24,7 @@ import shupship.repo.BasicLoginRepo;
 import shupship.service.JwtUserDetailsService;
 import shupship.service.MailSenderService;
 import shupship.util.ValidateUtil;
+import shupship.util.exception.ApplicationException;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -174,6 +176,18 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
     }
 
     @Override
+    public Users getCurrentUser() {
+        UserDetails user = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = user.getUsername();
+        BasicLogin basicLogin = basicLoginRepo.findByEmail(email);
+        Users users = userRepo.findByUid(basicLogin.getUserUid());
+        if (users == null) {
+            throw new ApplicationException("Users is null");
+        }
+        return users;
+    }
+
+    @Override
     public boolean registerUser(UserLoginDTO user) {
         Assert.hasText(user.getEmail(), "EMAIL_EMPTY");
 //        Assert.hasText(user.getPassword(), "PASSWORD_EMPTY");
@@ -196,6 +210,8 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
                 .isActive(Const.COMMON_CONST_VALUE.ACTIVE)
                 .isDeleted(Const.COMMON_CONST_VALUE.NOT_DELETED)
                 .mobile(user.getMobile())
+                .deptCode(user.getDeptCode())
+                .postCode(user.getPostCode())
                 .name(user.getName())
                 .status_update(0)
                 .roles(user.getRoles())
