@@ -26,15 +26,12 @@ import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-<<<<<<<<< Temporary merge branch 1
-=========
 /**
  * @author tuandv
  * The JwtRequestFilter extends the Spring Web Filter OncePerRequestFilter class. For any incoming request this Filter class gets executed.
  * It checks if the request has a valid JWT token. If it has a valid JWT Token then it sets the Authentication in the context,
  * to specify that the current user is authenticated.
  */
->>>>>>>>> Temporary merge branch 2
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 
