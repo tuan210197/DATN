@@ -43,4 +43,6 @@ public class UserLoginDTO {
     private boolean status_update;
     private String roles;
     private Address address;
+    private String employeeCode;
+    private Long empSystemId;
 }

@@ -5,12 +5,13 @@ import io.jsonwebtoken.impl.DefaultClaims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
 import shupship.auth.JwtTokenUtil;
 import shupship.common.Const;
@@ -18,11 +19,11 @@ import shupship.domain.dto.JwtRequest;
 import shupship.domain.dto.JwtResponse;
 import shupship.domain.dto.UserInfoDTO;
 import shupship.domain.dto.UserLoginDTO;
-import shupship.domain.model.Users;
 import shupship.service.JwtUserDetailsService;
-import shupship.util.exception.ApiException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -30,7 +31,7 @@ import java.util.*;
 /**
  * @author tuandv
  */
-
+@Scope("session")
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor
@@ -411,6 +412,7 @@ public class AuthenController extends BaseController {
 
     @GetMapping("/{userUid}")
     public ResponseEntity<?> getUserInfo(HttpServletRequest request, @PathVariable("userUid") String userUid) {
+
         try {
             String requestId = request.getHeader("request-id");
             log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
@@ -430,7 +432,7 @@ public class AuthenController extends BaseController {
 
 
     @GetMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletRequest request) {
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
         try {
             String requestId = request.getHeader("request-id");
             log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
@@ -448,5 +450,12 @@ public class AuthenController extends BaseController {
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
         }
     }
+//        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+//        if (auth != null) {
+//
+//            new SecurityContextLogoutHandler().logout(request, response, auth);
+//        }
+    }
 
-}
+
+

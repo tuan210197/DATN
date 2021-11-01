@@ -202,6 +202,7 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         log.info("End query Table basic_login at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
         Assert.isNull(checkBasicLogin, "EMAIL_REGISTERED");
+        Long sysid = sysid();
         Users users = Users.builder()
                 .avatar(user.getAvatar())
                 .birthday(user.getBirthday())
@@ -215,7 +216,8 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
                 .name(user.getName())
                 .status_update(0)
                 .roles(user.getRoles())
-                .empSystemId(sysid())
+                .empSystemId(sysid)
+                .employeeCode("SS"+sysid.toString())
 //                .roleName(user.getRoleName())
                 .build();
         log.info("Start save Table user at time: "
