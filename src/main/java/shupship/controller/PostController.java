@@ -24,9 +24,9 @@ public class PostController {
     @Autowired
     private IPostService postService;
 
-    @GetMapping("/list/{deptId}")
-    public ResponseEntity<?> getPostByDeptId(@PathVariable Long deptId) {
-        List<PostOffice> postOffices = postService.getPostByDeptId(deptId);
+    @GetMapping("/list/{deptCode}")
+    public ResponseEntity getPostByDeptId(@PathVariable String deptCode) {
+        List<PostOffice> postOffices = postService.getPostByDeptCode(deptCode);
         List<PostOfficeResponse> postOfficeResponses = postOffices.stream().map(PostOfficeResponse::leadModelToDto).collect(Collectors.toList());
         return new ResponseEntity<>(postOfficeResponses, HttpStatus.OK);
     }

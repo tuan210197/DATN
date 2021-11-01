@@ -15,7 +15,7 @@ public class PostService implements IPostService {
     private IPostOfficeRepository postOfficeRepository;
 
     @Override
-    public List<PostOffice> getPostByDeptId(Long id) {
+    public List<PostOffice> getPostByDeptCode(String id) {
         return postOfficeRepository.getPostOfficeByDeptCode(id);
     }
 }

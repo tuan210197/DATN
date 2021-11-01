@@ -148,7 +148,6 @@ public class AuthenController extends BaseController {
     public ResponseEntity<?> saveUser(HttpServletRequest request, @RequestBody UserLoginDTO userLoginDTO, Authentication authentication) throws Exception {
         UserDetails auth = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("TCT"))) {
-
             try {
                 String requestId = request.getHeader("request-id");
                 log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))

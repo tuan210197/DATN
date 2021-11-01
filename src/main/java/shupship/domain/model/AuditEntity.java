@@ -108,6 +108,7 @@ public abstract class AuditEntity implements Serializable {
         try {
             if (createdBy == null) {
                 this.createdBy = CommonUtils.getCurrentUser().getEmpSystemId();
+//                this.createdBy = -1L;
             }
         } catch (Exception e) {
             this.createdBy = -1L;
@@ -121,6 +122,7 @@ public abstract class AuditEntity implements Serializable {
     void preUpdate() throws ApplicationException {
         if (SecurityContextHolder.getContext() !=null && SecurityContextHolder.getContext().getAuthentication() !=null && SecurityContextHolder.getContext().getAuthentication().getPrincipal() != null) {
             this.lastModifiedBy = CommonUtils.getCurrentUser().getEmpSystemId();
+//            this.lastModifiedBy = -1L;
         }else{
             this.lastModifiedBy = -1L;
         }

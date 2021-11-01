@@ -12,10 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shupship.common.Constants;
-import shupship.domain.model.Address;
-import shupship.domain.model.Industry;
-import shupship.domain.model.Lead;
-import shupship.domain.model.Schedule;
+import shupship.domain.model.*;
 import shupship.enums.LeadSource;
 import shupship.enums.LeadStatus;
 import shupship.enums.LeadType;
@@ -32,6 +29,8 @@ import shupship.util.CommonUtils;
 import shupship.util.exception.ApplicationException;
 import shupship.util.exception.HieuDzException;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 
 
@@ -44,18 +43,26 @@ public class LeadServiceImpl implements ILeadService {
     @Autowired
     IScheduleRepository scheduleRepository;
 
+    ///@MockBean
     @Autowired
     IIndustryRepository industryRepository;
 
     @Override
-    public PagingRs getListLead(Pageable pageable) throws ApplicationContextException {
+    public PagingRs getListLead(Pageable pageable, Timestamp from, Timestamp to, Long status, Users users) throws ApplicationContextException {
 
-        Page<Lead> leadList = iLeadRepository.getListLead(pageable);
-//        List<LeadResponse> leadResponses = new ArrayList<>();
-//        for (Lead model : leadList){
-//            LeadResponse laLeadResponse = LeadResponse.leadModelToDto(model);
-//            leadResponses.add(laLeadResponse);
-//        }
+        Instant startDate = from.toInstant();
+        Instant endDate = to.toInstant();
+
+        Page<Lead> leadList = null;
+
+        if (users.getRoles().equals("TCT")) {
+            leadList = iLeadRepository.findAllLeadbyCriteria(status, null, startDate, endDate, null, pageable);
+        } else if (users.getRoles().equals("CN")) {
+            leadList = iLeadRepository.findAllLeadbyCriteriaByCNBC(status, null, startDate, endDate, users.getEmpSystemId(), users.getDeptCode(), pageable);
+        } else if (users.getRoles().equals("BC")) {
+            leadList = iLeadRepository.findAllLeadbyCriteriaByCNBC(status, null, startDate, endDate, users.getEmpSystemId(), users.getPostCode(), pageable);
+        }
+
         Page<LeadResponse> leadResponses = leadList.map(LeadResponse::leadModelToDto);
         PagingRs listLeadResponse = new PagingRs();
         listLeadResponse.setTotalItem(leadList.getTotalElements());
@@ -66,35 +73,41 @@ public class LeadServiceImpl implements ILeadService {
     @Override
     public Lead insertLead(LeadRequest leadRequest) throws ApplicationContextException {
         Lead data = new Lead();
-        if (StringUtils.isNotEmpty(leadRequest.getTitle()))
+        if (StringUtils.isNotEmpty(leadRequest.getTitle())) {
             data.setTitle(leadRequest.getTitle());
-        else throw new HieuDzException("Không được để trống tille");
+        } else throw new HieuDzException("Không được để trống tille");
 
         if (StringUtils.isNotEmpty(leadRequest.getFullName())) {
             data.setFullName(leadRequest.getFullName());
             data.setCompanyName(leadRequest.getFullName());
-        }
+        } else throw new HieuDzException("Không được để trống tên");
+
         if (StringUtils.isNotEmpty(leadRequest.getCompanyName())) {
             data.setFullName(leadRequest.getCompanyName());
             data.setCompanyName(leadRequest.getCompanyName());
-        }
-        data.setSalutation(leadRequest.getSalutation());
+        } else throw new HieuDzException("Không được để trống tên công ty");
+
+//        data.setSalutation(leadRequest.getSalutation());
         data.setStatus(LeadStatus.NEW.getType());
-        data.setLeadSource(LeadSource.valueOf(leadRequest.getLeadSource()).name());
-        data.setEmail(leadRequest.getEmail());
-        data.setPhone(CommonUtils.convertPhone(leadRequest.getPhone()));
+        if (StringUtils.isNotEmpty(LeadSource.valueOf(leadRequest.getLeadSource()).name())) {
+            data.setLeadSource(LeadSource.valueOf(leadRequest.getLeadSource()).name());
+        } else throw new HieuDzException("Chưa chọn phân loại khách hàng");
+
+        if (StringUtils.isNotEmpty(leadRequest.getPhone())) {
+            data.setPhone(CommonUtils.convertPhone(leadRequest.getPhone()));
+        } else throw new HieuDzException("Không được để trống số điện thoại");
+
+        if(StringUtils.isEmpty(leadRequest.getPhone())){
+            throw new HieuDzException("Không được để trống số điện thoại");
+        }
+        if (CollectionUtils.isNotEmpty(iLeadRepository.findLeadWithPhoneOnEVTP(CommonUtils.convertPhone(leadRequest.getPhone()))))
+            throw new HieuDzException("Số điện thoại đã tồn tại trên hệ thống!");
+        else data.setPhone(CommonUtils.convertPhone(leadRequest.getPhone()));
+
         data.setType(LeadType.TU_NHAP.getType());
-        // Neu duoc tao tu EVTP -> isFromEVTP = 1
         data.setIsFromEVTP(1L);
-        data.setDescription(leadRequest.getDescription());
-        data.setQuantityMonth(leadRequest.getQuantityMonth());
-        data.setWeight(leadRequest.getWeight());
-        data.setQuality(leadRequest.getQuality());
-        data.setCompensation(leadRequest.getCompensation());
-        data.setPayment(leadRequest.getPayment());
-        data.setOther(leadRequest.getOther());
-        data.setExpectedRevenue(leadRequest.getExpectedRevenue());
         data.setRepresentation(leadRequest.getRepresentation());
+
         data.setStatus(LeadStatus.NEW.getType());
         Address address = AddressRequest.addressDtoToModel(leadRequest.getAddress());
         data.setAddress(address);
@@ -104,9 +117,12 @@ public class LeadServiceImpl implements ILeadService {
             if (CollectionUtils.isNotEmpty(industries)) {
                 data.setIndustries(industries);
             }
+        } else {
+            throw new HieuDzException("Lỗi bỏ trống sp");
         }
         Lead lead = iLeadRepository.save(data);
         lead.setCustomerCode("KH".concat(String.valueOf(lead.getId())));
+        BeanUtils.copyProperties(data,lead);
         return lead;
     }
 
@@ -123,13 +139,13 @@ public class LeadServiceImpl implements ILeadService {
                 if (!existData.getPhone().equals(leadRequest.getPhone())) {
                     List<Schedule> schedules = scheduleRepository.getSchedulesByLeadId(id);
                     if (CollectionUtils.isNotEmpty(schedules)) {
-                        throw new HieuDzException("LeadService dòng 116");
+                        throw new HieuDzException("Chỉ cho phép sửa SĐT của khách hàng khi khách hàng chưa có lịch tiếp xúc và chưa có kết quả tiếp xúc");
                     } else {
                         if (existData.getPhone().equals(CommonUtils.convertPhone(leadRequest.getPhone()))) {
                             existData.setPhone(CommonUtils.convertPhone(leadRequest.getPhone()));
                         } else {
                             if (CollectionUtils.isNotEmpty(iLeadRepository.findLeadWithPhoneOnEVTP(CommonUtils.convertPhone(leadRequest.getPhone()))))
-                                throw new HieuDzException("LeadService dong 122");
+                                throw new HieuDzException("Số điện thoại đã tồn tại trên hệ thống!");
                             else existData.setPhone(CommonUtils.convertPhone(leadRequest.getPhone()));
                         }
                     }
@@ -139,24 +155,32 @@ public class LeadServiceImpl implements ILeadService {
             if (StringUtils.isNotEmpty(leadRequest.getFullName())) {
                 existData.setFullName(leadRequest.getFullName());
                 existData.setCompanyName(leadRequest.getFullName());
-            }
+            } else throw new HieuDzException("Không được để trống tên");
+
             if (StringUtils.isNotEmpty(leadRequest.getCompanyName())) {
                 existData.setFullName(leadRequest.getCompanyName());
                 existData.setCompanyName(leadRequest.getCompanyName());
-            }
+            } else throw new HieuDzException("Không được để trống tên công ty");
             existData.setRepresentation(leadRequest.getRepresentation());
-            existData.setTitle(leadRequest.getTitle());
-//        existData.setAnnualQuantity(inputData.getAnnualQuantity());
-//        existData.setWeight(inputData.getWeight());
-//        existData.setExpectedRevenue(inputData.getExpectedRevenue());
-//        existData.setLeadSource(inputData.getLeadSource());
-//        existData.setInProvincePrice(inputData.getInProvincePrice());
-//        existData.setOutProvincePrice(inputData.getOutProvincePrice());
-//        existData.setQuality(inputData.getQuality());
-//        existData.setCompensation(inputData.getCompensation());
-//        existData.setPayment(inputData.getPayment());
-//        existData.setOther(inputData.getOther());
-//        existData.setQuantityMonth(inputData.getQuantityMonth());
+
+            if (StringUtils.isNotEmpty(leadRequest.getTitle())) {
+                existData.setTitle(leadRequest.getTitle());
+            } else throw new HieuDzException("Không được để trống title");
+            existData.setLeadSource(leadRequest.getLeadSource());
+
+            if (leadRequest.getAddress() != null) {
+                Address address = AddressRequest.addressDtoToModel(leadRequest.getAddress());
+                existData.setAddress(address);
+            }
+
+            if (CollectionUtils.isNotEmpty(leadRequest.getIndustry())) {
+                List<Industry> industries = industryRepository.findIndustriesByCodeIn(leadRequest.getIndustry());
+                if (CollectionUtils.isNotEmpty(industries)) {
+                    existData.setIndustries(industries);
+                }
+            } else {
+                throw new HieuDzException("Chưa chọn sản phẩm kinh doanh");
+            }
         } catch (Exception e) {
             e.getLocalizedMessage();
             throw e;
@@ -169,11 +193,11 @@ public class LeadServiceImpl implements ILeadService {
         Lead existData = iLeadRepository.findLeadById(leadId);
 
         if (existData == null) {
-            throw new HieuDzException("dòng 162");
+            throw new HieuDzException("Khách hàng không tồn tại");
         }
         List<Schedule> schedules = scheduleRepository.getSchedulesByLeadId(leadId);
         if (CollectionUtils.isNotEmpty(schedules)) {
-            throw new HieuDzException("dòng 166");
+            throw new HieuDzException("Chỉ được xóa khách hàng khi không có lịch tiếp xúc và chưa cập nhật kết quả");
         }
         existData.setDeletedStatus(Constants.DELETE_LEAD);
         Lead lead = iLeadRepository.save(existData);
@@ -181,9 +205,12 @@ public class LeadServiceImpl implements ILeadService {
     }
 
     @Override
-    public LeadResponse detailLead(Long id) throws ApplicationException {
-        LeadResponse leadResponse = new LeadResponse();
-        Lead existData = iLeadRepository.findLeadById(id);
+    public LeadResponse detailLead(Long leadId) throws ApplicationException {
+        Lead existData = iLeadRepository.findLeadById(leadId);
+        if (existData == null) {
+            throw new HieuDzException("Khách hàng không tồn tại");
+        }
+        LeadResponse leadResponse = LeadResponse.leadModelToDto(existData);
         BeanUtils.copyProperties(existData, leadResponse);
         return leadResponse;
     }
