@@ -8,6 +8,4 @@ import shupship.domain.model.Users;
 
 @Service
 public interface UserService extends CrudService<Users,java.lang.String>{
-
-
 }

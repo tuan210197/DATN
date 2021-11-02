@@ -31,6 +31,8 @@ public class UserLoginDTO {
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate birthday;
     private String fullName;
+    private String deptCode;
+    private String postCode;
     private Integer gender;
     private String mobile;
     private String name;
@@ -41,4 +43,6 @@ public class UserLoginDTO {
     private boolean status_update;
     private String roles;
     private Address address;
+    private String employeeCode;
+    private Long empSystemId;
 }

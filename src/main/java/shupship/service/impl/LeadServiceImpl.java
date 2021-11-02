@@ -32,6 +32,8 @@ import shupship.util.CommonUtils;
 import shupship.util.exception.ApplicationException;
 import shupship.util.exception.HieuDzException;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 
 
@@ -51,14 +53,21 @@ public class LeadServiceImpl implements ILeadService {
     @Autowired
     ILeadAssignService leadAssignService;
     @Override
-    public PagingRs getListLead(Pageable pageable) throws ApplicationContextException {
+    public PagingRs getListLead(Pageable pageable, Timestamp from, Timestamp to, Long status, Users users) throws ApplicationContextException {
 
-        Page<Lead> leadList = iLeadRepository.getListLead(pageable);
-//        List<LeadResponse> leadResponses = new ArrayList<>();
-//        for (Lead model : leadList){
-//            LeadResponse laLeadResponse = LeadResponse.leadModelToDto(model);
-//            leadResponses.add(laLeadResponse);
-//        }
+        Instant startDate = from.toInstant();
+        Instant endDate = to.toInstant();
+
+        Page<Lead> leadList = null;
+
+        if (users.getRoles().equals("TCT")) {
+            leadList = iLeadRepository.findAllLeadbyCriteria(status, null, startDate, endDate, null, pageable);
+        } else if (users.getRoles().equals("CN")) {
+            leadList = iLeadRepository.findAllLeadbyCriteriaByCNBC(status, null, startDate, endDate, users.getEmpSystemId(), users.getDeptCode(), pageable);
+        } else if (users.getRoles().equals("BC")) {
+            leadList = iLeadRepository.findAllLeadbyCriteriaByCNBC(status, null, startDate, endDate, users.getEmpSystemId(), users.getPostCode(), pageable);
+        }
+
         Page<LeadResponse> leadResponses = leadList.map(LeadResponse::leadModelToDto);
         PagingRs listLeadResponse = new PagingRs();
         listLeadResponse.setTotalItem(leadList.getTotalElements());
