@@ -1,8 +1,6 @@
 package shupship.domain.model;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Where;
@@ -17,7 +15,10 @@ import java.time.LocalDateTime;
 @Table(name = "schedule")
 @Where(clause = "deleted_status=0")
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Embeddable
+@Builder
 public class Schedule extends AuditEntity {
     private static final long serialVersionUID = 1L;
 
@@ -59,4 +60,6 @@ public class Schedule extends AuditEntity {
     @JoinColumn(name = "created_by", referencedColumnName = "emp_system_id", insertable = false, updatable = false)
     @NotFound(action = NotFoundAction.IGNORE)
     private Users user;
+
+
 }

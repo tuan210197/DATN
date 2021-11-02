@@ -50,5 +50,5 @@ public interface JwtUserDetailsService extends UserDetailsService {
 
 	boolean unlockUser(UserLoginDTO userLoginDTO);
 
-	Users getCurrentUser();
+//	Users getCurrentUser();
 }

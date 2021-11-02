@@ -33,6 +33,8 @@ import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.Date;
 
+import static shupship.util.CommonUtils.getCurrentUser;
+
 @RestController
 @RequestMapping(value = "/api/lead")
 public class LeadController extends BaseController {
