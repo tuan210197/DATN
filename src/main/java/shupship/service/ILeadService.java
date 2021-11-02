@@ -24,4 +24,7 @@ public interface ILeadService {
     Lead deleteLeadOnEVTP(Long leadId) throws  ApplicationException;
 
     LeadResponse detailLead(Long id) throws  ApplicationException;
+
+
+    Lead createLeadWMO(LeadRequest inputData) throws Exception;
 }

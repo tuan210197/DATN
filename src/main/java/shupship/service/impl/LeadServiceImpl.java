@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shupship.common.Constants;
@@ -20,6 +21,7 @@ import shupship.repo.IIndustryRepository;
 import shupship.repo.ILeadRepository;
 import shupship.repo.IScheduleRepository;
 import shupship.request.AddressRequest;
+import shupship.request.LeadAssignRequest;
 import shupship.request.LeadRequest;
 import shupship.request.LeadUpdateRequest;
 import shupship.response.LeadResponse;
@@ -77,10 +79,10 @@ public class LeadServiceImpl implements ILeadService {
             data.setTitle(leadRequest.getTitle());
         } else throw new HieuDzException("Không được để trống tille");
 
-        if (StringUtils.isNotEmpty(leadRequest.getFullName())) {
-            data.setFullName(leadRequest.getFullName());
-            data.setCompanyName(leadRequest.getFullName());
-        } else throw new HieuDzException("Không được để trống tên");
+//        if (StringUtils.isNotEmpty(leadRequest.getFullName())) {
+//            data.setFullName(leadRequest.getFullName());
+//            data.setCompanyName(leadRequest.getFullName());
+//        } else throw new HieuDzException("Không được để trống tên");
 
         if (StringUtils.isNotEmpty(leadRequest.getCompanyName())) {
             data.setFullName(leadRequest.getCompanyName());
@@ -97,7 +99,7 @@ public class LeadServiceImpl implements ILeadService {
             data.setPhone(CommonUtils.convertPhone(leadRequest.getPhone()));
         } else throw new HieuDzException("Không được để trống số điện thoại");
 
-        if(StringUtils.isEmpty(leadRequest.getPhone())){
+        if (StringUtils.isEmpty(leadRequest.getPhone())) {
             throw new HieuDzException("Không được để trống số điện thoại");
         }
         if (CollectionUtils.isNotEmpty(iLeadRepository.findLeadWithPhoneOnEVTP(CommonUtils.convertPhone(leadRequest.getPhone()))))
@@ -122,7 +124,7 @@ public class LeadServiceImpl implements ILeadService {
         }
         Lead lead = iLeadRepository.save(data);
         lead.setCustomerCode("KH".concat(String.valueOf(lead.getId())));
-        BeanUtils.copyProperties(data,lead);
+        BeanUtils.copyProperties(data, lead);
         return lead;
     }
 
@@ -152,10 +154,10 @@ public class LeadServiceImpl implements ILeadService {
                 } else existData.setPhone(CommonUtils.convertPhone(leadRequest.getPhone()));
             }
 
-            if (StringUtils.isNotEmpty(leadRequest.getFullName())) {
-                existData.setFullName(leadRequest.getFullName());
-                existData.setCompanyName(leadRequest.getFullName());
-            } else throw new HieuDzException("Không được để trống tên");
+//            if (StringUtils.isNotEmpty(leadRequest.getFullName())) {
+//                existData.setFullName(leadRequest.getFullName());
+//                existData.setCompanyName(leadRequest.getFullName());
+//            } else throw new HieuDzException("Không được để trống tên");
 
             if (StringUtils.isNotEmpty(leadRequest.getCompanyName())) {
                 existData.setFullName(leadRequest.getCompanyName());
@@ -215,5 +217,53 @@ public class LeadServiceImpl implements ILeadService {
         return leadResponse;
     }
 
+    @Override
+    public Lead createLeadWMO(LeadRequest inputData) throws Exception {
+        Users user = getCurrentUser();
+        Lead data = new Lead();
+
+        if (StringUtils.isNotEmpty(inputData.getFullName())) {
+            data.setFullName(inputData.getFullName());
+            data.setCompanyName(inputData.getFullName());
+        }
+        if (StringUtils.isNotEmpty(inputData.getCompanyName())) {
+            data.setFullName(inputData.getCompanyName());
+            data.setCompanyName(inputData.getCompanyName());
+        }
+        data.setStatus(LeadStatus.NOT_CONTACTED.getType());
+        data.setLeadSource(LeadSource.valueOf(inputData.getLeadSource()).name());
+        data.setPhone(CommonUtils.convertPhone(inputData.getPhone()));
+        data.setType(LeadType.TU_NHAP.getType());
+        data.setRepresentation(inputData.getRepresentation());
+
+        Address address = AddressRequest.addressDtoToModel(inputData.getAddress());
+        data.setAddress(address);
+
+        if (CollectionUtils.isNotEmpty(inputData.getIndustry())) {
+            List<Industry> industries = industryRepository.findIndustriesByCodeIn(inputData.getIndustry());
+            if (CollectionUtils.isNotEmpty(industries)) {
+                data.setIndustries(industries);
+            }
+        } else {
+            throw new HieuDzException("Lỗi bỏ trống sp");
+        }
+        Lead lead = iLeadRepository.save(data);
+        lead.setCustomerCode("KH".concat(String.valueOf(lead.getId())));
+
+        LeadAssignRequest leadAssignRequest = new LeadAssignRequest();
+
+
+        return lead;
+    }
+
+    protected Users getCurrentUser() throws Exception {
+        Users user = (Users) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (user == null) {
+            throw new ApplicationException("User is null");
+        }
+
+        return user;
+
+    }
 }
 
