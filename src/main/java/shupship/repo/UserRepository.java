@@ -7,4 +7,5 @@ import shupship.domain.model.Users;
 
 @Repository
 public interface UserRepository extends JpaRepository<Users, String> {
+
 }

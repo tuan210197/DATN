@@ -26,6 +26,7 @@ import shupship.request.LeadRequest;
 import shupship.request.LeadUpdateRequest;
 import shupship.response.LeadResponse;
 import shupship.response.PagingRs;
+import shupship.service.ILeadAssignService;
 import shupship.service.ILeadService;
 import shupship.util.CommonUtils;
 import shupship.util.exception.ApplicationException;
@@ -47,6 +48,8 @@ public class LeadServiceImpl implements ILeadService {
     @Autowired
     IIndustryRepository industryRepository;
 
+    @Autowired
+    ILeadAssignService leadAssignService;
     @Override
     public PagingRs getListLead(Pageable pageable) throws ApplicationContextException {
 
@@ -213,10 +216,6 @@ public class LeadServiceImpl implements ILeadService {
         Users user = getCurrentUser();
         Lead data = new Lead();
 
-        if (StringUtils.isNotEmpty(inputData.getFullName())) {
-            data.setFullName(inputData.getFullName());
-            data.setCompanyName(inputData.getFullName());
-        }
         if (StringUtils.isNotEmpty(inputData.getCompanyName())) {
             data.setFullName(inputData.getCompanyName());
             data.setCompanyName(inputData.getCompanyName());
@@ -242,6 +241,18 @@ public class LeadServiceImpl implements ILeadService {
         lead.setCustomerCode("KH".concat(String.valueOf(lead.getId())));
 
         LeadAssignRequest leadAssignRequest = new LeadAssignRequest();
+        leadAssignRequest.setLeadId(lead.getId());
+        leadAssignRequest.setUserAssigneeId(user.getEmpSystemId());
+        leadAssignRequest.setUserRecipientId(user.getEmpSystemId());
+        leadAssignRequest.setDeptCode(user.getDeptCode());
+        leadAssignRequest.setPostCode(user.getPostCode());
+        leadAssignRequest.setStatus(5L);
+
+        leadAssignService.createLeadAssign(user, leadAssignRequest);
+
+//        activityLogService.createActivityLog(user, data, lead, actionType);
+//        // Logobject
+//        LogHelpers.logObject(user, lead, actionType);
 
 
         return lead;
