@@ -70,10 +70,10 @@ public class LeadServiceImpl implements ILeadService {
             data.setTitle(leadRequest.getTitle());
         } else throw new HieuDzException("Không được để trống tille");
 
-        if (StringUtils.isNotEmpty(leadRequest.getFullName())) {
-            data.setFullName(leadRequest.getFullName());
-            data.setCompanyName(leadRequest.getFullName());
-        } else throw new HieuDzException("Không được để trống tên");
+//        if (StringUtils.isNotEmpty(leadRequest.getFullName())) {
+//            data.setFullName(leadRequest.getFullName());
+//            data.setCompanyName(leadRequest.getFullName());
+//        } else throw new HieuDzException("Không được để trống tên");
 
         if (StringUtils.isNotEmpty(leadRequest.getCompanyName())) {
             data.setFullName(leadRequest.getCompanyName());
@@ -145,10 +145,10 @@ public class LeadServiceImpl implements ILeadService {
                 } else existData.setPhone(CommonUtils.convertPhone(leadRequest.getPhone()));
             }
 
-            if (StringUtils.isNotEmpty(leadRequest.getFullName())) {
-                existData.setFullName(leadRequest.getFullName());
-                existData.setCompanyName(leadRequest.getFullName());
-            } else throw new HieuDzException("Không được để trống tên");
+//            if (StringUtils.isNotEmpty(leadRequest.getFullName())) {
+//                existData.setFullName(leadRequest.getFullName());
+//                existData.setCompanyName(leadRequest.getFullName());
+//            } else throw new HieuDzException("Không được để trống tên");
 
             if (StringUtils.isNotEmpty(leadRequest.getCompanyName())) {
                 existData.setFullName(leadRequest.getCompanyName());

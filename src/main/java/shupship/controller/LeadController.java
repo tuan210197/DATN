@@ -21,7 +21,6 @@ import shupship.response.LeadResponse;
 import shupship.response.PagingRs;
 import shupship.service.ILeadService;
 import shupship.util.exception.ApplicationException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
