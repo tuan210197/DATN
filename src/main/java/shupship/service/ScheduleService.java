@@ -7,5 +7,5 @@ import shupship.util.exception.BusinessException;
 public interface ScheduleService {
     Schedule createSchedule(ScheduleRequest schedule) throws Exception;
 
-    Schedule getLatestScheduleByUserIdAndLeadId(String uid, Long leadId) throws BusinessException;
+    Schedule getLatestScheduleByUserIdAndLeadId(Long sysId, Long leadId) throws BusinessException;
 }

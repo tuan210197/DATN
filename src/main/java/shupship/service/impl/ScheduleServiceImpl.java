@@ -1,18 +1,24 @@
 package shupship.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.threeten.bp.LocalDate;
+import shupship.domain.model.BasicLogin;
 import shupship.domain.model.Lead;
 import shupship.domain.model.Users;
 import shupship.enums.LeadStatus;
 import shupship.enums.ScheduleStatus;
+import shupship.repo.BasicLoginRepo;
 import shupship.repo.ILeadRepository;
 import shupship.repo.IScheduleRepository;
+import shupship.repo.UserRepo;
 import shupship.request.ScheduleRequest;
 import shupship.domain.model.Schedule;
 import shupship.service.ScheduleService;
 import shupship.util.DateTimeUtils;
+import shupship.util.exception.ApplicationException;
 import shupship.util.exception.BusinessException;
 import shupship.util.exception.ErrorMessage;
 import shupship.util.exception.NotFoundException;
@@ -21,7 +27,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
-import static shupship.util.CommonUtils.getCurrentUser;
+
 import static shupship.util.DateTimeUtils.validateOverlapTime;
 
 @Service
@@ -35,7 +41,11 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Autowired
     private ScheduleService scheduleService;
+    @Autowired
+    private BasicLoginRepo basicLoginRepo;
 
+    @Autowired
+    private UserRepo userRepo;
 
     @Override
     public Schedule createSchedule(ScheduleRequest inputData) throws Exception {
@@ -51,9 +61,9 @@ public class ScheduleServiceImpl implements ScheduleService {
         }
         validateSchedule(fromDate, toDate);
 
-        List<Schedule> schedules = scheduleRepository.getSchedulesByUserId(user.getUid());
+        List<Schedule> schedules = scheduleRepository.getSchedulesByUserId(user.getEmpSystemId());
         validateOverlapTime(fromDate, toDate, schedules);
-        Schedule schedule = scheduleService.getLatestScheduleByUserIdAndLeadId(user.getUid(), inputData.getLeadId());
+        Schedule schedule = scheduleService.getLatestScheduleByUserIdAndLeadId(user.getEmpSystemId(), inputData.getLeadId());
 
         if (schedule != null) {
             schedule.setIsLatest(0);
@@ -77,11 +87,21 @@ public class ScheduleServiceImpl implements ScheduleService {
         return outData;
     }
 
+    public Users getCurrentUser() {
+        UserDetails user = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = user.getUsername();
+        BasicLogin basicLogin = basicLoginRepo.findByEmail(email);
+        Users users = userRepo.findByUid(basicLogin.getUserUid());
+        if (users == null) {
+            throw new ApplicationException("Users is null");
+        }
+        return users;
+    }
 
 
     @Override
-    public Schedule getLatestScheduleByUserIdAndLeadId(String uid, Long leadId) throws BusinessException {
-        return scheduleRepository.getLatestScheduleByUserIdAndLeadId(uid, leadId);
+    public Schedule getLatestScheduleByUserIdAndLeadId(Long sysId, Long leadId) throws BusinessException {
+        return scheduleRepository.getLatestScheduleByUserIdAndLeadId(sysId, leadId);
     }
 
     private void validateSchedule(LocalDateTime fromDate, LocalDateTime toDate) {

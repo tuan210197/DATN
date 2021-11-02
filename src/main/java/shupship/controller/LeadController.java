@@ -48,7 +48,7 @@ public class LeadController extends BaseController {
 
     @PostMapping(value = "/createWeb")
     public ResponseEntity createLeadOnEVTP(HttpServletRequest request, @Valid @RequestBody LeadRequest inputData) throws Exception {
-        ///Users users = getCurrentUser();
+//        Users users = getCurrentUser();
         Lead data = leadService.insertLead(inputData);
         LeadResponse response = LeadResponse.leadModelToDto(data);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
