@@ -26,7 +26,7 @@ public class ScheduleController {
 
     @Transactional
     @PostMapping(value = "/save")
-    public ResponseEntity<?> createSchedule(@Valid @RequestBody ScheduleRequest scheduleRequest) throws Exception {
+    public ResponseEntity createSchedule(@Valid @RequestBody ScheduleRequest scheduleRequest) throws Exception {
         Schedule schedule = scheduleService.createSchedule(scheduleRequest);
 
         ScheduleResponseDto response = new ScheduleResponseDto();

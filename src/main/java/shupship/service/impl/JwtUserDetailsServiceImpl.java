@@ -176,16 +176,7 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
     }
 
 
-//    public Users getCurrentUser() {
-//        UserDetails user = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        String email = user.getUsername();
-//        BasicLogin basicLogin = basicLoginRepo.findByEmail(email);
-//        Users users = userRepo.findByUid(basicLogin.getUserUid());
-//        if (users == null) {
-//            throw new ApplicationException("Users is null");
-//        }
-//        return users;
-//    }
+
 
     @Override
     public boolean registerUser(UserLoginDTO user) {
