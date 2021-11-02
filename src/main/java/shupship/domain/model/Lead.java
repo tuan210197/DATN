@@ -61,9 +61,6 @@ public class Lead extends AuditEntity implements Serializable {
     @Column(name = "compensation")
     private String compensation;
 
-    @Column(name = "payment")
-    private String payment;
-
     @Column(name = "other")
     private String other;
 
@@ -79,12 +76,8 @@ public class Lead extends AuditEntity implements Serializable {
     @JoinColumn(name = "address_id", referencedColumnName = "id")
     private Address address;
 
-    @Column(name = "date_of_birth")
-    private Date dateOfBirth;
-
     @Column(name = "company_name")
     private String companyName;
-
 
     @Column(name = "annual_quantity")
     private Long annualQuantity;

@@ -53,7 +53,7 @@ public class LeadController extends BaseController {
         Users users = getCurrentUser();
         Pageable pageablerequest = PageRequest.of(pageable.getPageNumber() - 1, Constants.PAGE_SIZE, pageable.getSort());
         Long leadStatus = null;
-        if (StringUtils.isEmpty(status)){
+        if (StringUtils.isNotEmpty(status)){
             leadStatus = LeadStatus.valueOf(status).getType();
         }
         LocalDateTime startDate;
@@ -95,8 +95,8 @@ public class LeadController extends BaseController {
 
     @PostMapping(value = "/createWeb")
     public ResponseEntity createLeadOnEVTP(HttpServletRequest request, @Valid @RequestBody LeadRequest inputData) throws Exception {
-//        Users users = getCurrentUser();
-        Lead data = leadService.insertLead(inputData);
+        Users users = getCurrentUser();
+        Lead data = leadService.insertLead(inputData, users);
         LeadResponse response = LeadResponse.leadModelToDto(data);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
