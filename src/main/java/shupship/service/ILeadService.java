@@ -15,7 +15,7 @@ import java.sql.Timestamp;
 
 public interface ILeadService {
 
-    PagingRs getListLead(Pageable pageable ) throws ApplicationContextException;
+    PagingRs getListLead(Pageable pageable, Timestamp from, Timestamp to, Long status, Users users) throws ApplicationContextException;
 
     Lead insertLead(LeadRequest leadRequest) throws ApplicationContextException;
 
