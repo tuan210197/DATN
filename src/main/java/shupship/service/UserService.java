@@ -7,5 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 import shupship.domain.model.Users;
 
 @Service
-public interface UserService extends CrudService<Users,java.lang.String>{
+public interface UserService extends CrudService<Users, java.lang.String> {
+
+    Users getCurrentUser();
+
 }

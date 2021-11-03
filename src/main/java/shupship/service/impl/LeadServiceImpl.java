@@ -46,7 +46,6 @@ public class LeadServiceImpl implements ILeadService {
     @Autowired
     IScheduleRepository scheduleRepository;
 
-    ///@MockBean
     @Autowired
     IIndustryRepository industryRepository;
 
@@ -76,7 +75,7 @@ public class LeadServiceImpl implements ILeadService {
     }
 
     @Override
-    public Lead insertLead(LeadRequest leadRequest) throws ApplicationContextException {
+    public Lead insertLead(LeadRequest leadRequest, Users users) throws ApplicationContextException {
         Lead data = new Lead();
         if (StringUtils.isNotEmpty(leadRequest.getTitle())) {
             data.setTitle(leadRequest.getTitle());

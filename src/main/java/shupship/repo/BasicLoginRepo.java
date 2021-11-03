@@ -12,6 +12,7 @@ import javax.transaction.Transactional;
 @Repository
 public interface BasicLoginRepo extends JpaRepository<BasicLogin, String> {
 
+    @Query("select a from BasicLogin a where a.email = :email")
     BasicLogin findByEmail(String email);
 
     BasicLogin findByUserUid(String userUid);
