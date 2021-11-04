@@ -1,7 +1,6 @@
 package shupship.controller;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -12,9 +11,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shupship.common.Constants;
+import shupship.domain.dto.LeadResponseDto;
 import shupship.domain.message.MessageResponse;
 import shupship.domain.model.Lead;
 import shupship.domain.model.Users;
+import shupship.dto.LeadHadPhoneResponseDto;
 import shupship.enums.LeadSource;
 import shupship.enums.LeadStatus;
 import shupship.request.LeadRequest;
@@ -22,6 +23,7 @@ import shupship.request.LeadUpdateRequest;
 import shupship.response.LeadResponse;
 import shupship.response.PagingRs;
 import shupship.service.ILeadService;
+import shupship.util.CommonUtils;
 import shupship.util.DateTimeUtils;
 import shupship.util.exception.ApplicationException;
 import shupship.util.exception.HieuDzException;
@@ -31,6 +33,7 @@ import javax.validation.Valid;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping(value = "/api/lead")
@@ -94,7 +97,7 @@ public class LeadController extends BaseController {
     }
 
     @PostMapping(value = "/createWeb")
-    public ResponseEntity createLeadOnEVTP(HttpServletRequest request, @Valid @RequestBody LeadRequest inputData) throws Exception {
+    public ResponseEntity createLeadOnWEB(HttpServletRequest request, @Valid @RequestBody LeadRequest inputData) throws Exception {
         Users users = getCurrentUser();
         Lead data = leadService.insertLead(inputData, users);
         LeadResponse response = LeadResponse.leadModelToDto(data);
@@ -102,7 +105,7 @@ public class LeadController extends BaseController {
     }
 
     @PutMapping(value = "evtp/{leadId}")
-    public ResponseEntity<LeadResponse> updateLeadOnEVTP(@RequestBody LeadUpdateRequest inputData, @PathVariable(value = "leadId") Long leadId)
+    public ResponseEntity<LeadResponse> updateLeadOnWEB(@RequestBody LeadUpdateRequest inputData, @PathVariable(value = "leadId") Long leadId)
             throws ApplicationException {
         //validateLeadSource
 //        if (!validateIndustry(inputData.getLeadSource())) {
@@ -114,8 +117,8 @@ public class LeadController extends BaseController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @DeleteMapping(value = "/evtp/{leadId}")
-    public ResponseEntity deleteLeadOnEVTP(@PathVariable(value = "leadId") Long leadId) throws Exception {
-        Lead data = leadService.deleteLeadOnEVTP(leadId);
+    public ResponseEntity deleteLeadOnWEB(@PathVariable(value = "leadId") Long leadId) throws Exception {
+        Lead data = leadService.deleteLeadOnWEB(leadId);
         return new ResponseEntity(new MessageResponse((true)), HttpStatus.OK);
     }
 
@@ -123,5 +126,52 @@ public class LeadController extends BaseController {
     public ResponseEntity detailLead(@PathVariable(value = "leadId") Long leadId) throws Exception {
         LeadResponse data = leadService.detailLead(leadId);
         return new ResponseEntity<>(data, HttpStatus.OK);
+    }
+
+    public static final String HAD_PHONE_CRM = "ERR_301";
+    public static final String HAD_PHONE_EVTP = "ERR_303";
+    @PostMapping
+    public ResponseEntity createLead(HttpServletRequest request, @Valid @RequestBody LeadRequest inputData) throws Exception {
+        Users users = getCurrentUser();
+        //validateLeadSource
+        if (!validateIndustry(inputData.getLeadSource())) {
+            throw new HieuDzException ("Industry code is not defined");
+        }
+        if (StringUtils.isNotBlank(inputData.getPhone())) {
+            LeadHadPhoneResponseDto responseHadPhoneUser = leadService.findLeadHadPhoneByUser(inputData, users.getEmpSystemId());
+//          LeadHadPhoneResponseDto responseHadPhone = leadService.findLeadHadPhone(inputData, user.getId());
+            if (responseHadPhoneUser != null) {
+                responseHadPhoneUser.setErrorCode(HAD_PHONE_CRM);
+                responseHadPhoneUser.setMessage("Khách hàng đã được thêm vào hệ thống.");
+                return new ResponseEntity<>(responseHadPhoneUser, HttpStatus.BAD_REQUEST);
+            }
+
+        }
+        Lead data = leadService.createLeadWMO(inputData, users);
+        LeadResponseDto response = LeadResponseDto.leadModelToDto(data);
+//        HashMap phoneEvtp = getPhoneEVTP(inputData.getPhone());
+//
+//        if (phoneEvtp != null && phoneEvtp.size() != 0) {
+//            LeadHadPhoneResponseDto responseDto = new LeadHadPhoneResponseDto();
+//            responseDto.setErrorCode(HAD_PHONE_EVTP);
+//            responseDto.setMessage("Khách hàng đã sử dụng dịch vụ của ShupShip.");
+//            responseDto.setCustomerCode((String) phoneEvtp.get("MA_KH"));
+//            return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
+//        }
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @DeleteMapping(value = "/{leadId}")
+    public ResponseEntity deleteLead(@PathVariable(value = "leadId") Long leadId) throws Exception {
+        Lead data = leadService.deleteLeadWMO(leadId);
+        return new ResponseEntity(new MessageResponse((true)), HttpStatus.OK);
+    }
+
+    private HashMap getPhoneEVTP(String phone) {
+        if (StringUtils.isNotBlank(phone)) {
+            HashMap resp = leadService.getCustomerByPhone(CommonUtils.convertPhone(phone));
+            return resp;
+        }
+        return null;
     }
 }

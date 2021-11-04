@@ -1,6 +1,7 @@
 package shupship.repo;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 import shupship.domain.model.Schedule;
@@ -18,4 +19,8 @@ public interface IScheduleRepository extends JpaRepository<Schedule, Long> {
     @Query(value = "SELECT * from schedule s where s.created_by = ?1 and s.lead_id = ?2 and s.is_latest = 1 and s.deleted_status = 0 order by s.to_time desc limit 1", nativeQuery = true)
     Schedule getLatestScheduleByUserIdAndLeadId(Long sysId, Long leadId);
 
+
+    @Query("update Schedule s set s.deletedStatus = 1 where s.id = :id and s.createdBy = :userId")
+    @Modifying
+    void deleteSchedule(long id, Long userId);
 }

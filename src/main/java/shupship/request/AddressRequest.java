@@ -39,7 +39,6 @@ public class AddressRequest extends BaseRequest {
         Address address = new Address();
         address.setHomeNo(addressRequest.getHomeNo());
         address.setWard(addressRequest.getWard());
-        ///address.setStreet(addressRequest.getStreet());
         address.setDistrict(addressRequest.getDistrict());
         address.setProvince(addressRequest.getProvince());
 

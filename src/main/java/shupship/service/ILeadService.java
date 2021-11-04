@@ -1,10 +1,10 @@
 package shupship.service;
 
-import org.apache.commons.net.ntp.TimeStamp;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.data.domain.Pageable;
 import shupship.domain.model.Lead;
 import shupship.domain.model.Users;
+import shupship.dto.LeadHadPhoneResponseDto;
 import shupship.request.LeadRequest;
 import shupship.request.LeadUpdateRequest;
 import shupship.response.LeadResponse;
@@ -12,6 +12,7 @@ import shupship.response.PagingRs;
 import shupship.util.exception.ApplicationException;
 
 import java.sql.Timestamp;
+import java.util.HashMap;
 
 public interface ILeadService {
 
@@ -21,10 +22,16 @@ public interface ILeadService {
 
     Lead updateLead(Long id, LeadUpdateRequest leadRequest) throws ApplicationException;
 
-    Lead deleteLeadOnEVTP(Long leadId) throws  ApplicationException;
+    Lead deleteLeadOnWEB(Long leadId) throws ApplicationException;
 
-    LeadResponse detailLead(Long id) throws  ApplicationException;
+    LeadResponse detailLead(Long id) throws ApplicationException;
 
 
-    Lead createLeadWMO(LeadRequest inputData) throws Exception;
+    Lead createLeadWMO(LeadRequest inputData, Users users) throws Exception;
+
+    Lead deleteLeadWMO(Long leadId) throws Exception;
+
+    LeadHadPhoneResponseDto findLeadHadPhoneByUser(LeadRequest inputData, Long userId);
+
+    HashMap getCustomerByPhone(String phone);
 }
