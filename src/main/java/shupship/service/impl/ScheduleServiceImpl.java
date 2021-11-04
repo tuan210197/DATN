@@ -5,9 +5,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.threeten.bp.LocalDate;
-import shupship.domain.model.BasicLogin;
-import shupship.domain.model.Lead;
-import shupship.domain.model.Users;
+import shupship.domain.model.*;
 import shupship.enums.LeadStatus;
 import shupship.enums.ScheduleStatus;
 import shupship.repo.BasicLoginRepo;
@@ -15,7 +13,6 @@ import shupship.repo.ILeadRepository;
 import shupship.repo.IScheduleRepository;
 import shupship.repo.UserRepo;
 import shupship.request.ScheduleRequest;
-import shupship.domain.model.Schedule;
 import shupship.service.ScheduleService;
 import shupship.util.DateTimeUtils;
 import shupship.util.exception.ApplicationException;
@@ -42,6 +39,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Autowired
     private ScheduleService scheduleService;
+
     @Autowired
     private BasicLoginRepo basicLoginRepo;
 
@@ -85,6 +83,13 @@ public class ScheduleServiceImpl implements ScheduleService {
             lead.setStatus(LeadStatus.CONTACTING.getType());
         }
         leadRepository.save(lead);
+
+        LeadAssign leadAssign = leadAssignRepository.getLeadAssignById(lead.getId());
+        if (leadAssign.getStatus() == 5 || leadAssign.getStatus() == 4) {
+            leadAssign.setStatus(2L);
+        }
+        LeadAssign leadAssign1 = leadAssignRepository.save(leadAssign);
+
         return outData;
     }
 

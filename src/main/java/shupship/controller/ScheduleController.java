@@ -19,7 +19,7 @@ import javax.validation.Valid;
 @CrossOrigin
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("/schedules")
+@RequestMapping("/api/schedules")
 public class ScheduleController {
     @Autowired
     private ScheduleService scheduleService;

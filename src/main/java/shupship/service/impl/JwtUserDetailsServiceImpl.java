@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shupship.auth.JwtTokenUtil;
 import shupship.common.Const;
+import shupship.controller.BaseController;
 import shupship.domain.dto.UserInfoDTO;
 import shupship.domain.dto.UserLoginDTO;
 
@@ -34,7 +35,7 @@ import java.util.*;
 @Service
 @Slf4j
 @Transactional
-public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
+public class JwtUserDetailsServiceImpl extends BaseController implements JwtUserDetailsService{
 
 
     @Autowired
@@ -179,7 +180,7 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
 
 
     @Override
-    public boolean registerUser(UserLoginDTO user) {
+    public boolean registerUser(UserLoginDTO user) throws Exception {
         Assert.hasText(user.getEmail(), "EMAIL_EMPTY");
 //        Assert.hasText(user.getPassword(), "PASSWORD_EMPTY");
 //        Assert.notNull(user.getBirthday(),"DATE_NOT_VALID");
@@ -193,6 +194,7 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         log.info("End query Table basic_login at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
         Assert.isNull(checkBasicLogin, "EMAIL_REGISTERED");
+        Users userLogin = getCurrentUser();
         Long sysid = sysid();
         Users users = Users.builder()
                 .avatar(user.getAvatar())
