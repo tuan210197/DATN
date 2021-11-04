@@ -17,9 +17,7 @@ import shupship.domain.model.*;
 import shupship.enums.LeadSource;
 import shupship.enums.LeadStatus;
 import shupship.enums.LeadType;
-import shupship.repo.IIndustryRepository;
-import shupship.repo.ILeadRepository;
-import shupship.repo.IScheduleRepository;
+import shupship.repo.*;
 import shupship.request.AddressRequest;
 import shupship.request.LeadAssignRequest;
 import shupship.request.LeadRequest;
@@ -45,19 +43,34 @@ public class LeadServiceImpl implements ILeadService {
     @Autowired
     IScheduleRepository scheduleRepository;
 
-    ///@MockBean
     @Autowired
     IIndustryRepository industryRepository;
 
-    @Override
-    public PagingRs getListLead(Pageable pageable) throws ApplicationContextException {
+    @Autowired
+    IWardRepository wardRepository;
 
-        Page<Lead> leadList = iLeadRepository.getListLead(pageable);
-//        List<LeadResponse> leadResponses = new ArrayList<>();
-//        for (Lead model : leadList){
-//            LeadResponse laLeadResponse = LeadResponse.leadModelToDto(model);
-//            leadResponses.add(laLeadResponse);
-//        }
+    @Autowired
+    IDistrictRepository districtRepository;
+
+    @Autowired
+    IProvinceRepository provinceRepository;
+
+    @Override
+    public PagingRs getListLead(Pageable pageable, Timestamp from, Timestamp to, Long status, Users users) throws ApplicationContextException {
+
+        Instant startDate = from.toInstant();
+        Instant endDate = to.toInstant();
+
+        Page<Lead> leadList = null;
+
+        if (users.getRoles().equals("TCT")) {
+            leadList = iLeadRepository.findAllLeadbyCriteria(status, null, startDate, endDate, null, pageable);
+        } else if (users.getRoles().equals("CN")) {
+            leadList = iLeadRepository.findAllLeadbyCriteriaByCNBC(status, null, startDate, endDate, users.getEmpSystemId(), users.getDeptCode(), pageable);
+        } else if (users.getRoles().equals("BC")) {
+            leadList = iLeadRepository.findAllLeadbyCriteriaByCNBC(status, null, startDate, endDate, users.getEmpSystemId(), users.getPostCode(), pageable);
+        }
+
         Page<LeadResponse> leadResponses = leadList.map(LeadResponse::leadModelToDto);
         PagingRs listLeadResponse = new PagingRs();
         listLeadResponse.setTotalItem(leadList.getTotalElements());
@@ -66,16 +79,11 @@ public class LeadServiceImpl implements ILeadService {
     }
 
     @Override
-    public Lead insertLead(LeadRequest leadRequest) throws ApplicationContextException {
+    public Lead insertLead(LeadRequest leadRequest, Users users) throws ApplicationContextException {
         Lead data = new Lead();
         if (StringUtils.isNotEmpty(leadRequest.getTitle())) {
             data.setTitle(leadRequest.getTitle());
         } else throw new HieuDzException("Không được để trống tille");
-
-//        if (StringUtils.isNotEmpty(leadRequest.getFullName())) {
-//            data.setFullName(leadRequest.getFullName());
-//            data.setCompanyName(leadRequest.getFullName());
-//        } else throw new HieuDzException("Không được để trống tên");
 
         if (StringUtils.isNotEmpty(leadRequest.getCompanyName())) {
             data.setFullName(leadRequest.getCompanyName());
@@ -83,7 +91,6 @@ public class LeadServiceImpl implements ILeadService {
         } else throw new HieuDzException("Không được để trống tên công ty");
 
 //        data.setSalutation(leadRequest.getSalutation());
-        data.setStatus(LeadStatus.NEW.getType());
         if (StringUtils.isNotEmpty(LeadSource.valueOf(leadRequest.getLeadSource()).name())) {
             data.setLeadSource(LeadSource.valueOf(leadRequest.getLeadSource()).name());
         } else throw new HieuDzException("Chưa chọn phân loại khách hàng");
@@ -104,7 +111,16 @@ public class LeadServiceImpl implements ILeadService {
         data.setRepresentation(leadRequest.getRepresentation());
 
         data.setStatus(LeadStatus.NEW.getType());
-        Address address = AddressRequest.addressDtoToModel(leadRequest.getAddress());
+        AddressRequest addressRequest = leadRequest.getAddress();
+        Ward ward = wardRepository.findWardByCode(addressRequest.getWard());
+        District district = districtRepository.findDistrictByCode(addressRequest.getDistrict());
+        Province province = provinceRepository.findProvinceByCode(addressRequest.getProvince());
+
+        Address address = new Address();
+        address.setHomeNo(addressRequest.getHomeNo());
+        address.setWard(ward.getWardName());
+        address.setDistrict(district.getDistrictName());
+        address.setProvince(province.getProvinceName());
         data.setAddress(address);
 
         if (CollectionUtils.isNotEmpty(leadRequest.getIndustry())) {
@@ -112,12 +128,11 @@ public class LeadServiceImpl implements ILeadService {
             if (CollectionUtils.isNotEmpty(industries)) {
                 data.setIndustries(industries);
             }
-        } else {
-            throw new HieuDzException("Lỗi bỏ trống sp");
-        }
+        } else throw new HieuDzException("Lỗi bỏ trống sp");
+        data.setCreatedBy(users.getEmpSystemId());
+
         Lead lead = iLeadRepository.save(data);
         lead.setCustomerCode("KH".concat(String.valueOf(lead.getId())));
-        BeanUtils.copyProperties(data, lead);
         return lead;
     }
 

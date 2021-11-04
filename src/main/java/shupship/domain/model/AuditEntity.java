@@ -1,7 +1,10 @@
 package shupship.domain.model;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import shupship.helper.InstantConverter;
+import shupship.service.UserService;
+import shupship.service.impl.UserServiceImpl;
 import shupship.util.CommonUtils;
 import shupship.util.exception.ApplicationException;
 
@@ -10,7 +13,7 @@ import java.io.Serializable;
 import java.time.Instant;
 
 @MappedSuperclass
-public abstract class AuditEntity implements Serializable {
+public abstract class AuditEntity implements Serializable{
     @Column(name = "created_date")
     @Convert(converter = InstantConverter.class)
     private Instant createdDate;
@@ -107,10 +110,10 @@ public abstract class AuditEntity implements Serializable {
         this.createdDate = Instant.now();
         try {
             if (createdBy == null) {
-                this.createdBy = CommonUtils.getCurrentUser().getEmpSystemId();
-//                this.createdBy = -1L;
+                this.createdBy = -1L;
             }
         } catch (Exception e) {
+            e.printStackTrace();
             this.createdBy = -1L;
         }
         this.deletedStatus = 0L;
@@ -121,8 +124,8 @@ public abstract class AuditEntity implements Serializable {
     @PreUpdate
     void preUpdate() throws ApplicationException {
         if (SecurityContextHolder.getContext() !=null && SecurityContextHolder.getContext().getAuthentication() !=null && SecurityContextHolder.getContext().getAuthentication().getPrincipal() != null) {
-            this.lastModifiedBy = CommonUtils.getCurrentUser().getEmpSystemId();
-//            this.lastModifiedBy = -1L;
+//            this.lastModifiedBy = CommonUtils.getCurrentUser().getEmpSystemId();
+            this.lastModifiedBy = -1L;
         }else{
             this.lastModifiedBy = -1L;
         }
