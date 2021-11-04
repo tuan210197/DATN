@@ -17,11 +17,11 @@ public class UserServiceImpl implements UserService {
     UserRepository repository;
 
 
-    @Override
-    public Page list(Pageable pageable) {
-        return repository.findAll(pageable);
-    }
-
+//    @Override
+//    public Page list(Pageable pageable) {
+//        return repository.findAll(pageable);
+//    }
+//
 
     @Override
     public List<Users> searchUser(String keyword) {

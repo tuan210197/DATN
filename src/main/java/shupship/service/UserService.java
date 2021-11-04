@@ -9,7 +9,9 @@ import shupship.domain.model.Users;
 import java.util.List;
 
 @Service
-public interface UserService extends CrudService<Users,java.lang.String>{
+public interface UserService
+//        extends CrudService<Users,java.lang.String>
+{
 
     List<Users> searchUser(String name);
 }
