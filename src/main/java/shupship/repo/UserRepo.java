@@ -7,17 +7,16 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import shupship.domain.model.Users;
 
-import javax.transaction.Transactional;
 import java.util.List;
 
 
 @Repository
-@Transactional
 public interface UserRepo extends JpaRepository<Users, String> {
 
     Users findByUid(String uid);
-//    Users findByEmail(String email);
-    @Query(value = "select u.role_name from users u where uid = ?1", nativeQuery = true)
+
+    //    Users findByEmail(String email);
+    @Query(value = "select u.role_name from users u where uid =?1", nativeQuery = true)
     List<String> findRoleNameByUid(String uid);
 
     @Query(value = "select u.empSystemId from Users u where u.empSystemId = :sysId")
@@ -29,5 +28,6 @@ public interface UserRepo extends JpaRepository<Users, String> {
 //            ":#{#appUser.getMobile()}, :#{#appUser.getName()});\n"
 //            , nativeQuery = true)
 //    Users insertAppUser(@Param("user") Users user);
-
+    @Query("Select e from Users e where e.empSystemId = :id")
+    Users getUserById(Long id);
 }

@@ -112,11 +112,9 @@ public abstract class AuditEntity extends BaseController implements Serializable
         try {
             if (createdBy == null) {
                 this.createdBy = getCurrentUser().getEmpSystemId();
-            }else {
-                this.createdBy = -1L;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ex) {
+            ex.printStackTrace();
             this.createdBy = -1L;
         }
         this.deletedStatus = 0L;

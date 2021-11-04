@@ -8,17 +8,11 @@ import org.threeten.bp.LocalDate;
 import shupship.domain.model.*;
 import shupship.enums.LeadStatus;
 import shupship.enums.ScheduleStatus;
-import shupship.repo.BasicLoginRepo;
-import shupship.repo.ILeadRepository;
-import shupship.repo.IScheduleRepository;
-import shupship.repo.UserRepo;
+import shupship.repo.*;
 import shupship.request.ScheduleRequest;
 import shupship.service.ScheduleService;
 import shupship.util.DateTimeUtils;
-import shupship.util.exception.ApplicationException;
-import shupship.util.exception.BusinessException;
-import shupship.util.exception.ErrorMessage;
-import shupship.util.exception.NotFoundException;
+import shupship.util.exception.*;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -36,6 +30,9 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Autowired
     private ILeadRepository leadRepository;
+
+    @Autowired
+    private ILeadAssignRepository leadAssignRepository;
 
     @Autowired
     private ScheduleService scheduleService;
@@ -56,7 +53,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         Lead lead = leadRepository.findLeadById(inputData.getLeadId());
 
         if (lead == null) {
-            throw new NotFoundException(new ErrorMessage("ERR_004", "Khách hàng không tồn tại."));
+            throw new HieuDzException("Khách hàng không tồn tại");
         }
         validateSchedule(fromDate, toDate);
 
@@ -79,17 +76,18 @@ public class ScheduleServiceImpl implements ScheduleService {
         data.setIsLatestResult(0);
         data.setNextScheduleId(inputData.getNextScheduleId());
         Schedule outData = scheduleRepository.save(data);
+
         if (lead.getStatus() == 1 || lead.getStatus() == 5) {
             lead.setStatus(LeadStatus.CONTACTING.getType());
+            leadRepository.save(lead);
         }
-        leadRepository.save(lead);
+
 
         LeadAssign leadAssign = leadAssignRepository.getLeadAssignById(lead.getId());
         if (leadAssign.getStatus() == 5 || leadAssign.getStatus() == 4) {
             leadAssign.setStatus(2L);
+            leadAssignRepository.save(leadAssign);
         }
-        LeadAssign leadAssign1 = leadAssignRepository.save(leadAssign);
-
         return outData;
     }
 

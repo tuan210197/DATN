@@ -33,6 +33,9 @@ public class Result extends AuditEntity {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "district_percent")
+    private Double districtPercent;
+
     @Column(name = "policy")    // chính sách
     private String policy;
 

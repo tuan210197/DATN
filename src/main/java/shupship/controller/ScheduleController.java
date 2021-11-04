@@ -24,7 +24,7 @@ public class ScheduleController {
     @Autowired
     private ScheduleService scheduleService;
 
-    @Transactional
+
     @PostMapping(value = "/save")
     public ResponseEntity createSchedule(@Valid @RequestBody ScheduleRequest scheduleRequest) throws Exception {
         Schedule schedule = scheduleService.createSchedule(scheduleRequest);

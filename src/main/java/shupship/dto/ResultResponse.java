@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import shupship.domain.dto.AddressResponseDto;
 import shupship.domain.model.Result;
 
 @Data
@@ -26,8 +27,8 @@ public class ResultResponse {
     private Double districtPercent;
     private Double inProvincePercent;
     private Double refundPercent;
-//    private PriceResponseDto price;
-//    private AddressResponseDto pickupAddress;
+    ////private PriceResponseDto price;
+    private AddressResponseDto pickupAddress;
     private ScheduleResponseResultDto nextSchedule;
 
 
@@ -41,16 +42,16 @@ public class ResultResponse {
         resultResponse.setStatus(result.getStatus());
         resultResponse.setDescription(result.getDescription());
         resultResponse.setResult(result.getResult());
-//        resultResponse.setInProvincePercent(result.getInProvincePercent());
-//        resultResponse.setDistrictPercent(result.getDistrictPercent());
+        ///resultResponse.setInProvincePercent(result.getInProvincePercent());
+        resultResponse.setDistrictPercent(result.getDistrictPercent());
         resultResponse.setRefundPercent(result.getRefundPercent());
         resultResponse.setCustomerCode(result.getCustomerCode());
 //        if (result.getPrice() != null) {
 //            resultResponse.setPrice(PriceResponseDto.priceModelTodto(result.getPrice()));
 //        }
-//        if (result.getAddress() != null) {
-//            resultResponse.setPickupAddress(AddressResponseDto.addressModelToDto(result.getAddress()));
-//        }
+        if (result.getAddress() != null) {
+            resultResponse.setPickupAddress(AddressResponseDto.addressModelToDto(result.getAddress()));
+        }
         return resultResponse;
     }
 }

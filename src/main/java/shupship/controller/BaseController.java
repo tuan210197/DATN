@@ -50,7 +50,7 @@ public abstract class BaseController {
         return new ResponseEntity<>(message, HttpStatus.valueOf(code));
     }
 
-    protected Users getCurrentUser() throws Exception {
+    protected Users getCurrentUser() {
         UserDetails user = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String email = user.getUsername();
         BasicLogin basicLogin = basicLoginRepo.findByEmail(email);
