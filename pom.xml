@@ -224,6 +224,7 @@
             <artifactId>hibernate-core</artifactId>
             <version>5.4.31.Final</version>
         </dependency>
+
     </dependencies>
 
     <build>

@@ -38,4 +38,17 @@ public class ScheduleController {
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+    @Transactional
+    @PutMapping(value = "/update/{scheduleId}")
+    public ResponseEntity updateSchedule(@RequestBody ScheduleRequest inputData, @PathVariable Long scheduleId) throws Exception {
+        Schedule data = scheduleService.updateSchedule(inputData, scheduleId);
+
+        ScheduleResponseDto response = new ScheduleResponseDto();
+        response.setId(data.getId());
+        response.setDescription(data.getDescription());
+        response.setStatus(ScheduleStatus.getByValue(data.getStatus()).name());
+        response.setFromDate(data.getFromDate());
+        response.setToDate(data.getToDate());
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
 }

@@ -26,6 +26,7 @@ import shupship.util.exception.NotFoundException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 import static shupship.util.DateTimeUtils.validateOverlapTime;
@@ -87,6 +88,27 @@ public class ScheduleServiceImpl implements ScheduleService {
         return outData;
     }
 
+    @Override
+    public Schedule updateSchedule(ScheduleRequest inputData, Long id) throws Exception {
+        Users user = getCurrentUser();
+        Schedule existData = scheduleRepository.getScheduleById(id, user.getEmpSystemId());
+        if (existData == null) {
+            throw new NotFoundException(new ErrorMessage("ERR_001", "Lịch không tồn tại"));
+        }
+
+        LocalDateTime fromDate = DateTimeUtils.StringToLocalDateTime(inputData.getFromDate());
+        LocalDateTime toDate = DateTimeUtils.StringToLocalDateTime(inputData.getToDate());
+
+        validateScheduleUpdate(fromDate, toDate);
+        List<Schedule> schedules = scheduleRepository.getSchedulesByUserId(user.getEmpSystemId()).stream().filter(e -> e.getId() != existData.getId()).collect(Collectors.toList());
+        validateOverlapTime(fromDate, toDate, schedules);
+
+        existData.setToDate(toDate);
+        existData.setFromDate(fromDate);
+        Schedule outData = scheduleRepository.save(existData);
+        return outData;
+    }
+
     public Users getCurrentUser() {
         UserDetails user = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String email = user.getUsername();
@@ -106,6 +128,17 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     private void validateSchedule(LocalDateTime fromDate, LocalDateTime toDate) {
         if (fromDate.plusMinutes(5).isBefore(LocalDateTime.now()) || toDate.isBefore(LocalDateTime.now())) {
+            throw new BusinessException(new ErrorMessage("ERR_100", "Không thể đặt thời gian trong quá khứ"));
+        }
+        if (toDate.isBefore(fromDate)) {
+            throw new BusinessException(new ErrorMessage("ERR_101", "Ngày kết thúc không thể trước ngày bắt đầu"));
+        }
+        if (fromDate.until(toDate, ChronoUnit.MINUTES) < 30) {
+            throw new BusinessException(new ErrorMessage("ERR_102", "Thời gian tiếp xúc cách nhau ít nhất 30 phút"));
+        }
+    }
+    private void validateScheduleUpdate(LocalDateTime fromDate, LocalDateTime toDate) {
+        if (toDate.isBefore(LocalDateTime.now())) {
             throw new BusinessException(new ErrorMessage("ERR_100", "Không thể đặt thời gian trong quá khứ"));
         }
         if (toDate.isBefore(fromDate)) {

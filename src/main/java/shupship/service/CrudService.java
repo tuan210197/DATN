@@ -9,18 +9,7 @@ public interface CrudService<E, P> {
 
 
     @Transactional
-    E save(E entity);
-
-    @Transactional
     Page<E> list(Pageable pageable);
 
-    @Transactional
-    Page<E> search(Specification<E> specification, Pageable pageable);
-
-    @Transactional
-    E get(P id);
-
-    @Transactional
-    void delete(E entity);
 
 }
