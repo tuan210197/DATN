@@ -15,6 +15,9 @@ import shupship.repo.UserRepository;
 import shupship.service.UserService;
 import shupship.util.exception.ApplicationException;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -53,7 +56,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Users getCurrentUser(){
+    public Users getCurrentUser() {
         UserDetails user = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String email = user.getUsername();
         BasicLogin basicLogin = basicLoginRepo.findByEmail(email);
@@ -62,6 +65,15 @@ public class UserServiceImpl implements UserService {
             throw new ApplicationException("Users is null");
         }
         return users;
+    }
+
+    @Override
+    public List<Users> searchUser(String keyword) {
+        if (keyword != null) {
+            return repository.search(keyword);
+
+        }
+        return repository.findAll();
     }
 
 }
