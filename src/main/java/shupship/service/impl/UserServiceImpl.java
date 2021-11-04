@@ -55,25 +55,14 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    @Override
-    public Users getCurrentUser() {
-        UserDetails user = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String email = user.getUsername();
-        BasicLogin basicLogin = basicLoginRepo.findByEmail(email);
-        Users users = userRepo.findByUid(basicLogin.getUserUid());
-        if (users == null) {
-            throw new ApplicationException("Users is null");
-        }
-        return users;
-    }
+
 
     @Override
     public List<Users> searchUser(String keyword) {
         if (keyword != null) {
             return repository.search(keyword);
-
+        } else {
+            return repository.findAll();
         }
-        return repository.findAll();
     }
-
 }
