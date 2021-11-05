@@ -75,6 +75,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         data.setIsLatest(1);
         data.setIsLatestResult(0);
         data.setNextScheduleId(inputData.getNextScheduleId());
+        data.setCreatedBy(user.getEmpSystemId());
         Schedule outData = scheduleRepository.save(data);
 
         if (lead.getStatus() == 1 || lead.getStatus() == 5) {
