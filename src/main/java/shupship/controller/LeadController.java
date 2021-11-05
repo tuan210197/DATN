@@ -1,5 +1,6 @@
 package shupship.controller;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -16,8 +17,10 @@ import shupship.domain.message.MessageResponse;
 import shupship.domain.model.Lead;
 import shupship.domain.model.Users;
 import shupship.dto.LeadHadPhoneResponseDto;
+import shupship.dto.LeadResponseWithDescriptionDto;
 import shupship.enums.LeadSource;
 import shupship.enums.LeadStatus;
+import shupship.helper.ResponseUtil;
 import shupship.request.LeadRequest;
 import shupship.request.LeadUpdateRequest;
 import shupship.response.LeadResponse;
@@ -32,8 +35,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Optional;
+
+import static java.util.Comparator.naturalOrder;
 
 @RestController
 @RequestMapping(value = "/api/lead")
@@ -165,6 +172,14 @@ public class LeadController extends BaseController {
     public ResponseEntity deleteLead(@PathVariable(value = "leadId") Long leadId) throws Exception {
         Lead data = leadService.deleteLeadWMO(leadId);
         return new ResponseEntity(new MessageResponse((true)), HttpStatus.OK);
+    }
+    @GetMapping(value = "/{id}")
+    public ResponseEntity findLeadById(@PathVariable Long id) throws Exception {
+        LeadResponseWithDescriptionDto data = leadService.findLeadDetail(id);
+        if (CollectionUtils.isNotEmpty(data.getSchedules())) {
+            data.getSchedules().sort(Comparator.nullsLast(naturalOrder()));
+        }
+        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(data));
     }
 
     private HashMap getPhoneEVTP(String phone) {

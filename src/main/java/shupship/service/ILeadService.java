@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import shupship.domain.model.Lead;
 import shupship.domain.model.Users;
 import shupship.dto.LeadHadPhoneResponseDto;
+import shupship.dto.LeadResponseWithDescriptionDto;
 import shupship.request.LeadRequest;
 import shupship.request.LeadUpdateRequest;
 import shupship.response.LeadResponse;
@@ -26,6 +27,7 @@ public interface ILeadService {
 
     LeadResponse detailLead(Long id) throws ApplicationException;
 
+    LeadResponseWithDescriptionDto findLeadDetail(Long id) throws Exception;
 
     Lead createLeadWMO(LeadRequest inputData, Users users) throws Exception;
 
