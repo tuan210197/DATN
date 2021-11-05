@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shupship.common.Constants;
-import shupship.domain.dto.LeadResponseDto;
 import shupship.domain.message.MessageResponse;
 import shupship.domain.model.Lead;
 import shupship.domain.model.Users;
@@ -155,7 +154,7 @@ public class LeadController extends BaseController {
 
         }
         Lead data = leadService.createLeadWMO(inputData, users);
-        LeadResponseDto response = LeadResponseDto.leadModelToDto(data);
+        LeadResponse response = LeadResponse.leadModelToDto(data);
 //        HashMap phoneEvtp = getPhoneEVTP(inputData.getPhone());
 //
 //        if (phoneEvtp != null && phoneEvtp.size() != 0) {
@@ -167,7 +166,6 @@ public class LeadController extends BaseController {
 //        }
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
-
     @DeleteMapping(value = "/{leadId}")
     public ResponseEntity deleteLead(@PathVariable(value = "leadId") Long leadId) throws Exception {
         Lead data = leadService.deleteLeadWMO(leadId);

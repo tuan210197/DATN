@@ -252,23 +252,19 @@ public class LeadServiceImpl implements ILeadService {
         } else {
             throw new HieuDzException("Lỗi bỏ trống sp");
         }
-        Lead lead = iLeadRepository.save(data);
-        lead.setCustomerCode("KH".concat(String.valueOf(lead.getId())));
+        data.setCreatedBy(users.getEmpSystemId());
+            Lead lead = iLeadRepository.save(data);
+            lead.setCustomerCode("KH".concat(String.valueOf(lead.getId())));
 
-        LeadAssignRequest leadAssignRequest = new LeadAssignRequest();
-        leadAssignRequest.setLeadId(lead.getId());
-        leadAssignRequest.setUserAssigneeId(users.getEmpSystemId());
-        leadAssignRequest.setUserRecipientId(users.getEmpSystemId());
-        leadAssignRequest.setDeptCode(users.getDeptCode());
-        leadAssignRequest.setPostCode(users.getPostCode());
-        leadAssignRequest.setStatus(5L);
-
-        leadAssignService.createLeadAssign(users, leadAssignRequest);
-
-//        activityLogService.createActivityLog(user, data, lead, actionType);
-//        // Logobject
-//        LogHelpers.logObject(user, lead, actionType);
-        return lead;
+            LeadAssignRequest leadAssignRequest = new LeadAssignRequest();
+            leadAssignRequest.setLeadId(lead.getId());
+            leadAssignRequest.setUserAssigneeId(users.getEmpSystemId());
+            leadAssignRequest.setUserRecipientId(users.getEmpSystemId());
+            leadAssignRequest.setDeptCode(users.getDeptCode());
+            leadAssignRequest.setPostCode(users.getPostCode());
+            leadAssignRequest.setStatus(5L);
+            leadAssignService.createLeadAssign(users, leadAssignRequest);
+            return lead;
     }
 
     @Override

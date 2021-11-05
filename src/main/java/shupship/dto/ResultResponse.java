@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import shupship.domain.dto.AddressResponseDto;
 import shupship.domain.model.Result;
+import shupship.response.AddressResponse;
 
 @Data
 @AllArgsConstructor
@@ -28,7 +28,7 @@ public class ResultResponse {
     private Double inProvincePercent;
     private Double refundPercent;
     ////private PriceResponseDto price;
-    private AddressResponseDto pickupAddress;
+    private AddressResponse pickupAddress;
     private ScheduleResponseResultDto nextSchedule;
 
 
@@ -50,7 +50,7 @@ public class ResultResponse {
 //            resultResponse.setPrice(PriceResponseDto.priceModelTodto(result.getPrice()));
 //        }
         if (result.getAddress() != null) {
-            resultResponse.setPickupAddress(AddressResponseDto.addressModelToDto(result.getAddress()));
+            resultResponse.setPickupAddress(AddressResponse.leadModelToDto(result.getAddress()));
         }
         return resultResponse;
     }

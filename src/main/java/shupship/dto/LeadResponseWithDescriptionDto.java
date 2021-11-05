@@ -6,13 +6,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import shupship.domain.dto.AddressResponseDto;
 import shupship.domain.dto.IndustryResponseDto;
 import shupship.domain.model.Lead;
 import shupship.enums.LeadSource;
 import shupship.enums.LeadStatus;
 import shupship.enums.LeadStatusVi;
 import shupship.enums.LeadType;
+import shupship.response.AddressResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +51,7 @@ public class LeadResponseWithDescriptionDto {
     private String statusDescription;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private AddressResponseDto address;
+    private AddressResponse address;
 
     private Long annualQuantity;
 
@@ -109,9 +109,15 @@ public class LeadResponseWithDescriptionDto {
             response.setStatus(LeadStatus.getByValue(data.getStatus()).name());
             response.setStatusDescription(LeadStatusVi.valueOf(LeadStatus.getByValue(data.getStatus()).name()).getType());
         }
-        if (data.getAddress() != null)
-            response.setAddress(new AddressResponseDto(data.getAddress().getHomeNo(), data.getAddress().getStreet(), data.getAddress().getDistrict(), data.getAddress().getProvince()));
-
+        if (data.getAddress() != null) {
+            AddressResponse addressResponse = new AddressResponse();
+            addressResponse.setId(data.getAddress().getId());
+            addressResponse.setHomeNo(data.getAddress().getHomeNo() == null ? "" : data.getAddress().getHomeNo());
+            addressResponse.setWard(data.getAddress().getWard() == null ? "" : data.getAddress().getWard());
+            addressResponse.setDistrict(data.getAddress().getDistrict() == null ? "" : data.getAddress().getDistrict());
+            addressResponse.setProvince(data.getAddress().getProvince() == null ? "" : data.getAddress().getProvince());
+            response.setAddress(addressResponse);
+        }
         response.setPhone(data.getPhone());
         response.setLeadSource(StringUtils.isNotBlank(data.getLeadSource()) ? LeadSource.valueOf(data.getLeadSource()).getValue() : "");
 
