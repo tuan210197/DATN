@@ -10,14 +10,13 @@ import org.springframework.context.ApplicationContextException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shupship.common.Constants;
-import shupship.domain.dto.CommonCodeResponseDto;
 import shupship.domain.model.*;
 import shupship.dto.LeadHadPhoneResponseDto;
 import shupship.dto.LeadResponseWithDescriptionDto;
-import shupship.dto.ResultLeadResponse;
 import shupship.dto.ScheduleResponseLeadDto;
 import shupship.enums.LeadSource;
 import shupship.enums.LeadStatus;
@@ -47,10 +46,11 @@ public class LeadServiceImpl implements ILeadService {
     @Autowired
     ILeadRepository iLeadRepository;
 
-     @Autowired
+    @Autowired
     ILeadAssignRepository iLeadAssignRepository;
     @Autowired
     IndustryDetailRepository industryDetailRepository;
+
     @Autowired
     IScheduleRepository scheduleRepository;
 
@@ -58,7 +58,14 @@ public class LeadServiceImpl implements ILeadService {
     IIndustryRepository industryRepository;
 
     @Autowired
+    UserRepo userRepo;
+
+    @Autowired
+    BasicLoginRepo basicLoginRepo;
+
+    @Autowired
     ILeadAssignService leadAssignService;
+
     @Override
     public PagingRs getListLead(Pageable pageable, Timestamp from, Timestamp to, Long status, Users users) throws ApplicationContextException {
 
@@ -253,18 +260,18 @@ public class LeadServiceImpl implements ILeadService {
             throw new HieuDzException("Lỗi bỏ trống sp");
         }
         data.setCreatedBy(users.getEmpSystemId());
-            Lead lead = iLeadRepository.save(data);
-            lead.setCustomerCode("KH".concat(String.valueOf(lead.getId())));
+        Lead lead = iLeadRepository.save(data);
+        lead.setCustomerCode("KH".concat(String.valueOf(lead.getId())));
 
-            LeadAssignRequest leadAssignRequest = new LeadAssignRequest();
-            leadAssignRequest.setLeadId(lead.getId());
-            leadAssignRequest.setUserAssigneeId(users.getEmpSystemId());
-            leadAssignRequest.setUserRecipientId(users.getEmpSystemId());
-            leadAssignRequest.setDeptCode(users.getDeptCode());
-            leadAssignRequest.setPostCode(users.getPostCode());
-            leadAssignRequest.setStatus(5L);
-            leadAssignService.createLeadAssign(users, leadAssignRequest);
-            return lead;
+        LeadAssignRequest leadAssignRequest = new LeadAssignRequest();
+        leadAssignRequest.setLeadId(lead.getId());
+        leadAssignRequest.setUserAssigneeId(users.getEmpSystemId());
+        leadAssignRequest.setUserRecipientId(users.getEmpSystemId());
+        leadAssignRequest.setDeptCode(users.getDeptCode());
+        leadAssignRequest.setPostCode(users.getPostCode());
+        leadAssignRequest.setStatus(5L);
+        leadAssignService.createLeadAssign(users, leadAssignRequest);
+        return lead;
     }
 
     @Override
@@ -328,12 +335,14 @@ public class LeadServiceImpl implements ILeadService {
     }
 
     protected Users getCurrentUser() throws Exception {
-        Users user = (Users) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (user == null) {
-            throw new ApplicationException("User is null");
+        UserDetails user = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = user.getUsername();
+        BasicLogin basicLogin = basicLoginRepo.findByEmail(email);
+        Users users = userRepo.findByUid(basicLogin.getUserUid());
+        if (users == null) {
+            throw new ApplicationException("Users is null");
         }
-
-        return user;
+        return users;
     }
 }
 

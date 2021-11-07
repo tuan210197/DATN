@@ -17,6 +17,7 @@ public interface ILeadAssignRepository extends PagingAndSortingRepository<LeadAs
     LeadAssign findLeadAssignedForPostCode(String postCode, long leadId);
 
     @Query("delete from LeadAssign la where la.leads.id = :leadId")
+
     @Modifying
     void deleteAssign(long leadId);
 }

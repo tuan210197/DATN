@@ -10,7 +10,7 @@ import java.util.List;
 
 @Transactional
 public interface IScheduleRepository extends JpaRepository<Schedule, Long> {
-    @Query(value = "select * from Schedule s where s.lead_id = ?1 and s.deleted_status = 0", nativeQuery = true)
+    @Query("select s from Schedule s where s.lead.id = :leadId and s.deletedStatus = 0")
     List<Schedule> getSchedulesByLeadId(Long leadId);
 
     @Query(value = "select s from Schedule s where s.createdBy = ?1 and s.deletedStatus = 0")
