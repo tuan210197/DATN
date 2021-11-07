@@ -21,7 +21,6 @@ import shupship.response.LeadResponse;
 import shupship.response.PagingRs;
 import shupship.service.ILeadService;
 import shupship.util.exception.ApplicationException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -48,14 +47,15 @@ public class LeadController extends BaseController {
 
     @PostMapping(value = "/createWeb")
     public ResponseEntity createLeadOnEVTP(HttpServletRequest request, @Valid @RequestBody LeadRequest inputData) throws Exception {
-//        Users users = getCurrentUser();
+        ///Users users = getCurrentUser();
         Lead data = leadService.insertLead(inputData);
         LeadResponse response = LeadResponse.leadModelToDto(data);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    @PostMapping(value = "/evtp/{leadId}")
-    public ResponseEntity<LeadResponse> updateLeadOnEVTP(HttpServletRequest request, @RequestBody LeadUpdateRequest inputData, @PathVariable(value = "leadId") Long leadId) throws ApplicationException {
+    @PutMapping(value = "evtp/{leadId}")
+    public ResponseEntity<LeadResponse> updateLeadOnEVTP(@RequestBody LeadUpdateRequest inputData, @PathVariable(value = "leadId") Long leadId)
+            throws ApplicationException {
         //validateLeadSource
 //        if (!validateIndustry(inputData.getLeadSource())) {
 //            throw new BusinessException(new ErrorMessage("ERR_002", "Industry code is not defined"));
@@ -63,7 +63,6 @@ public class LeadController extends BaseController {
 
         Lead data = leadService.updateLead(leadId, inputData);
         LeadResponse response = LeadResponse.leadModelToDto(data);
-
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @DeleteMapping(value = "/evtp/{leadId}")

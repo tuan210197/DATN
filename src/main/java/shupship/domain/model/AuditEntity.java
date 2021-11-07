@@ -102,29 +102,32 @@ public abstract class AuditEntity implements Serializable {
         this.deletedDate = deletedDate;
     }
 
-//    @PrePersist
-//    void prePersit() {
-//        this.createdDate = Instant.now();
-//        try {
-//            if (createdBy == null) {
+    @PrePersist
+    void prePersit() {
+        this.createdDate = Instant.now();
+        try {
+            if (createdBy == null) {
 //                this.createdBy = CommonUtils.getCurrentUser().getEmpSystemId();
-//            }
-//        } catch (Exception e) {
-//            this.createdBy = -1L;
-//        }
-//        this.deletedStatus = 0L;
-//        this.lastModifiedDate = createdDate;
-//        this.lastModifiedBy = createdBy;
-//    }
+                this.createdBy = -1L;
+            }
+        } catch (Exception e) {
+            this.createdBy = -1L;
+        }
+        this.deletedStatus = 0L;
+        this.lastModifiedDate = createdDate;
+        this.lastModifiedBy = createdBy;
+    }
 
-//    @PreUpdate
-//    void preUpdate() throws ApplicationException {
-//        if (SecurityContextHolder.getContext() !=null && SecurityContextHolder.getContext().getAuthentication() !=null && SecurityContextHolder.getContext().getAuthentication().getPrincipal() != null) {
+    @PreUpdate
+    void preUpdate() throws ApplicationException {
+        if (SecurityContextHolder.getContext() !=null && SecurityContextHolder.getContext().getAuthentication() !=null && SecurityContextHolder.getContext().getAuthentication().getPrincipal() != null) {
 //            this.lastModifiedBy = CommonUtils.getCurrentUser().getEmpSystemId();
-//        }else{
-//            this.lastModifiedBy = -1L;
-//        }
-//
-//        this.lastModifiedDate = Instant.now();
-//    }
+            this.lastModifiedBy = -1L;
+        }else{
+            this.lastModifiedBy = -1L;
+        }
+
+        this.lastModifiedDate = Instant.now();
+    }
+
 }
