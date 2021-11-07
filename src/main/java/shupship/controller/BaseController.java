@@ -52,7 +52,7 @@ public abstract class BaseController {
     }
 
     @Transactional
-    protected Users getCurrentUser() {
+    public Users getCurrentUser() {
         UserDetails user = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String email = user.getUsername();
         BasicLogin basicLogin = basicLoginRepo.findByEmail(email);

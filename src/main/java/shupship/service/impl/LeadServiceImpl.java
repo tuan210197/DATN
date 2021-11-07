@@ -13,8 +13,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shupship.common.Constants;
+import shupship.domain.dto.CommonCodeResponseDto;
 import shupship.domain.model.*;
 import shupship.dto.LeadHadPhoneResponseDto;
+import shupship.dto.LeadResponseWithDescriptionDto;
+import shupship.dto.ResultLeadResponse;
+import shupship.dto.ScheduleResponseLeadDto;
 import shupship.enums.LeadSource;
 import shupship.enums.LeadStatus;
 import shupship.enums.LeadType;
@@ -219,7 +223,6 @@ public class LeadServiceImpl implements ILeadService {
             throw new HieuDzException("Khách hàng không tồn tại");
         }
         LeadResponse leadResponse = LeadResponse.leadModelToDto(existData);
-        BeanUtils.copyProperties(existData, leadResponse);
         return leadResponse;
     }
 
@@ -249,23 +252,19 @@ public class LeadServiceImpl implements ILeadService {
         } else {
             throw new HieuDzException("Lỗi bỏ trống sp");
         }
-        Lead lead = iLeadRepository.save(data);
-        lead.setCustomerCode("KH".concat(String.valueOf(lead.getId())));
+        data.setCreatedBy(users.getEmpSystemId());
+            Lead lead = iLeadRepository.save(data);
+            lead.setCustomerCode("KH".concat(String.valueOf(lead.getId())));
 
-        LeadAssignRequest leadAssignRequest = new LeadAssignRequest();
-        leadAssignRequest.setLeadId(lead.getId());
-        leadAssignRequest.setUserAssigneeId(users.getEmpSystemId());
-        leadAssignRequest.setUserRecipientId(users.getEmpSystemId());
-        leadAssignRequest.setDeptCode(users.getDeptCode());
-        leadAssignRequest.setPostCode(users.getPostCode());
-        leadAssignRequest.setStatus(5L);
-
-        leadAssignService.createLeadAssign(users, leadAssignRequest);
-
-//        activityLogService.createActivityLog(user, data, lead, actionType);
-//        // Logobject
-//        LogHelpers.logObject(user, lead, actionType);
-        return lead;
+            LeadAssignRequest leadAssignRequest = new LeadAssignRequest();
+            leadAssignRequest.setLeadId(lead.getId());
+            leadAssignRequest.setUserAssigneeId(users.getEmpSystemId());
+            leadAssignRequest.setUserRecipientId(users.getEmpSystemId());
+            leadAssignRequest.setDeptCode(users.getDeptCode());
+            leadAssignRequest.setPostCode(users.getPostCode());
+            leadAssignRequest.setStatus(5L);
+            leadAssignService.createLeadAssign(users, leadAssignRequest);
+            return lead;
     }
 
     @Override
@@ -298,6 +297,22 @@ public class LeadServiceImpl implements ILeadService {
     }
 
     @Override
+    public LeadResponseWithDescriptionDto findLeadDetail(Long id) throws Exception {
+        Users user = getCurrentUser();
+        Lead lead = iLeadRepository.findLeadById(id);
+        if (lead == null) {
+            throw new HieuDzException("Khách hàng không tồn tại");
+        }
+        LeadResponseWithDescriptionDto leadResponseWithDescriptionDto = LeadResponseWithDescriptionDto.leadModelToDto(lead);
+        List<ScheduleResponseLeadDto> scheduleResponseLeadDto = leadResponseWithDescriptionDto.getSchedules();
+
+        if (scheduleResponseLeadDto != null) {
+            leadResponseWithDescriptionDto.setSchedules(scheduleResponseLeadDto);
+        }
+        return leadResponseWithDescriptionDto;
+    }
+
+    @Override
     public LeadHadPhoneResponseDto findLeadHadPhoneByUser(LeadRequest inputData, Long userId) {
         List<Lead> leadWithPhone = iLeadRepository.findLeadWithPhoneOnEVTP(CommonUtils.convertPhone(inputData.getPhone()));
         if (CollectionUtils.isEmpty(leadWithPhone)) {
@@ -319,7 +334,6 @@ public class LeadServiceImpl implements ILeadService {
         }
 
         return user;
-
     }
 }
 

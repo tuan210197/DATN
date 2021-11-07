@@ -113,8 +113,8 @@ public class Users extends AuditEntity {
     private String roles;
 //    = new HashSet<>();
 
-    public <E> Users(String email, String password, ArrayList<E> es) {
-    }
+//    public <E> Users(String email, String password, ArrayList<E> es) {
+//    }
 
 //    public void addRole(Role role) {
 //        roles.add(role);
