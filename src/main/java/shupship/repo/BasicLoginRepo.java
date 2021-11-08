@@ -16,7 +16,7 @@ public interface BasicLoginRepo extends PagingAndSortingRepository<BasicLogin, S
 
     BasicLogin findByUserUid(String userUid);
 
-    void deleteByEmail(String email);
+
 
 
 }

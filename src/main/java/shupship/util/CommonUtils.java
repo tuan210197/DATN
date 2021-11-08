@@ -1,24 +1,18 @@
 package shupship.util;
 
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import shupship.domain.model.BasicLogin;
 import shupship.domain.model.Users;
 import shupship.repo.BasicLoginRepo;
-import shupship.repo.UserRepo;
+import shupship.repo.UserRepository;
 import shupship.util.exception.ApplicationException;
 
-import javax.transaction.Transactional;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
@@ -27,21 +21,21 @@ import java.util.regex.Pattern;
 public class CommonUtils {
 
     @Autowired
-    static UserRepo userRepo;
+    static UserRepository userRepo;
 
     @Autowired
     static BasicLoginRepo basicLoginRepo;
 
-    public static Users getCurrentUser() throws ApplicationException {
-        UserDetails user = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String email = user.getUsername();
-        BasicLogin basicLogin = basicLoginRepo.findByEmail(email);
-        Users users = userRepo.findByUid(basicLogin.getUserUid());
-        if (users == null) {
-            throw new ApplicationException("Users is null");
-        }
-        return users;
-    }
+//    public static Users getCurrentUser() throws ApplicationException {
+//        UserDetails user = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        String email = user.getUsername();
+//        BasicLogin basicLogin = basicLoginRepo.findByEmail(email);
+//        Users users = userRepo.findByUid(basicLogin.getUserUid());
+//        if (users == null) {
+//            throw new ApplicationException("Users is null");
+//        }
+//        return users;
+//    }
 
     public static String formatUSDouble(double num) {
         NumberFormat nf = NumberFormat.getInstance(new Locale(Locale.US.getLanguage(), Locale.US.getCountry()));

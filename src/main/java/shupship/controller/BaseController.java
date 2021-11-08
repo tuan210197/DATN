@@ -11,7 +11,7 @@ import shupship.domain.message.ResponseMessage;
 import shupship.domain.model.BasicLogin;
 import shupship.domain.model.Users;
 import shupship.repo.BasicLoginRepo;
-import shupship.repo.UserRepo;
+import shupship.repo.UserRepository;
 import shupship.util.exception.ApplicationException;
 
 /**
@@ -24,7 +24,7 @@ import shupship.util.exception.ApplicationException;
 public abstract class BaseController {
 
     @Autowired
-    UserRepo userRepo;
+    UserRepository userRepo;
 
     @Autowired
     BasicLoginRepo basicLoginRepo;
@@ -50,14 +50,14 @@ public abstract class BaseController {
         return new ResponseEntity<>(message, HttpStatus.valueOf(code));
     }
 
-    protected Users getCurrentUser() {
-        UserDetails user = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String email = user.getUsername();
-        BasicLogin basicLogin = basicLoginRepo.findByEmail(email);
-        Users users = userRepo.findByUid(basicLogin.getUserUid());
-        if (users == null) {
-            throw new ApplicationException("Users is null");
-        }
-        return users;
-    }
+//    protected Users getCurrentUser() {
+//        UserDetails user = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        String email = user.getUsername();
+//        BasicLogin basicLogin = basicLoginRepo.findByEmail(email);
+//        Users users = userRepo.findByUid(basicLogin.getUserUid());
+//        if (users == null) {
+//            throw new ApplicationException("Users is null");
+//        }
+//        return users;
+//    }
 }

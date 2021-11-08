@@ -5,7 +5,6 @@ import io.jsonwebtoken.lang.Assert;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -20,12 +19,11 @@ import shupship.domain.dto.UserLoginDTO;
 
 import shupship.domain.model.BasicLogin;
 import shupship.domain.model.Users;
-import shupship.repo.UserRepo;
 import shupship.repo.BasicLoginRepo;
+import shupship.repo.UserRepository;
 import shupship.service.JwtUserDetailsService;
 import shupship.service.MailSenderService;
 import shupship.util.ValidateUtil;
-import shupship.util.exception.ApplicationException;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -42,7 +40,7 @@ public class JwtUserDetailsServiceImpl extends BaseController implements JwtUser
     private BasicLoginRepo basicLoginRepo;
 
     @Autowired
-    private UserRepo userRepo;
+    private UserRepository userRepo;
 
     @Autowired
     private PasswordEncoder bcryptEncoder;
@@ -143,41 +141,37 @@ public class JwtUserDetailsServiceImpl extends BaseController implements JwtUser
     @Override
     public boolean banUser(UserLoginDTO userLoginDTO) {
 
-        String email = userLoginDTO.getEmail();
-        BasicLogin basicLogin = basicLoginRepo.findByEmail(email);
-        String uid = basicLogin.getUserUid();
+//        String email = userLoginDTO.getEmail();
+//        BasicLogin basicLogin = basicLoginRepo.findByEmail(email);
+        String uid = userLoginDTO.getUserUid();
 
-        if (uid != null) {
-            Users users = userRepo.findByUid(uid);
-            users.setIsActive(0);
-            userRepo.save(users);
-            return true;
-
-        } else {
-            return false;
-        }
+            if (uid != null) {
+                Users users = userRepo.findByUid(uid);
+                users.setIsActive(0);
+                userRepo.save(users);
+                return true;
+            } else {
+                return false;
+            }
 
     }
 
     @Override
     public boolean unlockUser(UserLoginDTO userLoginDTO) {
-        String email = userLoginDTO.getEmail();
-        BasicLogin basicLogin = basicLoginRepo.findByEmail(email);
-        String uid = basicLogin.getUserUid();
+//        String email = userLoginDTO.getEmail();
+//        BasicLogin basicLogin = basicLoginRepo.findByEmail(email);
+        String uid = userLoginDTO.getUserUid();
 
         if (uid != null) {
             Users users = userRepo.findByUid(uid);
             users.setIsActive(1);
             userRepo.save(users);
             return true;
-
         } else {
             return false;
         }
+
     }
-
-
-
 
     @Override
     public boolean registerUser(UserLoginDTO user) throws Exception {
@@ -194,7 +188,7 @@ public class JwtUserDetailsServiceImpl extends BaseController implements JwtUser
         log.info("End query Table basic_login at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
         Assert.isNull(checkBasicLogin, "EMAIL_REGISTERED");
-        Users userLogin = getCurrentUser();
+//        Users userLogin = getCurrentUser();
         Long sysid = sysid();
         Users users = Users.builder()
                 .avatar(user.getAvatar())
@@ -340,7 +334,7 @@ public class JwtUserDetailsServiceImpl extends BaseController implements JwtUser
         Assert.isTrue(ValidateUtil.regexValidation(userLoginDTO.getMobile(), Const.VALIDATE_INPUT.regexPhone), "PHONE_WRONG_FORMAT");
         Assert.isTrue(Const.VALIDATE_INPUT.phoneNum.contains(userLoginDTO.getMobile().substring(0, 3)), "PHONE_NOT_VALID");
         Assert.isTrue(userCheck.getIsActive().equals(1), "USER_NOT_ACTIVE");
-//        userCheck.setAvatar(userLoginDTO.getAvatar());
+        userCheck.setAvatar(userLoginDTO.getAvatar());
         userCheck.setBirthday(userLoginDTO.getBirthday());
         userCheck.setFullName(userLoginDTO.getFullName());
         userCheck.setGender(userLoginDTO.getGender());
@@ -350,6 +344,7 @@ public class JwtUserDetailsServiceImpl extends BaseController implements JwtUser
         log.info("Start save Table user at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
         userRepo.save(userCheck);
+//        userRepo.updateUser(userLoginDTO.getBirthday(),userLoginDTO.getFullName(),userLoginDTO.getGender(),userLoginDTO.getMobile(),userLoginDTO.getAddress(),userId);
         log.info("End save Table user at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
         return true;

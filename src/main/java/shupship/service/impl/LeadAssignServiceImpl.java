@@ -10,7 +10,7 @@ import shupship.domain.model.Users;
 import shupship.enums.LeadType;
 import shupship.repo.ILeadAssignRepository;
 import shupship.repo.ILeadRepository;
-import shupship.repo.UserRepo;
+import shupship.repo.UserRepository;
 import shupship.request.LeadAssignRequest;
 import shupship.service.ILeadAssignService;
 import shupship.util.exception.HieuDzException;
@@ -21,7 +21,7 @@ public class LeadAssignServiceImpl implements ILeadAssignService {
     @Autowired
     ILeadRepository iLeadRepository;
     @Autowired
-    UserRepo userRepo;
+    UserRepository userRepo;
 
     @Autowired
     ILeadAssignRepository leadAssignRepo;
