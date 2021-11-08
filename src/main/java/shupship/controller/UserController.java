@@ -6,12 +6,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.repository.query.Param;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shupship.domain.dto.UserInfoDTO;
+import shupship.domain.model.Users;
+import shupship.repo.UserRepository;
 import shupship.service.UserService;
 import shupship.service.mapper.UserMapper;
 import shupship.util.CriteriaUtil;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin
@@ -19,6 +27,7 @@ import shupship.util.CriteriaUtil;
 @Slf4j
 @RequestMapping("/user")
 public class UserController extends BaseController {
+
     @Autowired
     private UserService userService;
     @Autowired
@@ -36,5 +45,14 @@ public class UserController extends BaseController {
         Page<UserInfoDTO> pages = userService.list(pageable).map(mapper::toDto);
         return ResponseEntity.ok(pages);
     }
+
+    @GetMapping("")
+    public ResponseEntity<?> searchUser( @RequestParam("keyword") String keyword) {
+        List<Users> users = userService.searchUser(keyword);
+        List<UserInfoDTO> list = users.stream().map(mapper::toDto).collect(Collectors.toList());
+
+        return ResponseEntity.ok(list);
+    }
+
 
 }

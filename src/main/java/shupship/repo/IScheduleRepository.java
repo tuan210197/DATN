@@ -19,8 +19,11 @@ public interface IScheduleRepository extends JpaRepository<Schedule, Long> {
     @Query(value = "SELECT * from schedule s where s.created_by = ?1 and s.lead_id = ?2 and s.is_latest = 1 and s.deleted_status = 0 order by s.to_time desc limit 1", nativeQuery = true)
     Schedule getLatestScheduleByUserIdAndLeadId(Long sysId, Long leadId);
 
+    @Query("Select a from Schedule a where a.id = :id and a.deletedStatus = 0 and a.createdBy = :sysId")
+    Schedule getScheduleById(Long id, Long sysId);
 
     @Query("update Schedule s set s.deletedStatus = 1 where s.id = :id and s.createdBy = :userId")
     @Modifying
     void deleteSchedule(long id, Long userId);
+
 }

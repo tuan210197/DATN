@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.transaction.annotation.Transactional;
 import shupship.common.Const;
 import shupship.domain.message.ResponseMessage;
 import shupship.domain.model.BasicLogin;
@@ -50,7 +51,8 @@ public abstract class BaseController {
         return new ResponseEntity<>(message, HttpStatus.valueOf(code));
     }
 
-    protected Users getCurrentUser() throws Exception {
+    @Transactional
+    public Users getCurrentUser() {
         UserDetails user = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String email = user.getUsername();
         BasicLogin basicLogin = basicLoginRepo.findByEmail(email);

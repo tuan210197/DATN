@@ -2,6 +2,7 @@ package shupship.domain.model;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+import shupship.controller.BaseController;
 import shupship.helper.InstantConverter;
 import shupship.service.UserService;
 import shupship.service.impl.UserServiceImpl;
@@ -13,7 +14,7 @@ import java.io.Serializable;
 import java.time.Instant;
 
 @MappedSuperclass
-public abstract class AuditEntity implements Serializable{
+public abstract class AuditEntity extends BaseController implements Serializable{
     @Column(name = "created_date")
     @Convert(converter = InstantConverter.class)
     private Instant createdDate;
@@ -110,26 +111,25 @@ public abstract class AuditEntity implements Serializable{
         this.createdDate = Instant.now();
 //        try {
 //            if (createdBy == null) {
+//                this.createdBy = getCurrentUser().getEmpSystemId();
+//            }
+//        } catch (Exception ex) {
+//            ex.printStackTrace();
 //                this.createdBy = -1L;
 //            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            this.createdBy = -1L;
-//        }
         this.deletedStatus = 0L;
         this.lastModifiedDate = createdDate;
         this.lastModifiedBy = createdBy;
     }
 
     @PreUpdate
-    void preUpdate() throws ApplicationException {
+    void preUpdate() throws Exception {
 //        if (SecurityContextHolder.getContext() !=null && SecurityContextHolder.getContext().getAuthentication() !=null && SecurityContextHolder.getContext().getAuthentication().getPrincipal() != null) {
-////            this.lastModifiedBy = CommonUtils.getCurrentUser().getEmpSystemId();
+//         this.lastModifiedBy = getCurrentUser().getEmpSystemId();
 //            this.lastModifiedBy = -1L;
 //        }else{
 //            this.lastModifiedBy = -1L;
 //        }
-
         this.lastModifiedDate = Instant.now();
     }
 }

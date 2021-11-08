@@ -20,7 +20,7 @@ public interface JwtUserDetailsService extends UserDetailsService {
 
 	UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;
 
-	boolean registerUser(UserLoginDTO userLoginDTO);
+	boolean registerUser(UserLoginDTO userLoginDTO) throws Exception;
 
 	void forgetPassword(UserLoginDTO userLoginDTO);
 
