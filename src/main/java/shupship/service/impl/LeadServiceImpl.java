@@ -96,11 +96,6 @@ public class LeadServiceImpl implements ILeadService {
             data.setTitle(leadRequest.getTitle());
         } else throw new HieuDzException("Không được để trống tille");
 
-//        if (StringUtils.isNotEmpty(leadRequest.getFullName())) {
-//            data.setFullName(leadRequest.getFullName());
-//            data.setCompanyName(leadRequest.getFullName());
-//        } else throw new HieuDzException("Không được để trống tên");
-
         if (StringUtils.isNotEmpty(leadRequest.getCompanyName())) {
             data.setFullName(leadRequest.getCompanyName());
             data.setCompanyName(leadRequest.getCompanyName());
