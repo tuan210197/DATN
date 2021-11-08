@@ -11,5 +11,5 @@ public interface ILeadAssignService {
 
     LeadAssign createLeadAssign(Users user, LeadAssignRequest leadAssginReq);
 
-    List<LeadAssign> createLeadAssignV2(Users user, LeadAssignRequestV2 leadAssignReques)
-;}
+    List<LeadAssign> createLeadAssignV2(Users user, LeadAssignRequestV2 leadAssignReques);
+}

@@ -10,7 +10,6 @@ spring:
 
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-#    172.104.190.139
     url: jdbc:postgresql://172.104.190.139:5432/erp_crm
     driverClassName: org.postgresql.Driver
     username: postgres
