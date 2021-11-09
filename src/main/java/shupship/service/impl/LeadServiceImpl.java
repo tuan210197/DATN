@@ -8,6 +8,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContextException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,8 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 
 @Log4j2
@@ -47,10 +50,12 @@ public class LeadServiceImpl implements ILeadService {
     @Autowired
     ILeadRepository iLeadRepository;
 
-     @Autowired
+    @Autowired
     ILeadAssignRepository iLeadAssignRepository;
+
     @Autowired
     IndustryDetailRepository industryDetailRepository;
+
     @Autowired
     IScheduleRepository scheduleRepository;
 
@@ -59,6 +64,7 @@ public class LeadServiceImpl implements ILeadService {
 
     @Autowired
     ILeadAssignService leadAssignService;
+
     @Override
     public PagingRs getListLead(Pageable pageable, Timestamp from, Timestamp to, Long status, Users users) throws ApplicationContextException {
 
@@ -80,6 +86,40 @@ public class LeadServiceImpl implements ILeadService {
         listLeadResponse.setTotalItem(leadList.getTotalElements());
         listLeadResponse.setData(leadResponses.getContent());
         return listLeadResponse;
+    }
+
+    @Override
+    public PagingRs getListLeadOnEmp(Pageable pageable, Timestamp from, Timestamp to, Long status, Users users, String key) throws ApplicationContextException {
+        Instant startDate = from.toInstant();
+        Instant endDate = to.toInstant();
+        Page<Lead> leadPage = null;
+        if (status != null && status == 7) {
+            leadPage = iLeadRepository.findAllLeadbyCriteriaOnApp2(startDate, endDate, users.getEmpSystemId(), key, pageable);
+            for (Lead model : leadPage) {
+                model.setStatus(LeadStatus.RECALL.getType());
+            }
+        } else if (status == 6) {
+            leadPage = iLeadRepository.findAllLeadbyCriteriaOnApp(startDate, endDate, users.getEmpSystemId(), null, key, pageable);
+        } else if (status == 5 || status == 1) {
+            Long sts = 5L;
+            Long sts1 = 1L;
+            leadPage = iLeadRepository.findAllLeadbyCriteriaOnAppNew(startDate, endDate, users.getEmpSystemId(), sts, sts1, key, pageable);
+        } else {
+            leadPage = iLeadRepository.findAllLeadbyCriteriaOnApp(startDate, endDate, users.getEmpSystemId(), status, key, pageable);
+        }
+
+        if (StringUtils.isNotEmpty(key)) {
+            leadPage = new PageImpl<>(leadPage.stream().filter(Objects::nonNull)
+                    .filter(e -> (Objects.nonNull(e.getCompanyName()) && e.getCompanyName().toLowerCase().contains(key.toLowerCase()))
+                            || (Objects.nonNull(e.getFullName()) && e.getFullName().toLowerCase().contains(key.toLowerCase()))
+                            || (Objects.nonNull(e.getCustomerCode()) && e.getCustomerCode().toLowerCase().contains(key.toLowerCase()))).collect(Collectors.toList()));
+        }
+
+        Page<LeadResponse> page = leadPage.map(LeadResponse::leadModelToDto);
+        PagingRs pagingRs = new PagingRs();
+        pagingRs.setData(page.getContent());
+        pagingRs.setTotalItem(leadPage.getTotalElements());
+        return pagingRs;
     }
 
     @Override
@@ -253,18 +293,18 @@ public class LeadServiceImpl implements ILeadService {
             throw new HieuDzException("Lỗi bỏ trống sp");
         }
         data.setCreatedBy(users.getEmpSystemId());
-            Lead lead = iLeadRepository.save(data);
-            lead.setCustomerCode("KH".concat(String.valueOf(lead.getId())));
+        Lead lead = iLeadRepository.save(data);
+        lead.setCustomerCode("KH".concat(String.valueOf(lead.getId())));
 
-            LeadAssignRequest leadAssignRequest = new LeadAssignRequest();
-            leadAssignRequest.setLeadId(lead.getId());
-            leadAssignRequest.setUserAssigneeId(users.getEmpSystemId());
-            leadAssignRequest.setUserRecipientId(users.getEmpSystemId());
-            leadAssignRequest.setDeptCode(users.getDeptCode());
-            leadAssignRequest.setPostCode(users.getPostCode());
-            leadAssignRequest.setStatus(5L);
-            leadAssignService.createLeadAssign(users, leadAssignRequest);
-            return lead;
+        LeadAssignRequest leadAssignRequest = new LeadAssignRequest();
+        leadAssignRequest.setLeadId(lead.getId());
+        leadAssignRequest.setUserAssigneeId(users.getEmpSystemId());
+        leadAssignRequest.setUserRecipientId(users.getEmpSystemId());
+        leadAssignRequest.setDeptCode(users.getDeptCode());
+        leadAssignRequest.setPostCode(users.getPostCode());
+        leadAssignRequest.setStatus(5L);
+        leadAssignService.createLeadAssign(users, leadAssignRequest);
+        return lead;
     }
 
     @Override

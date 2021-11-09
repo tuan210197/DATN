@@ -5,11 +5,10 @@ import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import shupship.domain.model.*;
+import shupship.dto.LeadAssignResponseDto;
 import shupship.dto.ScheduleResponseDto;
-import shupship.enums.LeadSource;
-import shupship.enums.LeadStatus;
-import shupship.enums.LeadStatusVi;
-import shupship.enums.LeadType;
+import shupship.enums.*;
+import shupship.util.DateTimeUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -33,6 +32,8 @@ public class LeadResponse {
 
     private LocalDateTime createdDate;
 
+    private LocalDateTime impactDate;
+
     private String companyName;
 
     private String representation;
@@ -45,10 +46,6 @@ public class LeadResponse {
 
     private String compensation;
 
-    private String payment;
-
-    private String other;
-
     private String type;
 
     private String status;
@@ -60,8 +57,6 @@ public class LeadResponse {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private AddressResponse address;
 
-    private Long annualQuantity;
-
     private Double expectedRevenue;
 
     private Double inProvincePrice;
@@ -69,6 +64,10 @@ public class LeadResponse {
     private Double outProvincePrice;
 
     private String leadSource;
+
+    private String statusLa;
+
+    private String statusDescLa;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<IndustryResponse> industries;
@@ -85,23 +84,24 @@ public class LeadResponse {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<LeadAssignResponse> leadAssigns;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String successCusCode;
+
     public static LeadResponse leadModelToDto(Lead data) {
         LeadResponse response = new LeadResponse();
         response.setId(data.getId());
         response.setFullName(data.getFullName());
         response.setTitle(data.getTitle());
         response.setExpectedRevenue(data.getExpectedRevenue() == null ? 0 :data.getExpectedRevenue());
-        response.setAnnualQuantity(data.getAnnualQuantity() == null ? 0 :data.getAnnualQuantity());
         response.setCompanyName(data.getCompanyName() == null ? "" :data.getCompanyName());
         response.setRepresentation(data.getRepresentation() == null ? "" :data.getRepresentation());
         response.setQuantityMonth(data.getQuantityMonth() == null ? 0 : data.getQuantityMonth());
         response.setWeight(data.getWeight() == null ? 0 :data.getWeight());
         response.setQuality(data.getQuality() == null ? "" :data.getQuality());
         response.setCompensation(data.getCompensation() == null ? "" :data.getCompensation());
-        response.setOther(data.getOther() == null ? "" : data.getOther());
         if (data.getType() != null)
             response.setType(LeadType.getByValue(data.getType()).name());
-        response.setCustomerCode(data.getCustomerCode() == null ? "" : data.getCustomerCode());
+        response.setCustomerCode(data.getCustomerCode() == null ? "KH".concat(String.valueOf(data.getId())) : data.getCustomerCode());
         response.setInProvincePrice(data.getInProvincePrice() == null ? 0 :data.getInProvincePrice());
         response.setOutProvincePrice(data.getOutProvincePrice() == null ? 0 : data.getOutProvincePrice());
         if (data.getStatus().equals(LeadStatus.NOT_CONTACTED.getType())) {
@@ -123,15 +123,43 @@ public class LeadResponse {
         response.setUnmaskPhone(data.getPhone() == null ? "" : data.getPhone().replaceAll(".(?=.{4})", "*"));
         response.setPhone(data.getPhone() == null ? "" : data.getPhone());
         response.setLeadSource(StringUtils.isNotBlank(data.getLeadSource()) ? LeadSource.valueOf(data.getLeadSource()).getValue() : "");
-        if (data.getLeadAssigns() != null) {
-            List<LeadAssignResponse> leadAssignResponseDtos = data.getLeadAssigns().stream().map(LeadAssignResponse::leadAssignModelToDto)
-                    .sorted(Comparator.comparing(LeadAssignResponse::getId).reversed())
-                    .collect(Collectors.toList());
-            response.setLeadAssigns(leadAssignResponseDtos);
-            if (leadAssignResponseDtos.size() > 0) {
-                response.setCreatedDate(leadAssignResponseDtos.get(0).getCreatedDate());
+        List<LeadAssign> leadAssign = data.getLeadAssigns().stream().sorted(Comparator.comparing(LeadAssign::getId).reversed()).collect(Collectors.toList());
+
+        if (CollectionUtils.isNotEmpty(data.getLeadAssigns())) {
+
+            List<LeadAssignResponse> leadAssignResponse = leadAssign.stream().map(LeadAssignResponse::leadAssignModelToDto).collect(Collectors.toList());
+            response.setLeadAssigns(leadAssignResponse);
+
+            LeadAssign model = leadAssign.get(0);
+
+            response.setStatusLa(LeadStatus.getByValue(model.getStatus()).name());
+            response.setStatusDescLa(LeadStatusVi.valueOf(LeadStatus.getByValue(model.getStatus()).name()).getType());
+
+            if (model.getStatus() == 1 || model.getStatus() == 5) {
+                response.setStatusLa(LeadStatus.getByValue(LeadStatus.NEW.getType()).name());
+                response.setStatusDescLa(LeadStatusVi.valueOf(LeadStatus.NEW.name()).getType());
+                response.setCreatedDate(DateTimeUtils.instantToLocalDateTime(model.getCreatedDate()));
+                response.setImpactDate(DateTimeUtils.instantToLocalDateTime(model.getCreatedDate()));
+            } else if (model.getStatus() == 3 || model.getStatus() == 4) {
+                List<Result> listResult = null;
+                listResult = model.getLeads().getSchedules().stream().map(Schedule::getResult).collect(Collectors.toList());
+                Result result = listResult.get(listResult.size() - 1);
+                response.setCreatedDate(DateTimeUtils.instantToLocalDateTime(model.getCreatedDate()));
+                if (result != null) {
+                    response.setImpactDate(DateTimeUtils.instantToLocalDateTime(result.getCreatedDate()));
+                }
+            } else {
+                if (CollectionUtils.isNotEmpty(model.getLeads().getSchedules())) {
+                    Schedule schedule = new Schedule();
+                    schedule = model.getLeads().getSchedules().stream().collect(Collectors.toList()).get(0);
+                    response.setImpactDate(schedule.getFromDate());
+                }
+                response.setCreatedDate(DateTimeUtils.instantToLocalDateTime(model.getCreatedDate()));
             }
 
+        } else {
+            response.setCreatedDate(DateTimeUtils.instantToLocalDateTime(data.getCreatedDate()));
+            response.setLeadAssigns(new ArrayList<>());
         }
         if (CollectionUtils.isNotEmpty(data.getIndustries())) {
             List<IndustryResponse> industryResponses = data.getIndustries().stream().map(e -> new IndustryResponse(e.getCode(), e.getName())).collect(Collectors.toList());
@@ -140,6 +168,10 @@ public class LeadResponse {
         if (CollectionUtils.isNotEmpty(data.getSchedules())) {
             List<ScheduleResponseDto> scheduleResponseDtos = data.getSchedules().stream().map(ScheduleResponseDto::scheduleModelToDto).collect(Collectors.toList());
             response.setSchedules(scheduleResponseDtos);
+        } response.setSchedules(new ArrayList<>());
+        if (data.getStatus().equals(LeadStatus.SUCCESS.getType())) {
+            Result result = data.getSchedules().stream().filter(e -> e.getStatus().equals(ScheduleStatus.SUCCESS.getType())).limit(1).map(Schedule::getResult).collect(Collectors.toList()).get(0);
+            response.setSuccessCusCode(result.getCustomerCode());
         }
         return response;
     }

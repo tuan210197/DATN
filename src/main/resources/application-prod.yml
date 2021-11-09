@@ -10,7 +10,7 @@ spring:
 
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-#    172.104.190.139
+    #    172.104.190.139
     url: jdbc:postgresql://172.104.190.139:5432/erp_crm
     driverClassName: org.postgresql.Driver
     username: postgres
@@ -38,7 +38,13 @@ spring:
 
 jwt:
   secret: supship
-  expireToken:  3600000
+  expireToken: 3600000
+
+
+#twilio:
+#  account_sid: ACae2f5cbcb84e3ec4a95ef275d2b3d99a
+#  auth_token: b6c598522e3fd7180cea68095657c8a9
+#  trial_number: +12183048442
 
 server:
   port: 8085
