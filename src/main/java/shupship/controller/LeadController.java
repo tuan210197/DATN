@@ -207,6 +207,19 @@ public class LeadController extends BaseController {
 //        }
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
+    @PutMapping(value = "/{leadId}")
+    public ResponseEntity updateLead(@RequestBody LeadUpdateRequest inputData, @PathVariable(value = "leadId") Long leadId) throws Exception {
+        //validateLeadSource
+        if (!validateIndustry(inputData.getLeadSource())) {
+            throw new HieuDzException("Industry code is not defined");
+        }
+
+        Lead data = leadService.updateLeadWMO(leadId, inputData);
+        LeadResponse response = LeadResponse.leadModelToDto(data);
+
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
     @DeleteMapping(value = "/{leadId}")
     public ResponseEntity deleteLead(@PathVariable(value = "leadId") Long leadId) throws Exception {
         Lead data = leadService.deleteLeadWMO(leadId);
@@ -220,6 +233,7 @@ public class LeadController extends BaseController {
         }
         return ResponseUtil.wrapOrNotFound(Optional.ofNullable(data));
     }
+
 
     private HashMap getPhoneEVTP(String phone) {
         if (StringUtils.isNotBlank(phone)) {

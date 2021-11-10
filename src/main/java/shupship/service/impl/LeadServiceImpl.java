@@ -135,11 +135,6 @@ public class LeadServiceImpl implements ILeadService {
             data.setTitle(leadRequest.getTitle());
         } else throw new HieuDzException("Không được để trống tille");
 
-//        if (StringUtils.isNotEmpty(leadRequest.getFullName())) {
-//            data.setFullName(leadRequest.getFullName());
-//            data.setCompanyName(leadRequest.getFullName());
-//        } else throw new HieuDzException("Không được để trống tên");
-
         if (StringUtils.isNotEmpty(leadRequest.getCompanyName())) {
             data.setFullName(leadRequest.getCompanyName());
             data.setCompanyName(leadRequest.getCompanyName());
@@ -210,11 +205,6 @@ public class LeadServiceImpl implements ILeadService {
                 } else existData.setPhone(CommonUtils.convertPhone(leadRequest.getPhone()));
             }
 
-//            if (StringUtils.isNotEmpty(leadRequest.getFullName())) {
-//                existData.setFullName(leadRequest.getFullName());
-//                existData.setCompanyName(leadRequest.getFullName());
-//            } else throw new HieuDzException("Không được để trống tên");
-
             if (StringUtils.isNotEmpty(leadRequest.getCompanyName())) {
                 existData.setFullName(leadRequest.getCompanyName());
                 existData.setCompanyName(leadRequest.getCompanyName());
@@ -249,7 +239,7 @@ public class LeadServiceImpl implements ILeadService {
     @Override
     public Lead deleteLeadOnWEB(Long leadId, Users users) throws ApplicationException {
         Lead existData = iLeadRepository.findLeadById(leadId);
-
+        ///Users user = users.getCurrentUser();
         if (existData == null) {
             throw new HieuDzException("Khách hàng không tồn tại");
         }
@@ -257,7 +247,7 @@ public class LeadServiceImpl implements ILeadService {
         if (CollectionUtils.isNotEmpty(schedules)) {
             throw new HieuDzException("Chỉ được xóa khách hàng khi không có lịch tiếp xúc và chưa cập nhật kết quả");
         }
-        existData.setDeletedBy(users.getEmpSystemId());
+        ///existData.setDeletedBy(user.getEmpSystemId());
         existData.setDeletedStatus(Constants.DELETE_LEAD);
         Lead lead = iLeadRepository.save(existData);
         return lead;
