@@ -10,13 +10,14 @@ import org.springframework.context.ApplicationContextException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shupship.common.Constants;
+import shupship.domain.dto.CommonCodeResponseDto;
 import shupship.domain.model.*;
 import shupship.dto.LeadHadPhoneResponseDto;
 import shupship.dto.LeadResponseWithDescriptionDto;
+import shupship.dto.ResultLeadResponse;
 import shupship.dto.ScheduleResponseLeadDto;
 import shupship.enums.LeadSource;
 import shupship.enums.LeadStatus;
@@ -48,6 +49,7 @@ public class LeadServiceImpl implements ILeadService {
 
     @Autowired
     ILeadAssignRepository iLeadAssignRepository;
+
     @Autowired
     IndustryDetailRepository industryDetailRepository;
 
@@ -65,7 +67,6 @@ public class LeadServiceImpl implements ILeadService {
 
     @Autowired
     ILeadAssignService leadAssignService;
-
     @Override
     public PagingRs getListLead(Pageable pageable, Timestamp from, Timestamp to, Long status, Users users) throws ApplicationContextException {
 
@@ -90,11 +91,50 @@ public class LeadServiceImpl implements ILeadService {
     }
 
     @Override
+    public PagingRs getListLeadOnEmp(Pageable pageable, Timestamp from, Timestamp to, Long status, Users users, String key) throws ApplicationContextException {
+        Instant startDate = from.toInstant();
+        Instant endDate = to.toInstant();
+        Page<Lead> leadPage = null;
+        if (status != null && status == 7) {
+            leadPage = iLeadRepository.findAllLeadbyCriteriaOnApp2(startDate, endDate, users.getEmpSystemId(), key, pageable);
+            for (Lead model : leadPage) {
+                model.setStatus(LeadStatus.RECALL.getType());
+            }
+        } else if (status == 6) {
+            leadPage = iLeadRepository.findAllLeadbyCriteriaOnApp(startDate, endDate, users.getEmpSystemId(), null, key, pageable);
+        } else if (status == 5 || status == 1) {
+            Long sts = 5L;
+            Long sts1 = 1L;
+            leadPage = iLeadRepository.findAllLeadbyCriteriaOnAppNew(startDate, endDate, users.getEmpSystemId(), sts, sts1, key, pageable);
+        } else {
+            leadPage = iLeadRepository.findAllLeadbyCriteriaOnApp(startDate, endDate, users.getEmpSystemId(), status, key, pageable);
+        }
+
+        if (StringUtils.isNotEmpty(key)) {
+            leadPage = new PageImpl<>(leadPage.stream().filter(Objects::nonNull)
+                    .filter(e -> (Objects.nonNull(e.getCompanyName()) && e.getCompanyName().toLowerCase().contains(key.toLowerCase()))
+                            || (Objects.nonNull(e.getFullName()) && e.getFullName().toLowerCase().contains(key.toLowerCase()))
+                            || (Objects.nonNull(e.getCustomerCode()) && e.getCustomerCode().toLowerCase().contains(key.toLowerCase()))).collect(Collectors.toList()));
+        }
+
+        Page<LeadResponse> page = leadPage.map(LeadResponse::leadModelToDto);
+        PagingRs pagingRs = new PagingRs();
+        pagingRs.setData(page.getContent());
+        pagingRs.setTotalItem(leadPage.getTotalElements());
+        return pagingRs;
+    }
+
+    @Override
     public Lead insertLead(LeadRequest leadRequest, Users users) throws ApplicationContextException {
         Lead data = new Lead();
         if (StringUtils.isNotEmpty(leadRequest.getTitle())) {
             data.setTitle(leadRequest.getTitle());
         } else throw new HieuDzException("Không được để trống tille");
+
+//        if (StringUtils.isNotEmpty(leadRequest.getFullName())) {
+//            data.setFullName(leadRequest.getFullName());
+//            data.setCompanyName(leadRequest.getFullName());
+//        } else throw new HieuDzException("Không được để trống tên");
 
         if (StringUtils.isNotEmpty(leadRequest.getCompanyName())) {
             data.setFullName(leadRequest.getCompanyName());

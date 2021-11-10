@@ -17,4 +17,10 @@ public interface UserRepository extends JpaRepository<Users, String> {
             + " OR u.mobile like %:keyword%"
     )
     List<Users> search(@Param("keyword") String keyword);
+
+    @Query("select a from Users a where a.isActive = 1 and a.postCode = :postCode")
+    List<Users> getUsersByPostCode(String postCode);
+
+
+
 }

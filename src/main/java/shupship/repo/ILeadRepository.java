@@ -65,6 +65,79 @@ public interface ILeadRepository extends PagingAndSortingRepository<Lead, Long>,
                                            @Param("code") String code,
                                            Pageable pageRequest);
 
+    @Query("select distinct a from Lead a left join LeadAssign b on a.id = b.leads " +
+            " where b.recallStatus = 1 and b.userRecipientId = :id " +
+            " and (COALESCE(:key) is null or (a.fullName = :key or a.customerCode = :key or a.companyName = :key) )  " +
+            " and " +
+            " (" +
+            " ( COALESCE(:start) is null or b.createdDate >= :start) " +
+            " and " +
+            " ( COALESCE(:end) is null or b.createdDate <= :end)" +
+            " )")
+    Page<Lead> findAllLeadbyCriteriaOnApp2(@Param("start") Instant start,
+                                           @Param("end") Instant end,
+                                           @Param("id") Long id,
+                                           @Param("key") String key,
+                                           Pageable pageable);
+
+    @Query("Select distinct a from Lead a left join LeadAssign b on a.id = b.leads " +
+            " where " +
+            " (b.userRecipientId = :userId" +
+            " and (COALESCE(:status) is null or a.status = :status)" +
+            " and " +
+            " ( COALESCE(:start) is null or b.createdDate >= :start) " +
+            " and " +
+            " ( COALESCE(:end) is null or b.createdDate <= :end)" +
+            ")" +
+            " or " +
+            " (" +
+            " (" +
+            " ( COALESCE(:start) is null or a.createdDate >= :start) " +
+            " and " +
+            " ( COALESCE(:end) is null or a.createdDate <= :end)" +
+            " ) " +
+            " and a.deletedStatus = 0 and a.isFromEVTP is null" +
+            " and (COALESCE(:key) is null or (a.fullName = :key or a.customerCode = :key or a.companyName = :key) )  " +
+            " and a.createdBy = :userId" +
+            " and (COALESCE(:status) is null or a.status = :status)" +
+            " )")
+    Page<Lead> findAllLeadbyCriteriaOnApp(@Param("start") Instant start,
+                                          @Param("end") Instant end,
+                                          @Param("userId") Long userId,
+                                          @Param("status") Long status,
+                                          @Param("key") String key,
+                                          Pageable pageable);
+
+    @Query("Select distinct a from Lead a left join LeadAssign b on a.id = b.leads " +
+            " where " +
+            " (b.userRecipientId = :userId" +
+            " and ((COALESCE(:status) is null or a.status = :status) or (COALESCE(:status1) is null or a.status = :status1) )" +
+            " and " +
+            " ( COALESCE(:start) is null or b.createdDate >= :start) " +
+            " and " +
+            " ( COALESCE(:end) is null or b.createdDate <= :end)" +
+            ")" +
+            " or " +
+            " (" +
+            " (" +
+            " ( COALESCE(:start) is null or a.createdDate >= :start) " +
+            " and " +
+            " ( COALESCE(:end) is null or a.createdDate <= :end)" +
+            " ) " +
+            " and a.deletedStatus = 0 and a.isFromEVTP is null" +
+            " and (COALESCE(:key) is null or (a.fullName = :key or a.customerCode = :key or a.companyName = :key) )  " +
+            " and a.createdBy = :userId" +
+            " and ((COALESCE(:status) is null or a.status = :status) or (COALESCE(:status1) is null or a.status = :status1))" +
+            " )")
+    Page<Lead> findAllLeadbyCriteriaOnAppNew(@Param("start") Instant start,
+                                             @Param("end") Instant end,
+                                             @Param("userId") Long userId,
+                                             @Param("status") Long status,
+                                             @Param("status1") Long status1,
+                                             @Param("key") String key,
+                                             Pageable pageable);
+
+
     @Query("select l from Lead l where l.deletedStatus = 0 and l.phone = :phone and l.createdBy = :userId")
     Lead findLeadWithPhoneByUser(String phone, Long userId);
 }

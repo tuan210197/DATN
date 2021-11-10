@@ -3,9 +3,7 @@ package shupship.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import shupship.cronjob.JobDistrict;
 import shupship.cronjob.JobProvince;
 import shupship.cronjob.JobWard;
@@ -29,6 +27,9 @@ public class TestController extends BaseController {
 	@Autowired
 	JobWard jobWard;
 
+//	@Autowired
+//	TwilioSmsSender twilioSmsSender;
+
 	@RequestMapping({ "/hello" })
 	public String firstPage() {
 		return "hello";
@@ -46,5 +47,11 @@ public class TestController extends BaseController {
 		jobWard.syncWard();
 		return new ResponseEntity("OK", HttpStatus.OK);
 	}
+
+
+//	@PostMapping(value = "/send-sms")
+//	public void sendSms(@Valid @RequestBody SmsRequest smsRequest) {
+//		twilioSmsSender.sendSms(smsRequest);
+//	}
 
 }
