@@ -23,13 +23,15 @@ public interface ILeadService {
 
     Lead updateLead(Long id, LeadUpdateRequest leadRequest) throws ApplicationException;
 
-    Lead deleteLeadOnWEB(Long leadId) throws ApplicationException;
+    Lead deleteLeadOnWEB(Long leadId, Users users) throws ApplicationException;
 
     LeadResponse detailLead(Long id) throws ApplicationException;
 
     LeadResponseWithDescriptionDto findLeadDetail(Long id) throws Exception;
 
     Lead createLeadWMO(LeadRequest inputData, Users users) throws Exception;
+
+    Lead updateLeadWMO(Long id, LeadUpdateRequest inputData) throws Exception;
 
     Lead deleteLeadWMO(Long leadId) throws Exception;
 

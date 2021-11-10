@@ -111,7 +111,7 @@ public class LeadController extends BaseController {
     }
 
     @PutMapping(value = "evtp/{leadId}")
-    public ResponseEntity<LeadResponse> updateLeadOnWEB(@RequestBody LeadUpdateRequest inputData, @PathVariable(value = "leadId") Long leadId)
+    public ResponseEntity<LeadResponse> updateLeadOnWEB(@RequestBody LeadUpdateRequest inputData,@PathVariable(value = "leadId") Long leadId)
             throws ApplicationException {
         //validateLeadSource
 //        if (!validateIndustry(inputData.getLeadSource())) {
@@ -123,8 +123,8 @@ public class LeadController extends BaseController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @DeleteMapping(value = "/evtp/{leadId}")
-    public ResponseEntity deleteLeadOnWEB(@PathVariable(value = "leadId") Long leadId) throws Exception {
-        Lead data = leadService.deleteLeadOnWEB(leadId);
+    public ResponseEntity deleteLeadOnWEB(Users users,@PathVariable(value = "leadId") Long leadId) throws Exception {
+        Lead data = leadService.deleteLeadOnWEB(leadId,users);
         return new ResponseEntity(new MessageResponse((true)), HttpStatus.OK);
     }
 

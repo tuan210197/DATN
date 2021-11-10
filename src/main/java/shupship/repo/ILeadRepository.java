@@ -22,7 +22,7 @@ public interface ILeadRepository extends PagingAndSortingRepository<Lead, Long>,
     Lead findLeadById(Long id);
 
     @Query("select l from Lead l where l.deletedStatus = 0 and l.phone = :phone")
-    List<Lead> findLeadWithPhoneOnEVTP(String phone);
+    List<Lead> findLeadWithPhoneOnWEB(String phone);
 
     @Query(" Select distinct a from Lead a left join LeadAssign b on a.id = b.leads " +
             " where  a.deletedStatus = 0" +
@@ -64,4 +64,7 @@ public interface ILeadRepository extends PagingAndSortingRepository<Lead, Long>,
                                            @Param("userId") Long userId,
                                            @Param("code") String code,
                                            Pageable pageRequest);
+
+    @Query("select l from Lead l where l.deletedStatus = 0 and l.phone = :phone and l.createdBy = :userId")
+    Lead findLeadWithPhoneByUser(String phone, Long userId);
 }
