@@ -164,8 +164,8 @@ public class LeadController extends BaseController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
     @DeleteMapping(value = "/evtp/{leadId}")
-    public ResponseEntity deleteLeadOnWEB(Users users,@PathVariable(value = "leadId") Long leadId) throws Exception {
-        Lead data = leadService.deleteLeadOnWEB(leadId,users);
+    public ResponseEntity deleteLeadOnWEB(@PathVariable(value = "leadId") Long leadId) throws Exception {
+        Lead data = leadService.deleteLeadOnWEB(leadId);
         return new ResponseEntity(new MessageResponse((true)), HttpStatus.OK);
     }
 
@@ -186,25 +186,14 @@ public class LeadController extends BaseController {
         }
         if (StringUtils.isNotBlank(inputData.getPhone())) {
             LeadHadPhoneResponseDto responseHadPhoneUser = leadService.findLeadHadPhoneByUser(inputData, users.getEmpSystemId());
-//          LeadHadPhoneResponseDto responseHadPhone = leadService.findLeadHadPhone(inputData, user.getId());
             if (responseHadPhoneUser != null) {
                 responseHadPhoneUser.setErrorCode(HAD_PHONE_CRM);
                 responseHadPhoneUser.setMessage("Khách hàng đã được thêm vào hệ thống.");
                 return new ResponseEntity<>(responseHadPhoneUser, HttpStatus.BAD_REQUEST);
             }
-
         }
         Lead data = leadService.createLeadWMO(inputData, users);
         LeadResponse response = LeadResponse.leadModelToDto(data);
-//        HashMap phoneEvtp = getPhoneEVTP(inputData.getPhone());
-//
-//        if (phoneEvtp != null && phoneEvtp.size() != 0) {
-//            LeadHadPhoneResponseDto responseDto = new LeadHadPhoneResponseDto();
-//            responseDto.setErrorCode(HAD_PHONE_EVTP);
-//            responseDto.setMessage("Khách hàng đã sử dụng dịch vụ của ShupShip.");
-//            responseDto.setCustomerCode((String) phoneEvtp.get("MA_KH"));
-//            return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
-//        }
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 

@@ -25,7 +25,7 @@ public interface ILeadService {
 
     Lead updateLead(Long id, LeadUpdateRequest leadRequest) throws ApplicationException;
 
-    Lead deleteLeadOnWEB(Long leadId, Users users) throws ApplicationException;
+    Lead deleteLeadOnWEB(Long leadId) throws Exception;
 
     LeadResponse detailLead(Long id) throws ApplicationException;
 

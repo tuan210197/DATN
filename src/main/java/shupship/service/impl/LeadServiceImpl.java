@@ -135,12 +135,14 @@ public class LeadServiceImpl implements ILeadService {
             data.setTitle(leadRequest.getTitle());
         } else throw new HieuDzException("Không được để trống tille");
 
+        if (StringUtils.isNotEmpty(leadRequest.getFullName())) {
+            data.setFullName(leadRequest.getFullName());
+            data.setCompanyName(leadRequest.getFullName());
+        }
         if (StringUtils.isNotEmpty(leadRequest.getCompanyName())) {
             data.setFullName(leadRequest.getCompanyName());
             data.setCompanyName(leadRequest.getCompanyName());
-        } else throw new HieuDzException("Không được để trống tên công ty");
-
-//        data.setSalutation(leadRequest.getSalutation());
+        }
         data.setStatus(LeadStatus.NEW.getType());
         if (StringUtils.isNotEmpty(LeadSource.valueOf(leadRequest.getLeadSource()).name())) {
             data.setLeadSource(LeadSource.valueOf(leadRequest.getLeadSource()).name());
@@ -150,9 +152,6 @@ public class LeadServiceImpl implements ILeadService {
             data.setPhone(CommonUtils.convertPhone(leadRequest.getPhone()));
         } else throw new HieuDzException("Không được để trống số điện thoại");
 
-        if (StringUtils.isEmpty(leadRequest.getPhone())) {
-            throw new HieuDzException("Không được để trống số điện thoại");
-        }
         if (CollectionUtils.isNotEmpty(iLeadRepository.findLeadWithPhoneOnWEB(CommonUtils.convertPhone(leadRequest.getPhone()))))
             throw new HieuDzException("Số điện thoại đã tồn tại trên hệ thống!");
         else data.setPhone(CommonUtils.convertPhone(leadRequest.getPhone()));
@@ -160,7 +159,9 @@ public class LeadServiceImpl implements ILeadService {
         data.setType(LeadType.TU_NHAP.getType());
         data.setIsFromEVTP(1L);
         data.setRepresentation(leadRequest.getRepresentation());
-
+        data.setQuantityMonth(leadRequest.getQuantityMonth());
+        data.setWeight(leadRequest.getWeight());
+        data.setExpectedRevenue(leadRequest.getExpectedRevenue());
         data.setStatus(LeadStatus.NEW.getType());
         Address address = AddressRequest.addressDtoToModel(leadRequest.getAddress());
         data.setAddress(address);
@@ -170,9 +171,8 @@ public class LeadServiceImpl implements ILeadService {
             if (CollectionUtils.isNotEmpty(industries)) {
                 data.setIndustries(industries);
             }
-        } else {
-            throw new HieuDzException("Lỗi bỏ trống sp");
-        }
+        } else throw new HieuDzException("Lỗi bỏ trống sp");
+
         data.setCreatedBy(users.getEmpSystemId());
         Lead lead = iLeadRepository.save(data);
         lead.setCustomerCode("KH".concat(String.valueOf(lead.getId())));
@@ -237,9 +237,9 @@ public class LeadServiceImpl implements ILeadService {
     }
 
     @Override
-    public Lead deleteLeadOnWEB(Long leadId, Users users) throws ApplicationException {
+    public Lead deleteLeadOnWEB(Long leadId) throws Exception {
         Lead existData = iLeadRepository.findLeadById(leadId);
-        ///Users user = users.getCurrentUser();
+        Users user = getCurrentUser();
         if (existData == null) {
             throw new HieuDzException("Khách hàng không tồn tại");
         }
@@ -247,7 +247,7 @@ public class LeadServiceImpl implements ILeadService {
         if (CollectionUtils.isNotEmpty(schedules)) {
             throw new HieuDzException("Chỉ được xóa khách hàng khi không có lịch tiếp xúc và chưa cập nhật kết quả");
         }
-        ///existData.setDeletedBy(user.getEmpSystemId());
+        existData.setDeletedBy(user.getEmpSystemId());
         existData.setDeletedStatus(Constants.DELETE_LEAD);
         Lead lead = iLeadRepository.save(existData);
         return lead;
@@ -268,6 +268,10 @@ public class LeadServiceImpl implements ILeadService {
 
         Lead data = new Lead();
 
+        if (StringUtils.isNotEmpty(inputData.getFullName())) {
+            data.setFullName(inputData.getFullName());
+            data.setCompanyName(inputData.getFullName());
+        }
         if (StringUtils.isNotEmpty(inputData.getCompanyName())) {
             data.setFullName(inputData.getCompanyName());
             data.setCompanyName(inputData.getCompanyName());
@@ -277,7 +281,10 @@ public class LeadServiceImpl implements ILeadService {
         data.setPhone(CommonUtils.convertPhone(inputData.getPhone()));
         data.setType(LeadType.TU_NHAP.getType());
         data.setRepresentation(inputData.getRepresentation());
-
+        data.setQuantityMonth(inputData.getQuantityMonth());
+        data.setWeight(inputData.getWeight());
+        data.setExpectedRevenue(inputData.getExpectedRevenue());
+        data.setTitle(inputData.getTitle());
         Address address = AddressRequest.addressDtoToModel(inputData.getAddress());
         data.setAddress(address);
 
