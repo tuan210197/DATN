@@ -3,26 +3,45 @@ package shupship.util;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.NameValuePair;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import shupship.domain.model.BasicLogin;
 import shupship.domain.model.Users;
+import shupship.repo.BasicLoginRepo;
+import shupship.repo.UserRepo;
 import shupship.util.exception.ApplicationException;
 
+import javax.transaction.Transactional;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
+@Component
 public class CommonUtils {
+
+    @Autowired
+    static UserRepo userRepo;
+
+    @Autowired
+    static BasicLoginRepo basicLoginRepo;
+
     public static Users getCurrentUser() throws ApplicationException {
-        Users user = (Users) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (user == null) {
+        UserDetails user = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = user.getUsername();
+        BasicLogin basicLogin = basicLoginRepo.findByEmail(email);
+        Users users = userRepo.findByUid(basicLogin.getUserUid());
+        if (users == null) {
             throw new ApplicationException("Users is null");
         }
-        return user;
+        return users;
     }
 
     public static String formatUSDouble(double num) {

@@ -1,12 +1,18 @@
 package shupship.controller;
 
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.transaction.annotation.Transactional;
 import shupship.common.Const;
 import shupship.domain.message.ResponseMessage;
+import shupship.domain.model.BasicLogin;
 import shupship.domain.model.Users;
+import shupship.repo.BasicLoginRepo;
+import shupship.repo.UserRepo;
 import shupship.util.exception.ApplicationException;
 import shupship.util.exception.ApiException;
 
@@ -18,6 +24,12 @@ import shupship.util.exception.ApiException;
  * @since 02/10/2021
  */
 public abstract class BaseController {
+
+    @Autowired
+    UserRepo userRepo;
+
+    @Autowired
+    BasicLoginRepo basicLoginRepo;
 
     protected <T> ResponseEntity<?> toSuccessResult(T data, String successMessage) {
         ResponseMessage<T> message = new ResponseMessage<>();
@@ -40,13 +52,15 @@ public abstract class BaseController {
         return new ResponseEntity<>(message, HttpStatus.valueOf(code));
     }
 
-    protected Users getCurrentUser() throws Exception {
-        Users user = (Users) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        if (user == null) {
-            throw new ApplicationException("User is null");
+    @Transactional
+    public Users getCurrentUser() {
+        UserDetails user = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String email = user.getUsername();
+        BasicLogin basicLogin = basicLoginRepo.findByEmail(email);
+        Users users = userRepo.findByUid(basicLogin.getUserUid());
+        if (users == null) {
+            throw new ApplicationException("Users is null");
         }
-        return user;
-
+        return users;
     }
 }

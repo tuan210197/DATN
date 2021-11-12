@@ -5,6 +5,7 @@ import io.jsonwebtoken.lang.Assert;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shupship.auth.JwtTokenUtil;
 import shupship.common.Const;
+import shupship.controller.BaseController;
 import shupship.domain.dto.UserInfoDTO;
 import shupship.domain.dto.UserLoginDTO;
 
@@ -23,6 +25,7 @@ import shupship.repo.BasicLoginRepo;
 import shupship.service.JwtUserDetailsService;
 import shupship.service.MailSenderService;
 import shupship.util.ValidateUtil;
+import shupship.util.exception.ApplicationException;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -32,7 +35,7 @@ import java.util.*;
 @Service
 @Slf4j
 @Transactional
-public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
+public class JwtUserDetailsServiceImpl extends BaseController implements JwtUserDetailsService{
 
 
     @Autowired
@@ -173,8 +176,11 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         }
     }
 
+
+
+
     @Override
-    public boolean registerUser(UserLoginDTO user) {
+    public boolean registerUser(UserLoginDTO user) throws Exception {
         Assert.hasText(user.getEmail(), "EMAIL_EMPTY");
 //        Assert.hasText(user.getPassword(), "PASSWORD_EMPTY");
 //        Assert.notNull(user.getBirthday(),"DATE_NOT_VALID");
@@ -188,6 +194,8 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
         log.info("End query Table basic_login at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
         Assert.isNull(checkBasicLogin, "EMAIL_REGISTERED");
+        Users userLogin = getCurrentUser();
+        Long sysid = sysid();
         Users users = Users.builder()
                 .avatar(user.getAvatar())
                 .birthday(user.getBirthday())
@@ -196,10 +204,13 @@ public class JwtUserDetailsServiceImpl implements JwtUserDetailsService {
                 .isActive(Const.COMMON_CONST_VALUE.ACTIVE)
                 .isDeleted(Const.COMMON_CONST_VALUE.NOT_DELETED)
                 .mobile(user.getMobile())
+                .deptCode(user.getDeptCode())
+                .postCode(user.getPostCode())
                 .name(user.getName())
                 .status_update(0)
                 .roles(user.getRoles())
-                .empSystemId(sysid())
+                .empSystemId(sysid)
+                .employeeCode("SS"+sysid.toString())
 //                .roleName(user.getRoleName())
                 .build();
         log.info("Start save Table user at time: "

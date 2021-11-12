@@ -13,25 +13,32 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shupship.common.Constants;
+import shupship.domain.dto.CommonCodeResponseDto;
 import shupship.domain.model.*;
+import shupship.dto.LeadHadPhoneResponseDto;
+import shupship.dto.LeadResponseWithDescriptionDto;
+import shupship.dto.ResultLeadResponse;
+import shupship.dto.ScheduleResponseLeadDto;
 import shupship.enums.LeadSource;
 import shupship.enums.LeadStatus;
 import shupship.enums.LeadType;
-import shupship.repo.IIndustryRepository;
-import shupship.repo.ILeadRepository;
-import shupship.repo.IScheduleRepository;
+import shupship.repo.*;
 import shupship.request.AddressRequest;
 import shupship.request.LeadAssignRequest;
 import shupship.request.LeadRequest;
 import shupship.request.LeadUpdateRequest;
 import shupship.response.LeadResponse;
 import shupship.response.PagingRs;
+import shupship.service.ILeadAssignService;
 import shupship.service.ILeadService;
 import shupship.util.CommonUtils;
 import shupship.util.exception.ApplicationException;
 import shupship.util.exception.HieuDzException;
 
 import javax.servlet.http.HttpServletRequest;
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -41,22 +48,34 @@ public class LeadServiceImpl implements ILeadService {
     @Autowired
     ILeadRepository iLeadRepository;
 
+     @Autowired
+    ILeadAssignRepository iLeadAssignRepository;
+    @Autowired
+    IndustryDetailRepository industryDetailRepository;
     @Autowired
     IScheduleRepository scheduleRepository;
 
-    ///@MockBean
     @Autowired
     IIndustryRepository industryRepository;
 
+    @Autowired
+    ILeadAssignService leadAssignService;
     @Override
-    public PagingRs getListLead(Pageable pageable) throws ApplicationContextException {
+    public PagingRs getListLead(Pageable pageable, Timestamp from, Timestamp to, Long status, Users users) throws ApplicationContextException {
 
-        Page<Lead> leadList = iLeadRepository.getListLead(pageable);
-//        List<LeadResponse> leadResponses = new ArrayList<>();
-//        for (Lead model : leadList){
-//            LeadResponse laLeadResponse = LeadResponse.leadModelToDto(model);
-//            leadResponses.add(laLeadResponse);
-//        }
+        Instant startDate = from.toInstant();
+        Instant endDate = to.toInstant();
+
+        Page<Lead> leadList = null;
+
+        if (users.getRoles().equals("TCT")) {
+            leadList = iLeadRepository.findAllLeadbyCriteria(status, null, startDate, endDate, null, pageable);
+        } else if (users.getRoles().equals("CN")) {
+            leadList = iLeadRepository.findAllLeadbyCriteriaByCNBC(status, null, startDate, endDate, users.getEmpSystemId(), users.getDeptCode(), pageable);
+        } else if (users.getRoles().equals("BC")) {
+            leadList = iLeadRepository.findAllLeadbyCriteriaByCNBC(status, null, startDate, endDate, users.getEmpSystemId(), users.getPostCode(), pageable);
+        }
+
         Page<LeadResponse> leadResponses = leadList.map(LeadResponse::leadModelToDto);
         PagingRs listLeadResponse = new PagingRs();
         listLeadResponse.setTotalItem(leadList.getTotalElements());
@@ -65,7 +84,7 @@ public class LeadServiceImpl implements ILeadService {
     }
 
     @Override
-    public Lead insertLead(LeadRequest leadRequest) throws ApplicationContextException {
+    public Lead insertLead(LeadRequest leadRequest, Users users) throws ApplicationContextException {
         Lead data = new Lead();
         if (StringUtils.isNotEmpty(leadRequest.getTitle())) {
             data.setTitle(leadRequest.getTitle());
@@ -183,7 +202,7 @@ public class LeadServiceImpl implements ILeadService {
     }
 
     @Override
-    public Lead deleteLeadOnEVTP(Long leadId) throws ApplicationException {
+    public Lead deleteLeadOnWEB(Long leadId) throws ApplicationException {
         Lead existData = iLeadRepository.findLeadById(leadId);
 
         if (existData == null) {
@@ -205,19 +224,14 @@ public class LeadServiceImpl implements ILeadService {
             throw new HieuDzException("Khách hàng không tồn tại");
         }
         LeadResponse leadResponse = LeadResponse.leadModelToDto(existData);
-        BeanUtils.copyProperties(existData, leadResponse);
         return leadResponse;
     }
 
     @Override
-    public Lead createLeadWMO(LeadRequest inputData) throws Exception {
-        Users user = getCurrentUser();
+    public Lead createLeadWMO(LeadRequest inputData, Users users) throws Exception {
+
         Lead data = new Lead();
 
-        if (StringUtils.isNotEmpty(inputData.getFullName())) {
-            data.setFullName(inputData.getFullName());
-            data.setCompanyName(inputData.getFullName());
-        }
         if (StringUtils.isNotEmpty(inputData.getCompanyName())) {
             data.setFullName(inputData.getCompanyName());
             data.setCompanyName(inputData.getCompanyName());
@@ -239,13 +253,79 @@ public class LeadServiceImpl implements ILeadService {
         } else {
             throw new HieuDzException("Lỗi bỏ trống sp");
         }
-        Lead lead = iLeadRepository.save(data);
-        lead.setCustomerCode("KH".concat(String.valueOf(lead.getId())));
+        data.setCreatedBy(users.getEmpSystemId());
+            Lead lead = iLeadRepository.save(data);
+            lead.setCustomerCode("KH".concat(String.valueOf(lead.getId())));
 
-        LeadAssignRequest leadAssignRequest = new LeadAssignRequest();
+            LeadAssignRequest leadAssignRequest = new LeadAssignRequest();
+            leadAssignRequest.setLeadId(lead.getId());
+            leadAssignRequest.setUserAssigneeId(users.getEmpSystemId());
+            leadAssignRequest.setUserRecipientId(users.getEmpSystemId());
+            leadAssignRequest.setDeptCode(users.getDeptCode());
+            leadAssignRequest.setPostCode(users.getPostCode());
+            leadAssignRequest.setStatus(5L);
+            leadAssignService.createLeadAssign(users, leadAssignRequest);
+            return lead;
+    }
 
+    @Override
+    public Lead deleteLeadWMO(Long leadId) throws Exception {
+        Users user = getCurrentUser();
+        Lead existData = iLeadRepository.findLeadById(leadId);
 
+        if (existData == null) {
+            throw new HieuDzException("Khách hàng không tồn tại");
+        }
+        List<Schedule> schedules = scheduleRepository.getSchedulesByLeadId(leadId);
+        if (CollectionUtils.isNotEmpty(schedules)) {
+            throw new HieuDzException("Chỉ được xóa khách hàng khi không có lịch tiếp xúc và chưa cập nhật kết quả.");
+        }
+        existData.setDeletedStatus(1L);
+        Lead lead = iLeadRepository.save(existData);
+
+        lead.getIndustries().forEach(e ->
+                industryDetailRepository.deleteByRelatedToIdAndIndustryId(existData.getId(), e.getId()));
+
+        lead.getSchedules().forEach(e ->
+                scheduleRepository.deleteSchedule(e.getId(), user.getEmpSystemId()));
+
+        lead.getLeadAssigns().forEach(e ->
+                iLeadAssignRepository.deleteAssign(existData.getId()));
+
+//        lead.getLeadAssigns().forEach(e ->
+//                leadAssignExcelRepository.deleteLeadAssignExcel(e.getId()));
         return lead;
+    }
+
+    @Override
+    public LeadResponseWithDescriptionDto findLeadDetail(Long id) throws Exception {
+        Users user = getCurrentUser();
+        Lead lead = iLeadRepository.findLeadById(id);
+        if (lead == null) {
+            throw new HieuDzException("Khách hàng không tồn tại");
+        }
+        LeadResponseWithDescriptionDto leadResponseWithDescriptionDto = LeadResponseWithDescriptionDto.leadModelToDto(lead);
+        List<ScheduleResponseLeadDto> scheduleResponseLeadDto = leadResponseWithDescriptionDto.getSchedules();
+
+        if (scheduleResponseLeadDto != null) {
+            leadResponseWithDescriptionDto.setSchedules(scheduleResponseLeadDto);
+        }
+        return leadResponseWithDescriptionDto;
+    }
+
+    @Override
+    public LeadHadPhoneResponseDto findLeadHadPhoneByUser(LeadRequest inputData, Long userId) {
+        List<Lead> leadWithPhone = iLeadRepository.findLeadWithPhoneOnEVTP(CommonUtils.convertPhone(inputData.getPhone()));
+        if (CollectionUtils.isEmpty(leadWithPhone)) {
+            return null;
+        }
+        return LeadHadPhoneResponseDto.leadModelToDto(leadWithPhone.get(0), null);
+    }
+
+    @Override
+    public HashMap getCustomerByPhone(String phone) {
+        HashMap customer = new HashMap();
+        return customer;
     }
 
     protected Users getCurrentUser() throws Exception {
@@ -255,7 +335,6 @@ public class LeadServiceImpl implements ILeadService {
         }
 
         return user;
-
     }
 }
 

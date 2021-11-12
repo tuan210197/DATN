@@ -14,8 +14,9 @@ import java.util.List;
 public interface UserRepo extends JpaRepository<Users, String> {
 
     Users findByUid(String uid);
-//    Users findByEmail(String email);
-    @Query(value = "select u.role_name from users u where uid =?1", nativeQuery = true)
+
+    //    Users findByEmail(String email);
+    @Query("select u.roles from Users u where u.uid = :uid")
     List<String> findRoleNameByUid(String uid);
 
     @Query(value = "select u.empSystemId from Users u where u.empSystemId = :sysId")
@@ -27,5 +28,6 @@ public interface UserRepo extends JpaRepository<Users, String> {
 //            ":#{#appUser.getMobile()}, :#{#appUser.getName()});\n"
 //            , nativeQuery = true)
 //    Users insertAppUser(@Param("user") Users user);
-
+    @Query("Select e from Users e where e.empSystemId = :id and e.deletedStatus = 0")
+    Users getUserById(Long id);
 }

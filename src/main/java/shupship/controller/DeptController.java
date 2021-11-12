@@ -26,7 +26,7 @@ public class DeptController extends BaseController {
     private IDeptService deptService;
 
     @GetMapping("/list")
-    public ResponseEntity getAllDept(HttpServletRequest request) {
+    public ResponseEntity<?> getAllDept(HttpServletRequest request) {
        List<DeptOffice> deptOfficeList = deptService.getListDeptCode();
        List<DeptOfficeResponse> deptOfficeResponses = deptOfficeList.stream().map(DeptOfficeResponse::leadModelToDto).collect(Collectors.toList());
        return new ResponseEntity<>(deptOfficeResponses, HttpStatus.OK);
