@@ -45,6 +45,7 @@ public class Schedule extends AuditEntity {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "result_id", referencedColumnName = "id")
+    @NotFound(action = NotFoundAction.IGNORE)
     private Result result;
 
     @ManyToOne(fetch = FetchType.LAZY)

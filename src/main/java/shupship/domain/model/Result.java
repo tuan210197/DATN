@@ -60,9 +60,6 @@ public class Result extends AuditEntity {
     @JoinColumn(name = "address_id", referencedColumnName = "id")
     private Address address;
 
-    @OneToOne(mappedBy = "result")
-    private Schedule schedule;
-
     @Column(name = "discount")      // chiếu khấu
     private Double discount;
 

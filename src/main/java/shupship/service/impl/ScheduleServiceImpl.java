@@ -1,15 +1,22 @@
 package shupship.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.threeten.bp.LocalDate;
+import shupship.domain.dto.CommonCodeResponseDto;
 import shupship.domain.model.*;
+import shupship.dto.ResultLeadResponse;
 import shupship.enums.LeadStatus;
 import shupship.enums.ScheduleStatus;
 import shupship.repo.*;
 import shupship.request.ScheduleRequest;
+import shupship.response.ScheduleLstResponse;
+import shupship.service.ICommonService;
 import shupship.service.ScheduleService;
 import shupship.util.DateTimeUtils;
 import shupship.util.exception.*;
@@ -42,6 +49,9 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     @Autowired
     private UserRepo userRepo;
+
+    @Autowired
+    private ICommonService commonService;
 
     @Override
     public Schedule createSchedule(ScheduleRequest inputData) throws Exception {
@@ -128,6 +138,51 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     public Schedule getLatestScheduleByUserIdAndLeadId(Long sysId, Long leadId) throws BusinessException {
         return scheduleRepository.getLatestScheduleByUserIdAndLeadId(sysId, leadId);
+    }
+
+    @Override
+    public Page<ScheduleLstResponse> findAllSchedulesPageable(Pageable pageable, LocalDateTime date, LocalDateTime end) {
+        Page<Schedule> schedulePage = Page.empty();
+        Users users = getCurrentUser();
+        if (date != null || end != null) {
+            Pageable pageRequest = PageRequest.of(0, Integer.MAX_VALUE);
+            schedulePage = scheduleRepository.findAll(pageRequest, date, end, users.getEmpSystemId());
+        } else {
+            schedulePage = scheduleRepository.findAll(pageable);
+        }
+        Page<ScheduleLstResponse> scheduleResponseLeadDtoPage = schedulePage.map(ScheduleLstResponse::scheduleModelToDto);
+
+        for (ScheduleLstResponse s : scheduleResponseLeadDtoPage) {
+
+            ResultLeadResponse resultLeadResponse = s.getResult();
+
+            if (resultLeadResponse == null) {
+                continue;
+            }
+            CommonCodeResponseDto reasonDescription = getReasonDescription(resultLeadResponse.getReason());
+            if (reasonDescription != null) {
+                resultLeadResponse.setReasonDescription(reasonDescription.getName());
+            }
+            CommonCodeResponseDto statusDescription = getStatusDescription(resultLeadResponse.getStatus());
+            if (statusDescription != null)
+                resultLeadResponse.setStatusDescription(statusDescription.getName());
+
+            s.setResult(resultLeadResponse);
+        }
+
+        return scheduleResponseLeadDtoPage;
+    }
+
+    private CommonCodeResponseDto getReasonDescription(Long reasonId) {
+        return commonService.findCommonCodeByClassCdAndExtValue("RESULT_FAIL_STATUS", reasonId);
+    }
+
+    private CommonCodeResponseDto getStatusDescription(Long statusId) {
+        return commonService.findCommonCodeByClassCdAndExtValue("RESULT_STATUS", statusId);
+    }
+
+    private CommonCodeResponseDto getTypeDescription(Long priceId) {
+        return commonService.findCommonCodeByClassCdAndExtValue("PRICE_TYPE", priceId);
     }
 
     private void validateSchedule(LocalDateTime fromDate, LocalDateTime toDate) {
