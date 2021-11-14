@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.threeten.bp.LocalDate;
 import shupship.domain.dto.CommonCodeResponseDto;
 import shupship.domain.model.*;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 import static shupship.util.DateTimeUtils.validateOverlapTime;
 
 @Service
+@Transactional
 public class ScheduleServiceImpl implements ScheduleService {
 
     @Autowired
@@ -159,13 +161,13 @@ public class ScheduleServiceImpl implements ScheduleService {
             if (resultLeadResponse == null) {
                 continue;
             }
-            CommonCodeResponseDto reasonDescription = getReasonDescription(resultLeadResponse.getReason());
-            if (reasonDescription != null) {
-                resultLeadResponse.setReasonDescription(reasonDescription.getName());
-            }
-            CommonCodeResponseDto statusDescription = getStatusDescription(resultLeadResponse.getStatus());
-            if (statusDescription != null)
-                resultLeadResponse.setStatusDescription(statusDescription.getName());
+//            CommonCodeResponseDto reasonDescription = getReasonDescription(result());
+//            if (reasonDescription != null) {
+//                resultLeadResponse.setReasonDescription(reasonDescription.getName());
+//            }
+//            CommonCodeResponseDto statusDescription = getStatusDescription(resultLeadResponse.getStatus());
+//            if (statusDescription != null)
+//                resultLeadResponse.setStatusDescription(statusDescription.getName());
 
             s.setResult(resultLeadResponse);
         }
@@ -173,9 +175,9 @@ public class ScheduleServiceImpl implements ScheduleService {
         return scheduleResponseLeadDtoPage;
     }
 
-    private CommonCodeResponseDto getReasonDescription(Long reasonId) {
-        return commonService.findCommonCodeByClassCdAndExtValue("RESULT_FAIL_STATUS", reasonId);
-    }
+//    private CommonCodeResponseDto getReasonDescription(Long reasonId) {
+//        return commonService.findCommonCodeByClassCdAndExtValue("RESULT_FAIL_STATUS", reasonId);
+//    }
 
     private CommonCodeResponseDto getStatusDescription(Long statusId) {
         return commonService.findCommonCodeByClassCdAndExtValue("RESULT_STATUS", statusId);

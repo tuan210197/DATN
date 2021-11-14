@@ -16,7 +16,7 @@ public class ResultResponse {
     private Long id;
     private String result;
     private String reasonDescription;
-    private Long reason;
+    private String reason;
     private String suggestions;
     private String proposal;
     private String description;
@@ -35,12 +35,10 @@ public class ResultResponse {
     public static ResultResponse resultModelToDto(Result result) {
         ResultResponse resultResponse = new ResultResponse();
         resultResponse.setId(result.getId());
-        resultResponse.setPolicy(result.getPolicy());
         resultResponse.setReason(result.getReason());
         resultResponse.setSuggestions(result.getProposal());
         resultResponse.setProposal(result.getProposal());
         resultResponse.setStatus(result.getStatus());
-        resultResponse.setDescription(result.getDescription());
         resultResponse.setResult(result.getResult());
         ///resultResponse.setInProvincePercent(result.getInProvincePercent());
         resultResponse.setDistrictPercent(result.getDistrictPercent());

@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ScheduleLstResponse implements Comparable<ScheduleLstResponse>{
+public class ScheduleLstResponse {
     private Long id;
     private LocalDateTime fromDate;
     private LocalDateTime toDate;
@@ -41,16 +41,11 @@ public class ScheduleLstResponse implements Comparable<ScheduleLstResponse>{
         scheduleResponseDto.setToDate(schedule.getToDate());
         scheduleResponseDto.setLead(LeadScheduleResponse.leadScheduleModelToDto(schedule.getLead()));
         scheduleResponseDto.setStatus(ScheduleStatus.getByValue(schedule.getStatus()).name());
-//        scheduleResponseDto.setStatusDescription(ScheduleStatusVi.valueOf(ScheduleStatus.getByValue(schedule.getStatus()).name()).getType());
+//      scheduleResponseDto.setStatusDescription(ScheduleStatusVi.valueOf(ScheduleStatus.getByValue(schedule.getStatus()).name()).getType());
         if (schedule.getResult() != null) {
             scheduleResponseDto.setResult(ResultLeadResponse.resultModelToDto(schedule.getResult()));
         }
         return scheduleResponseDto;
-    }
-
-    @Override
-    public int compareTo(ScheduleLstResponse o) {
-        return this.getToDate().compareTo(o.getToDate());
     }
 
 }

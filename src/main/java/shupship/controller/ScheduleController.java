@@ -37,8 +37,6 @@ import java.util.Optional;
 import static java.util.Comparator.naturalOrder;
 
 @RestController
-@CrossOrigin
-@RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/api/schedules")
 public class ScheduleController {
@@ -103,16 +101,17 @@ public class ScheduleController {
         PagingRs pagingRs = new PagingRs();
         pagingRs.setData(resp.getContent());
         pagingRs.setTotalItem(resp.getTotalElements());
-        if (CollectionUtils.isEmpty(resp.getContent())) {
-            return new ResponseEntity(HttpStatus.NO_CONTENT);
-        }
-        if (startDate != null || endDate != null) {
-            List<ScheduleLstResponse> scheduleLstResponseDtoList = new ArrayList<>(resp.getContent());
-            if (CollectionUtils.isNotEmpty(scheduleLstResponseDtoList)) {
-                scheduleLstResponseDtoList.sort(Comparator.nullsLast(naturalOrder()));
-            }
-            return ResponseUtil.wrapOrNotFound(Optional.ofNullable(scheduleLstResponseDtoList));
-        }
-        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(pagingRs));
+        return new ResponseEntity(resp, HttpStatus.OK);
+//        if (CollectionUtils.isEmpty(resp.getContent())) {
+//            return new ResponseEntity(HttpStatus.NO_CONTENT);
+//        }
+//        if (startDate != null || endDate != null) {
+//            List<ScheduleLstResponse> scheduleLstResponseDtoList = new ArrayList<>(resp.getContent());
+//            if (CollectionUtils.isNotEmpty(scheduleLstResponseDtoList)) {
+//                scheduleLstResponseDtoList.sort(Comparator.nullsLast(naturalOrder()));
+//            }
+//            return ResponseUtil.wrapOrNotFound(Optional.ofNullable(scheduleLstResponseDtoList));
+//        }
+//        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(pagingRs));
     }
 }
