@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import shupship.domain.dto.AddressResponseDto;
 import shupship.domain.model.Result;
+import shupship.response.AddressResponse;
 
 @Data
 @AllArgsConstructor
@@ -16,7 +16,7 @@ public class ResultResponse {
     private Long id;
     private String result;
     private String reasonDescription;
-    private Long reason;
+    private String reason;
     private String suggestions;
     private String proposal;
     private String description;
@@ -28,19 +28,17 @@ public class ResultResponse {
     private Double inProvincePercent;
     private Double refundPercent;
     ////private PriceResponseDto price;
-    private AddressResponseDto pickupAddress;
+    private AddressResponse pickupAddress;
     private ScheduleResponseResultDto nextSchedule;
 
 
     public static ResultResponse resultModelToDto(Result result) {
         ResultResponse resultResponse = new ResultResponse();
         resultResponse.setId(result.getId());
-        resultResponse.setPolicy(result.getPolicy());
         resultResponse.setReason(result.getReason());
         resultResponse.setSuggestions(result.getProposal());
         resultResponse.setProposal(result.getProposal());
         resultResponse.setStatus(result.getStatus());
-        resultResponse.setDescription(result.getDescription());
         resultResponse.setResult(result.getResult());
         ///resultResponse.setInProvincePercent(result.getInProvincePercent());
         resultResponse.setDistrictPercent(result.getDistrictPercent());
@@ -50,7 +48,7 @@ public class ResultResponse {
 //            resultResponse.setPrice(PriceResponseDto.priceModelTodto(result.getPrice()));
 //        }
         if (result.getAddress() != null) {
-            resultResponse.setPickupAddress(AddressResponseDto.addressModelToDto(result.getAddress()));
+            resultResponse.setPickupAddress(AddressResponse.leadModelToDto(result.getAddress()));
         }
         return resultResponse;
     }

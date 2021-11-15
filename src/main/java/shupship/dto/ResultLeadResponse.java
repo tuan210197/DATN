@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import shupship.domain.dto.AddressResponseDto;
 import shupship.domain.model.Result;
+import shupship.response.AddressResponse;
 import shupship.util.DateTimeUtils;
 
 import static shupship.util.DateTimeUtils.instantToLocalDateTime;
@@ -19,7 +19,7 @@ public class ResultLeadResponse implements Comparable<ResultLeadResponse>{
     private Long id;
     private String result;
     private String reasonDescription;
-    private Long reason;
+    private String reason;
     private String suggestions;
     private String description;
     private String policy;
@@ -31,18 +31,16 @@ public class ResultLeadResponse implements Comparable<ResultLeadResponse>{
     private Double refundPercent;
     private String createdDate;
     ///private PriceResponseDto price;
-    private AddressResponseDto address;
+    private AddressResponse address;
 
 
 
     public static ResultLeadResponse resultModelToDto(Result result) {
         ResultLeadResponse resultResponse = new ResultLeadResponse();
         resultResponse.setId(result.getId());
-        resultResponse.setPolicy(result.getPolicy());
         resultResponse.setReason(result.getReason());
         resultResponse.setSuggestions(result.getProposal());
-        resultResponse.setStatus(result.getStatus());
-        resultResponse.setDescription(result.getDescription());
+        resultResponse.setStatus(result.getStatus());;
         resultResponse.setResult(result.getResult());
         resultResponse.setCustomerCode(result.getCustomerCode());
         resultResponse.setInProvincePercent(result.getInProvincePrice());
@@ -53,7 +51,7 @@ public class ResultLeadResponse implements Comparable<ResultLeadResponse>{
 //            resultResponse.setPrice(PriceResponseDto.priceModelTodto(result.getPrice()));
 //        }
         if (result.getAddress() != null) {
-            resultResponse.setAddress(AddressResponseDto.addressModelToDto(result.getAddress()));
+            resultResponse.setAddress(AddressResponse.leadModelToDto(result.getAddress()));
         }
         return resultResponse;
     }

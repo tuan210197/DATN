@@ -27,7 +27,6 @@ public class UserInfoDTO {
     private Integer isActive;
     private Integer isDeleted;
     private String email;
-    private String avatar;
     @JsonSerialize(using = ToStringSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate birthday;
@@ -38,5 +37,7 @@ public class UserInfoDTO {
     private String postCode;
     private String deptCode;
     private Address address;
+    private String empCode;
+    private Long empId;
     private String roles;
 }

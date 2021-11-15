@@ -49,8 +49,6 @@ public class UserServiceImpl implements UserService {
 
     }
 
-
-
     @Override
     public List<Users> searchUser(String keyword) {
         if (keyword != null) {
@@ -58,5 +56,10 @@ public class UserServiceImpl implements UserService {
         } else {
             return repository.findAll();
         }
+    }
+
+    @Override
+    public List<Users> getUsersByPostCode(String postCode) {
+        return repository.getUsersByPostCode(postCode);
     }
 }

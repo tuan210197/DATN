@@ -11,8 +11,8 @@ import javax.persistence.*;
  */
 @EqualsAndHashCode(callSuper = true)
 @Entity
+@NamedQuery(name = "Result.findAll", query = "SELECT a FROM Result a")
 @Table(name = "result")
-@Where(clause = "deleted_status=0")
 @Data
 public class Result extends AuditEntity {
     private static final long serialVersionUID = 1L;
@@ -25,19 +25,13 @@ public class Result extends AuditEntity {
     private String result;
 
     @Column(name = "reason")
-    private Long reason;
+    private String reason;
 
     @Column(name = "proposal")    // đề xuất
     private String proposal;
 
-    @Column(name = "description")
-    private String description;
-
     @Column(name = "district_percent")
     private Double districtPercent;
-
-    @Column(name = "policy")    // chính sách
-    private String policy;
 
     @Column(name = "status")
     private Long status;
@@ -60,10 +54,10 @@ public class Result extends AuditEntity {
     @JoinColumn(name = "address_id", referencedColumnName = "id")
     private Address address;
 
-    @OneToOne(mappedBy = "result")
-    private Schedule schedule;
-
     @Column(name = "discount")      // chiếu khấu
     private Double discount;
+
+    @OneToOne(mappedBy = "result")
+    private Schedule schedule;
 
 }
