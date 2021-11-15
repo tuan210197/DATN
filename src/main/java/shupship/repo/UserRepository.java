@@ -10,6 +10,8 @@ import java.util.List;
 
 @Repository
 public interface UserRepository extends JpaRepository<Users, String> {
+    Users findByUid(String uid);
+
     @Query(value = "SELECT u FROM Users u WHERE u.fullName like %:keyword%"
             + " OR u.postCode like %:keyword%"
             + " OR u.deptCode like %:keyword%"
@@ -20,7 +22,6 @@ public interface UserRepository extends JpaRepository<Users, String> {
 
     @Query("select a from Users a where a.isActive = 1 and a.postCode = :postCode")
     List<Users> getUsersByPostCode(String postCode);
-
 
 
 }
