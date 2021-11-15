@@ -25,4 +25,7 @@ public interface UserRepository extends JpaRepository<Users, String> {
 
     @Query(value = "select u.empSystemId from Users u where u.empSystemId = :sysId")
     Long getSysId(Long sysId);
+
+    @Query("Select e from Users e where e.empSystemId = :id and e.deletedStatus = 0")
+    Users getUserById(Long id);
 }
