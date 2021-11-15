@@ -23,5 +23,6 @@ public interface UserRepository extends JpaRepository<Users, String> {
     @Query("select a from Users a where a.isActive = 1 and a.postCode = :postCode")
     List<Users> getUsersByPostCode(String postCode);
 
-
+    @Query(value = "select u.empSystemId from Users u where u.empSystemId = :sysId")
+    Long getSysId(Long sysId);
 }
