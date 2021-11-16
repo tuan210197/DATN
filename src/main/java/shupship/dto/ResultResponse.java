@@ -26,8 +26,9 @@ public class ResultResponse {
     private String statusDescription;
     private Double districtPercent;
     private Double inProvincePercent;
+    private Double outProvincePercent;
+    private Double discount;
     private Double refundPercent;
-    ////private PriceResponseDto price;
     private AddressResponse pickupAddress;
     private ScheduleResponseResultDto nextSchedule;
 
@@ -40,13 +41,12 @@ public class ResultResponse {
         resultResponse.setProposal(result.getProposal());
         resultResponse.setStatus(result.getStatus());
         resultResponse.setResult(result.getResult());
-        ///resultResponse.setInProvincePercent(result.getInProvincePercent());
+        resultResponse.setInProvincePercent(result.getInProvincePrice());
+        resultResponse.setOutProvincePercent(result.getOutProvincePrice());
         resultResponse.setDistrictPercent(result.getDistrictPercent());
+        resultResponse.setDiscount(result.getDiscount());
         resultResponse.setRefundPercent(result.getRefundPercent());
         resultResponse.setCustomerCode(result.getCustomerCode());
-//        if (result.getPrice() != null) {
-//            resultResponse.setPrice(PriceResponseDto.priceModelTodto(result.getPrice()));
-//        }
         if (result.getAddress() != null) {
             resultResponse.setPickupAddress(AddressResponse.leadModelToDto(result.getAddress()));
         }

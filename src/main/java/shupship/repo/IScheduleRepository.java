@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
+import shupship.domain.model.Lead;
 import shupship.domain.model.Schedule;
 
 import java.time.LocalDateTime;
@@ -37,5 +38,8 @@ public interface IScheduleRepository extends JpaRepository<Schedule, Long> {
     @Query("update Schedule s set s.deletedStatus = 1 where s.id = :id and s.createdBy = :userId")
     @Modifying
     void deleteSchedule(long id, Long userId);
+
+    @Query("Select a from Schedule a where a.id = :id and a.deletedStatus = 0")
+    Schedule findScheduleById(Long id);
 
 }

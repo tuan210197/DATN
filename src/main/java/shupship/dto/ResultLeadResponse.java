@@ -28,6 +28,8 @@ public class ResultLeadResponse implements Comparable<ResultLeadResponse>{
     private String customerCode;
     private Double districtPercent;
     private Double inProvincePercent;
+    private Double outProvincePercent;
+    private Double discount;
     private Double refundPercent;
     private String createdDate;
     ///private PriceResponseDto price;
@@ -44,12 +46,11 @@ public class ResultLeadResponse implements Comparable<ResultLeadResponse>{
         resultResponse.setResult(result.getResult());
         resultResponse.setCustomerCode(result.getCustomerCode());
         resultResponse.setInProvincePercent(result.getInProvincePrice());
+        resultResponse.setOutProvincePercent(result.getOutProvincePrice());
+        resultResponse.setDiscount(result.getDiscount());
         resultResponse.setDistrictPercent(result.getDistrictPercent());
         resultResponse.setRefundPercent(result.getRefundPercent());
         resultResponse.setCreatedDate(instantToLocalDateTime(result.getLastModifiedDate()).toString());
-//        if (result.getPrice() != null) {
-//            resultResponse.setPrice(PriceResponseDto.priceModelTodto(result.getPrice()));
-//        }
         if (result.getAddress() != null) {
             resultResponse.setAddress(AddressResponse.leadModelToDto(result.getAddress()));
         }
@@ -66,11 +67,10 @@ public class ResultLeadResponse implements Comparable<ResultLeadResponse>{
         resultResponse.setDescription(result.getDescription());
         resultResponse.setResult(result.getResult());
         resultResponse.setInProvincePercent(result.getInProvincePercent());
+        resultResponse.setOutProvincePercent(result.getOutProvincePercent());
+        resultResponse.setDiscount(result.getDiscount());
         resultResponse.setDistrictPercent(result.getDistrictPercent());
         resultResponse.setRefundPercent(result.getRefundPercent());
-//        if (result.getPrice() != null) {
-//            resultResponse.setPrice(result.getPrice());
-//        }
         if (result.getPickupAddress() != null) {
             resultResponse.setAddress(result.getPickupAddress());
         }

@@ -30,6 +30,8 @@ public class ResultRequest {
 
     private String customerCode;
 
+    private Double discount;
+
     private AddressRequest pickupAddress;
 
     public static Result resultDtoToModel(ResultRequest resultRequest) {
@@ -38,6 +40,8 @@ public class ResultRequest {
         result.setProposal(resultRequest.getProposal());
         result.setDistrictPercent(resultRequest.getDistrictPercent());
         result.setInProvincePrice(resultRequest.getInProvincePercent());
+        result.setOutProvincePrice(resultRequest.getOutProvincePercent());
+        result.setDiscount(resultRequest.getDiscount());
         result.setRefundPercent(resultRequest.getRefundPercent());
         result.setStatus(resultRequest.getStatus());
         result.setCustomerCode(resultRequest.getCustomerCode());
@@ -52,6 +56,8 @@ public class ResultRequest {
         result.setProposal(resultRequest.getProposal());
         result.setDistrictPercent(resultRequest.getDistrictPercent());
         result.setInProvincePrice(resultRequest.getInProvincePercent());
+        result.setOutProvincePrice(resultRequest.getOutProvincePercent());
+        result.setDiscount(resultRequest.getDiscount());
         result.setRefundPercent(resultRequest.getRefundPercent());
         result.setStatus(resultRequest.getStatus());
         result.setCustomerCode(resultRequest.getCustomerCode());

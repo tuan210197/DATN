@@ -5,6 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import shupship.domain.model.Schedule;
+import shupship.enums.ScheduleStatus;
+import shupship.enums.ScheduleStatusVi;
+import shupship.response.LeadResponse;
+import shupship.response.LeadScheduleResponse;
 
 import java.time.LocalDateTime;
 
@@ -18,6 +22,7 @@ public class ScheduleResponseDto {
     private LocalDateTime toDate;
     private String description;
     private String status;
+    private LeadScheduleResponse lead;
     private ResultResponse result;
 
     public ScheduleResponseDto(Long id, LocalDateTime fromDate, LocalDateTime toDate, String description, String status) {
@@ -33,6 +38,8 @@ public class ScheduleResponseDto {
         scheduleResponseDto.setId(schedule.getId());
         scheduleResponseDto.setFromDate(schedule.getFromDate());
         scheduleResponseDto.setToDate(schedule.getToDate());
+        scheduleResponseDto.setLead(LeadScheduleResponse.leadScheduleModelToDto(schedule.getLead()));
+        scheduleResponseDto.setStatus(ScheduleStatus.getByValue(schedule.getStatus()).name());
         if (schedule.getResult() != null) {
             scheduleResponseDto.setResult(ResultResponse.resultModelToDto(schedule.getResult()));
         }
