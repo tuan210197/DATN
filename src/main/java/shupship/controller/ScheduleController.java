@@ -9,11 +9,14 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import shupship.dto.ScheduleResponseDto;
 import shupship.enums.ScheduleStatus;
+import shupship.helper.ResponseUtil;
 import shupship.request.ScheduleRequest;
 import shupship.domain.model.Schedule;
+import shupship.response.LeadResponse;
 import shupship.service.ScheduleService;
 
 import javax.validation.Valid;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin
@@ -50,5 +53,11 @@ public class ScheduleController {
         response.setFromDate(data.getFromDate());
         response.setToDate(data.getToDate());
         return new ResponseEntity(response, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{scheduleId}")
+    public ResponseEntity getSchedulebyId(@PathVariable Long scheduleId) throws Exception {
+        ScheduleResponseDto schedule = scheduleService.detailSchedule(scheduleId);
+        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(schedule));
     }
 }

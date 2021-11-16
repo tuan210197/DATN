@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import org.threeten.bp.LocalDate;
 import shupship.domain.model.*;
+import shupship.dto.ScheduleResponseDto;
 import shupship.enums.LeadStatus;
 import shupship.enums.ScheduleStatus;
 import shupship.repo.*;
@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
-
 
 import static shupship.util.DateTimeUtils.validateOverlapTime;
 
@@ -130,6 +129,17 @@ public class ScheduleServiceImpl implements ScheduleService {
         return scheduleRepository.getLatestScheduleByUserIdAndLeadId(sysId, leadId);
     }
 
+    @Override
+    public ScheduleResponseDto detailSchedule(Long id) throws Exception {
+        Users users = getCurrentUser();
+        Schedule existData = scheduleRepository.getScheduleById(id, users.getEmpSystemId());
+        if (existData == null) {
+            throw new NotFoundException(new ErrorMessage("ERR_001", "Lịch không tồn tại"));
+        }
+        ScheduleResponseDto scheduleResponseDto = ScheduleResponseDto.scheduleModelToDto(existData);
+        return scheduleResponseDto;
+    }
+
     private void validateSchedule(LocalDateTime fromDate, LocalDateTime toDate) {
         if (fromDate.plusMinutes(5).isBefore(LocalDateTime.now()) || toDate.isBefore(LocalDateTime.now())) {
             throw new BusinessException(new ErrorMessage("ERR_100", "Không thể đặt thời gian trong quá khứ"));
@@ -141,6 +151,7 @@ public class ScheduleServiceImpl implements ScheduleService {
             throw new BusinessException(new ErrorMessage("ERR_102", "Thời gian tiếp xúc cách nhau ít nhất 30 phút"));
         }
     }
+
     private void validateScheduleUpdate(LocalDateTime fromDate, LocalDateTime toDate) {
         if (toDate.isBefore(LocalDateTime.now())) {
             throw new BusinessException(new ErrorMessage("ERR_100", "Không thể đặt thời gian trong quá khứ"));
