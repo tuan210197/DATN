@@ -6,26 +6,25 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import shupship.controller.BaseController;
-import shupship.domain.model.BasicLogin;
-import shupship.domain.model.Lead;
-import shupship.domain.model.LeadAssign;
-import shupship.domain.model.Users;
+import org.springframework.web.multipart.MultipartFile;
+import shupship.domain.model.*;
 import shupship.enums.LeadStatus;
 import shupship.enums.LeadType;
-import shupship.repo.BasicLoginRepo;
-import shupship.repo.ILeadAssignRepository;
-import shupship.repo.ILeadRepository;
-import shupship.repo.UserRepo;
+import shupship.repo.*;
 import shupship.request.LeadAssignRequest;
 import shupship.request.LeadAssignRequestV2;
+import shupship.response.LeadAssignHisResponse;
+import shupship.service.ILeadAssignExcelService;
 import shupship.service.ILeadAssignService;
 import shupship.service.MailSenderService;
 import shupship.util.exception.HieuDzException;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -46,6 +45,15 @@ public class LeadAssignServiceImpl implements ILeadAssignService {
 
     @Autowired
     ILeadAssignRepository leadAssignRepo;
+
+    @Autowired
+    ILeadAssgnHisRepository leadAssgnHisRepository;
+
+    @Autowired
+    ILeadAssignExcelService leadAssignExcelService;
+
+    @Autowired
+    ILeadRepository leadRepository;
 
     @Override
     public LeadAssign createLeadAssign(Users user, LeadAssignRequest leadAssginReq) {
@@ -119,7 +127,6 @@ public class LeadAssignServiceImpl implements ILeadAssignService {
 
             if (employee.getIsActive() != null && employee.getIsActive() == 0)
                 throw new HieuDzException("Nhân viên đã bị khóa");
-
 
 
             if (lead.getStatus() == 1) {
@@ -217,8 +224,87 @@ public class LeadAssignServiceImpl implements ILeadAssignService {
         return assigns;
     }
 
-    public void sendEmailAssign(LeadAssign leadAssign, Long userAssigned, String reason) {
+    @Override
+    public String checkFileInput(MultipartFile multipartFile) {
+        String message = null;
+        if (multipartFile.isEmpty()) {
+            message = "file empty";
+        }
+        return message;
+    }
 
+    @Override
+    public LeadAssignHisResponse importFileLeadAssign(Users user, MultipartFile reapExcelDataFile) throws Exception {
+        String ranName = String.valueOf(System.currentTimeMillis());
+        File file = null;
+        file = this.write(reapExcelDataFile, ranName, null);
+        if (file.exists() && file.isFile()) {
+            LeadAssignHis fileLeadAssign = new LeadAssignHis();
+            //bc1.2 lưu thông tin db
+            fileLeadAssign.setFileName(file.getName());
+            fileLeadAssign.setFileCreator(userRepo.getUserById(user.getEmpSystemId()));
+            LeadAssignHis his = leadAssgnHisRepository.save(fileLeadAssign);
+
+            //bc2
+            List<LeadAssignExcel> listRes = leadAssignExcelService.importFile(user, file, his.getId());
+            long numValid = 0;
+            long numInValid = 0;
+            if (CollectionUtils.isNotEmpty(listRes)) {
+                his.setTotal((long) listRes.size());
+                for (LeadAssignExcel i : listRes) {
+                    if (i.getStatus() == 0) {
+                        numValid += 1;
+                    } else {
+                        numInValid += 1;
+                    }
+                }
+            } else throw new HieuDzException("File tải lên không có dữ liệu");
+
+            //bc3 update file info
+            his.setTotalValid(numValid);
+            his.setTotalInvalid(numInValid);
+            his.setLeadAssignExcels(listRes);
+            leadAssgnHisRepository.save(his);
+            return LeadAssignHisResponse.leadAssignHisToDto(his);
+        }
+        return null;
+    }
+
+    @Override
+    public LeadAssign assignLeadForPostCode(Users users, String postCode, String deptCode, Long leadId) throws IOException {
+        Lead lead = leadRepository.findLeadById(leadId);
+        if (lead == null) {
+            throw new HieuDzException("Không tìm thấy khách hàng");
+        }
+
+        LeadAssign data = new LeadAssign();
+        data.setUserAssigneeId(users.getEmpSystemId());
+//        Map<String, Object> chiNhanhByBuuCuc = elasticService.getChiNhanhByBuuCuc(postCode);
+//        data.setDeptCode((String) chiNhanhByBuuCuc.get("DEPT_CODE"));
+        data.setDeptCode(deptCode);
+        data.setPostCode(postCode);
+        data.setStatus(1L);
+        data.setLeads(lead);
+        return leadAssignRepo.save(data);
+    }
+
+    public File write(MultipartFile multipartFile, String uniqueName, String directoryName) throws IOException {
+            if (StringUtils.isEmpty(directoryName))
+                directoryName = System.getProperty("user.dir") + "/files/uploaded";
+
+            File directory = new File(directoryName);
+            if (!directory.exists()) {
+                directory.mkdir();
+                // If you require it to make the entire directory directoryName including parents,
+                // use directory.mkdirs(); here instead.
+            }
+            uniqueName = StringUtils.isEmpty(uniqueName) ? "" : uniqueName;
+            File file = new File(directoryName + "/" + uniqueName + multipartFile.getOriginalFilename());
+            multipartFile.transferTo(file);
+            return file;
+    }
+
+    public void sendEmailAssign(LeadAssign leadAssign, Long userAssigned, String reason) {
         Users users = userRepo.getUserById(leadAssign.getUserRecipientId());
         Users users1 = userRepo.getUserById(userAssigned);
         if (users == null || users1 == null)
@@ -230,12 +316,10 @@ public class LeadAssignServiceImpl implements ILeadAssignService {
         String content = "Hệ thống đã chuyển tiếp xúc khách hàng " + lead.getFullName() + "cho nhân viên khác. Lý do " + reason +
                 "GIAO TIẾP XÚC THÌ ĐÉO ĐẶT LỊCH CÒN OM";
         mailSenderService.sendSimpleMessage(basicLogin.getEmail(), sub, content);
-//        log.info("Send email for: " + users.getEmpSystemId());
 
         String sub1 = "THÔNG BÁO TIẾP XÚC";
         String content1 = "Đồng chí vừa được chuyển tiếp xúc 1 khách hàng. Vui lòng kiểm tra lại. LO MÀ ĐẶT LỊCH KO THÌ BỐ XỬ";
         mailSenderService.sendSimpleMessage(basicLogin1.getEmail(), sub1, content1);
-//        log.info("Send email for: " + users1.getEmpSystemId());
     }
 
 }

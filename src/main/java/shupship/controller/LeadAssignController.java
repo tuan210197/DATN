@@ -1,17 +1,18 @@
 package shupship.controller;
 
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import shupship.domain.model.LeadAssign;
 import shupship.domain.model.Users;
 import shupship.request.LeadAssignRequestV2;
+import shupship.response.LeadAssignHisResponse;
 import shupship.response.LeadAssignResponse;
+import shupship.response.RestResponse;
 import shupship.service.ILeadAssignService;
 import shupship.service.ILeadService;
 
@@ -33,6 +34,23 @@ public class LeadAssignController extends BaseController {
         List<LeadAssign> leadAssignList = leadAssignService.createLeadAssignV2(users, inputData);
         List<LeadAssignResponse> response = leadAssignList.stream().map(LeadAssignResponse::leadAssignModelToDto).collect(Collectors.toList());
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @PostMapping(value = "/import")
+    public RestResponse importLeadAssign(HttpServletRequest request, @RequestParam("file") MultipartFile reapExcelDataFile) throws Exception {
+
+        RestResponse rest = new RestResponse();
+        String message = leadAssignService.checkFileInput(reapExcelDataFile);
+        if (StringUtils.isEmpty(message)) {
+            Users user = getCurrentUser();
+            LeadAssignHisResponse listRes = leadAssignService.importFileLeadAssign(user, reapExcelDataFile);
+            rest.setData(listRes);
+            rest.setStatus(listRes != null ? "Thành công ❤❤❤" : "Thất bại ❤❤❤");
+        } else {
+            rest.setData(message);
+            rest.setStatus("Thất bại");
+        }
+        return rest;
     }
 
 }

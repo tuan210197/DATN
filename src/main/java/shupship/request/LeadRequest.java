@@ -37,6 +37,10 @@ public class LeadRequest extends BaseRequest {
 
     private Double expectedRevenue;
 
+    private Double inProvincePercent;
+
+    private Double outProvincePercent;
+
     private String industrys;
 
     private String subscriptionStatus;

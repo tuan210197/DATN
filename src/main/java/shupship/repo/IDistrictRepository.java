@@ -15,5 +15,7 @@ public interface IDistrictRepository extends PagingAndSortingRepository<District
     @Query("select d from District d where d.provinceCode = :provinceCode ")
     List<District> getDistrictByProvinceCode(String provinceCode);
 
+    @Query("select d from District d where d.districtName like %:district%")
+    List<District> getDistrictByName(String district);
 
 }
