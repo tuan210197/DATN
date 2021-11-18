@@ -122,7 +122,7 @@ public class LeadResponse {
         }
         response.setUnmaskPhone(data.getPhone() == null ? "" : data.getPhone().replaceAll(".(?=.{4})", "*"));
         response.setPhone(data.getPhone() == null ? "" : data.getPhone());
-        response.setLeadSource(StringUtils.isNotBlank(data.getLeadSource()) ? LeadSource.valueOf(data.getLeadSource()).getValue() : "");
+        response.setLeadSource(StringUtils.isNotBlank(data.getLeadSource()) ? data.getLeadSource() : "");
 
         if (CollectionUtils.isNotEmpty(data.getLeadAssigns())) {
             List<LeadAssign> leadAssign = data.getLeadAssigns().stream().sorted(Comparator.comparing(LeadAssign::getId).reversed()).collect(Collectors.toList());

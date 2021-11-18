@@ -293,8 +293,6 @@ public class LeadServiceImpl implements ILeadService {
             if (CollectionUtils.isNotEmpty(industries)) {
                 data.setIndustries(industries);
             }
-        } else {
-            throw new HieuDzException("Lỗi bỏ trống sp");
         }
         data.setCreatedBy(users.getEmpSystemId());
         Lead lead = iLeadRepository.save(data);

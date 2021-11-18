@@ -236,17 +236,17 @@ public class LeadAssignServiceImpl implements ILeadAssignService {
     @Override
     public LeadAssignHisResponse importFileLeadAssign(Users user, MultipartFile reapExcelDataFile) throws Exception {
         String ranName = String.valueOf(System.currentTimeMillis());
-        File file = null;
-        file = this.write(reapExcelDataFile, ranName, null);
-        if (file.exists() && file.isFile()) {
+//        File file = null;
+//        file = this.write(reapExcelDataFile, ranName, null);
+//        if (file.exists() && file.isFile()) {
             LeadAssignHis fileLeadAssign = new LeadAssignHis();
             //bc1.2 lưu thông tin db
-            fileLeadAssign.setFileName(file.getName());
+            fileLeadAssign.setFileName(reapExcelDataFile.getOriginalFilename());
             fileLeadAssign.setFileCreator(userRepo.getUserById(user.getEmpSystemId()));
             LeadAssignHis his = leadAssgnHisRepository.save(fileLeadAssign);
 
             //bc2
-            List<LeadAssignExcel> listRes = leadAssignExcelService.importFile(user, file, his.getId());
+            List<LeadAssignExcel> listRes = leadAssignExcelService.importFile(user, reapExcelDataFile, his.getId());
             long numValid = 0;
             long numInValid = 0;
             if (CollectionUtils.isNotEmpty(listRes)) {
@@ -266,8 +266,7 @@ public class LeadAssignServiceImpl implements ILeadAssignService {
             his.setLeadAssignExcels(listRes);
             leadAssgnHisRepository.save(his);
             return LeadAssignHisResponse.leadAssignHisToDto(his);
-        }
-        return null;
+//        }
     }
 
     @Override

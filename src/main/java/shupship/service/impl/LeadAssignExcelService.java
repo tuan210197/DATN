@@ -12,6 +12,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import shupship.domain.model.*;
 import shupship.repo.*;
 import shupship.request.AddressRequest;
@@ -59,9 +60,9 @@ public class LeadAssignExcelService implements ILeadAssignExcelService {
     private ILeadAssignExcelRepository leadAssignExcelRepository;
 
     @Override
-    public List<LeadAssignExcel> importFile(Users users, File file, Long fileId) throws Exception {
+    public List<LeadAssignExcel> importFile(Users users, MultipartFile file, Long fileId) throws Exception {
         List<LeadAssignExcel> responses = new ArrayList<>();
-        XSSFWorkbook workbook = new XSSFWorkbook(file);
+        XSSFWorkbook workbook = new XSSFWorkbook(file.getInputStream());
         XSSFSheet worksheet = workbook.getSheetAt(0);
         DataFormatter dataFormatter = new DataFormatter();
         XSSFRow rowCheck = worksheet.getRow(6);
@@ -135,7 +136,7 @@ public class LeadAssignExcelService implements ILeadAssignExcelService {
             Address address = new Address();
             List<Province> province1 = provinceRepository.getProvinceByName(province);
             List<District> district1 = districtRepository.getDistrictByName(district);
-            List<Ward> ward1 = wardRepository.getWardByName(ward);
+            List<Ward> ward1 = wardRepository.getWardByName(ward, district1.get(0).getDistrictCode());
             if (StringUtils.isNotBlank(province)) {
                 if (province1.get(0) == null) {
                     if (StringUtils.isEmpty(leadAssignExcel.getError())) {
@@ -162,15 +163,14 @@ public class LeadAssignExcelService implements ILeadAssignExcelService {
                             leadAssignExcel.setError("Quận/huyện không tồn tại hoặc sai định dạng Quận/huyện");
                         }
                     }
-                } else if (!district1.get(0).getDistrictCode().equals(province1.get(0).getProvinceCode())) {
+                } else if (!(district1.get(0).getProvinceCode().equals(province1.get(0).getProvinceCode()))) {
                     if (StringUtils.isEmpty(leadAssignExcel.getError())) {
                         if (leadAssignExcel.getStatus() == null) {
                             leadAssignExcel.setStatus(1L);
                             leadAssignExcel.setError("Quận/huyện không thuộc " + province1.get(0).getProvinceName());
                         }
                     }
-                } else
-                    address.setDistrict(district1.get(0).getDistrictCode());
+                } else address.setDistrict(district1.get(0).getDistrictCode());
             } else {
                 if (StringUtils.isEmpty(leadAssignExcel.getError())) {
                     if (leadAssignExcel.getStatus() == null) {
@@ -188,15 +188,14 @@ public class LeadAssignExcelService implements ILeadAssignExcelService {
                             leadAssignExcel.setError("Phường/xã không tồn tại hoặc sai định dạng Phường/xã");
                         }
                     }
-                } else if (!ward1.get(0).getWardCode().equals(district1.get(0).getDistrictCode())) {
+                } else if (!(ward1.get(0).getDistrictCode().equals(district1.get(0).getDistrictCode()))) {
                     if (StringUtils.isEmpty(leadAssignExcel.getError())) {
                         if (leadAssignExcel.getStatus() == null) {
                             leadAssignExcel.setStatus(1L);
                             leadAssignExcel.setError("Phường/xã không thuộc " + district1.get(0).getDistrictName());
                         }
                     }
-                } else
-                    address.setWard(ward1.get(0).getWardCode());
+                } else address.setWard(ward1.get(0).getWardCode());
             } else {
                 if (StringUtils.isEmpty(leadAssignExcel.getError())) {
                     if (leadAssignExcel.getStatus() == null) {
@@ -294,7 +293,7 @@ public class LeadAssignExcelService implements ILeadAssignExcelService {
                 leadRequest.setPhone(leadAssignExcel.getPhone());
                 leadRequest.setAddress(AddressRequest.addressModelToDto(leadAssignExcel.getAddress()));
                 leadRequest.setLeadSource(leadAssignExcel.getLeadSource());
-
+                leadRequest.setIndustry(new ArrayList<>());
                 leadRequest.setQuantityMonth(0.0);
                 leadRequest.setWeight(0.0);
                 leadRequest.setExpectedRevenue(0.0);
