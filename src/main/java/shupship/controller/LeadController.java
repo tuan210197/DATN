@@ -55,9 +55,11 @@ public class LeadController extends BaseController {
         Users users = getCurrentUser();
         Pageable pageablerequest = PageRequest.of(pageable.getPageNumber() - 1, Constants.PAGE_SIZE, pageable.getSort());
         Long leadStatus = null;
-        if (StringUtils.isNotEmpty(status)){
-            leadStatus = LeadStatus.valueOf(status).getType();
-        }
+        if (StringUtils.isNotEmpty(status)) {
+            if (LeadStatus.valueOf(status).getType() == 6)
+                leadStatus = null;
+            else leadStatus = LeadStatus.valueOf(status).getType();
+        } else throw new HieuDzException("Không được để trống status");
         LocalDateTime startDate;
         LocalDateTime endDate;
 
@@ -97,13 +99,13 @@ public class LeadController extends BaseController {
 
     @GetMapping()
     public ResponseEntity getListLeadOnEmp(@PageableDefault(page = 1)
-                                      @SortDefault.SortDefaults({@SortDefault(sort = "lastModifiedDate", direction = Sort.Direction.DESC)}) Pageable pageable,
-                                      @RequestParam(required = false) String status, @RequestParam(required = false) String key,
-                                      @RequestParam(required = false) String from, @RequestParam(required = false) String to) throws Exception {
+                                           @SortDefault.SortDefaults({@SortDefault(sort = "lastModifiedDate", direction = Sort.Direction.DESC)}) Pageable pageable,
+                                           @RequestParam(required = false) String status, @RequestParam(required = false) String key,
+                                           @RequestParam(required = false) String from, @RequestParam(required = false) String to) throws Exception {
         Users users = getCurrentUser();
         Pageable pageablerequest = PageRequest.of(pageable.getPageNumber() - 1, Constants.PAGE_SIZE, pageable.getSort());
         Long leadStatus = null;
-        if (StringUtils.isNotEmpty(status)){
+        if (StringUtils.isNotEmpty(status)) {
             leadStatus = LeadStatus.valueOf(status).getType();
         }
         LocalDateTime startDate;
@@ -152,7 +154,7 @@ public class LeadController extends BaseController {
     }
 
     @PutMapping(value = "evtp/{leadId}")
-    public ResponseEntity<LeadResponse> updateLeadOnWEB(@RequestBody LeadUpdateRequest inputData,@PathVariable(value = "leadId") Long leadId)
+    public ResponseEntity<LeadResponse> updateLeadOnWEB(@RequestBody LeadUpdateRequest inputData, @PathVariable(value = "leadId") Long leadId)
             throws ApplicationException {
         //validateLeadSource
 //        if (!validateIndustry(inputData.getLeadSource())) {
@@ -163,6 +165,7 @@ public class LeadController extends BaseController {
         LeadResponse response = LeadResponse.leadModelToDto(data);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
     @DeleteMapping(value = "/evtp/{leadId}")
     public ResponseEntity deleteLeadOnWEB(@PathVariable(value = "leadId") Long leadId) throws Exception {
         Lead data = leadService.deleteLeadOnWEB(leadId);
@@ -177,12 +180,13 @@ public class LeadController extends BaseController {
 
     public static final String HAD_PHONE_CRM = "ERR_301";
     public static final String HAD_PHONE_EVTP = "ERR_303";
+
     @PostMapping
     public ResponseEntity createLead(HttpServletRequest request, @Valid @RequestBody LeadRequest inputData) throws Exception {
         Users users = getCurrentUser();
         //validateLeadSource
         if (!validateIndustry(inputData.getLeadSource())) {
-            throw new HieuDzException ("Industry code is not defined");
+            throw new HieuDzException("Industry code is not defined");
         }
         if (StringUtils.isNotBlank(inputData.getPhone())) {
             LeadHadPhoneResponseDto responseHadPhoneUser = leadService.findLeadHadPhoneByUser(inputData, users.getEmpSystemId());
@@ -209,11 +213,13 @@ public class LeadController extends BaseController {
 
         return new ResponseEntity(response, HttpStatus.OK);
     }
+
     @DeleteMapping(value = "/{leadId}")
     public ResponseEntity deleteLead(@PathVariable(value = "leadId") Long leadId) throws Exception {
         Lead data = leadService.deleteLeadWMO(leadId);
         return new ResponseEntity(new MessageResponse((true)), HttpStatus.OK);
     }
+
     @GetMapping(value = "/{id}")
     public ResponseEntity findLeadById(@PathVariable Long id) throws Exception {
         LeadResponseWithDescriptionDto data = leadService.findLeadDetail(id);

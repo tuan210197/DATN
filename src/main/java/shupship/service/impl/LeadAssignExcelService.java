@@ -78,6 +78,7 @@ public class LeadAssignExcelService implements ILeadAssignExcelService {
 
         for (int i = 7; i < worksheet.getPhysicalNumberOfRows(); i++) {
 
+            StringBuilder err = new StringBuilder();
             LeadAssignExcel leadAssignExcel = new LeadAssignExcel();
             XSSFRow row = worksheet.getRow(i);
 
@@ -85,7 +86,7 @@ public class LeadAssignExcelService implements ILeadAssignExcelService {
 
             if (StringUtils.isBlank(dataFormatter.formatCellValue(row.getCell(0)))) {
                 leadAssignExcel.setStatus(1L);
-                leadAssignExcel.setError("Chưa nhập trường Công ty/Cửa hàng");
+                err.append("Chưa nhập trường Công ty/Cửa hàng");
             } else {
                 leadAssignExcel.setFullName(dataFormatter.formatCellValue(row.getCell(0)));
                 leadAssignExcel.setCompanyName(dataFormatter.formatCellValue(row.getCell(0)));
@@ -95,7 +96,7 @@ public class LeadAssignExcelService implements ILeadAssignExcelService {
                 if (StringUtils.isEmpty(leadAssignExcel.getError())) {
                     if (leadAssignExcel.getStatus() == null) {
                         leadAssignExcel.setStatus(1L);
-                        leadAssignExcel.setError("Chưa nhập trường Người liên hệ");
+                        err.append("Chưa nhập trường Người liên hệ");
                     }
                 }
             } else leadAssignExcel.setRepresentation(dataFormatter.formatCellValue(row.getCell(1)));
@@ -104,7 +105,7 @@ public class LeadAssignExcelService implements ILeadAssignExcelService {
                 if (StringUtils.isEmpty(leadAssignExcel.getError())) {
                     if (leadAssignExcel.getStatus() == null) {
                         leadAssignExcel.setStatus(1L);
-                        leadAssignExcel.setError("Chưa nhập trường Chức danh");
+                        err.append("Chưa nhập trường Chức danh");
                     }
                 }
             } else leadAssignExcel.setTitle(dataFormatter.formatCellValue(row.getCell(2)));
@@ -115,7 +116,7 @@ public class LeadAssignExcelService implements ILeadAssignExcelService {
                     if (StringUtils.isEmpty(leadAssignExcel.getError())) {
                         if (leadAssignExcel.getStatus() == null) {
                             leadAssignExcel.setStatus(1L);
-                            leadAssignExcel.setError("Số điện thoại không đúng định dạng: " + dataFormatter.formatCellValue(row.getCell(3)));
+                            err.append("Số điện thoại không đúng định dạng: " + dataFormatter.formatCellValue(row.getCell(3)));
                             leadAssignExcel.setPhone(dataFormatter.formatCellValue(row.getCell(3)));
                         }
                     }
@@ -125,7 +126,7 @@ public class LeadAssignExcelService implements ILeadAssignExcelService {
                 if (StringUtils.isEmpty(leadAssignExcel.getError())) {
                     if (leadAssignExcel.getStatus() == null) {
                         leadAssignExcel.setStatus(1L);
-                        leadAssignExcel.setError("Chưa nhập trường Số điện thoại");
+                        err.append("Chưa nhập trường Số điện thoại");
                     }
                 }
             }
@@ -142,7 +143,7 @@ public class LeadAssignExcelService implements ILeadAssignExcelService {
                     if (StringUtils.isEmpty(leadAssignExcel.getError())) {
                         if (leadAssignExcel.getStatus() == null) {
                             leadAssignExcel.setStatus(1L);
-                            leadAssignExcel.setError("Tỉnh không tồn tại hoặc sai tên Tỉnh/TP");
+                            err.append("Tỉnh không tồn tại hoặc sai tên Tỉnh/TP");
                         }
                     }
                 } else address.setProvince(province1.get(0).getProvinceCode());
@@ -150,7 +151,7 @@ public class LeadAssignExcelService implements ILeadAssignExcelService {
                 if (StringUtils.isEmpty(leadAssignExcel.getError())) {
                     if (leadAssignExcel.getStatus() == null) {
                         leadAssignExcel.setStatus(1L);
-                        leadAssignExcel.setError("Chưa nhập trường Tỉnh/TP");
+                        err.append("Chưa nhập trường Tỉnh/TP");
                     }
                 }
             }
@@ -160,14 +161,14 @@ public class LeadAssignExcelService implements ILeadAssignExcelService {
                     if (StringUtils.isEmpty(leadAssignExcel.getError())) {
                         if (leadAssignExcel.getStatus() == null) {
                             leadAssignExcel.setStatus(1L);
-                            leadAssignExcel.setError("Quận/huyện không tồn tại hoặc sai định dạng Quận/huyện");
+                            err.append("Quận/huyện không tồn tại hoặc sai định dạng Quận/huyện");
                         }
                     }
                 } else if (!(district1.get(0).getProvinceCode().equals(province1.get(0).getProvinceCode()))) {
                     if (StringUtils.isEmpty(leadAssignExcel.getError())) {
                         if (leadAssignExcel.getStatus() == null) {
                             leadAssignExcel.setStatus(1L);
-                            leadAssignExcel.setError("Quận/huyện không thuộc " + province1.get(0).getProvinceName());
+                            err.append("Quận/huyện không thuộc " + province1.get(0).getProvinceName());
                         }
                     }
                 } else address.setDistrict(district1.get(0).getDistrictCode());
@@ -175,7 +176,7 @@ public class LeadAssignExcelService implements ILeadAssignExcelService {
                 if (StringUtils.isEmpty(leadAssignExcel.getError())) {
                     if (leadAssignExcel.getStatus() == null) {
                         leadAssignExcel.setStatus(1L);
-                        leadAssignExcel.setError("Chưa nhập trường Tỉnh/TP");
+                        err.append("Chưa nhập trường Tỉnh/TP");
                     }
                 }
             }
@@ -185,14 +186,14 @@ public class LeadAssignExcelService implements ILeadAssignExcelService {
                     if (StringUtils.isEmpty(leadAssignExcel.getError())) {
                         if (leadAssignExcel.getStatus() == null) {
                             leadAssignExcel.setStatus(1L);
-                            leadAssignExcel.setError("Phường/xã không tồn tại hoặc sai định dạng Phường/xã");
+                            err.append("Phường/xã không tồn tại hoặc sai định dạng Phường/xã");
                         }
                     }
                 } else if (!(ward1.get(0).getDistrictCode().equals(district1.get(0).getDistrictCode()))) {
                     if (StringUtils.isEmpty(leadAssignExcel.getError())) {
                         if (leadAssignExcel.getStatus() == null) {
                             leadAssignExcel.setStatus(1L);
-                            leadAssignExcel.setError("Phường/xã không thuộc " + district1.get(0).getDistrictName());
+                            err.append("Phường/xã không thuộc " + district1.get(0).getDistrictName());
                         }
                     }
                 } else address.setWard(ward1.get(0).getWardCode());
@@ -200,7 +201,7 @@ public class LeadAssignExcelService implements ILeadAssignExcelService {
                 if (StringUtils.isEmpty(leadAssignExcel.getError())) {
                     if (leadAssignExcel.getStatus() == null) {
                         leadAssignExcel.setStatus(1L);
-                        leadAssignExcel.setError("Chưa nhập trường Tỉnh/TP");
+                        err.append("Chưa nhập trường Tỉnh/TP");
                     }
                 }
             }
@@ -209,7 +210,7 @@ public class LeadAssignExcelService implements ILeadAssignExcelService {
                 if (StringUtils.isEmpty(leadAssignExcel.getError())) {
                     if (leadAssignExcel.getStatus() == null) {
                         leadAssignExcel.setStatus(1L);
-                        leadAssignExcel.setError("Chưa nhập trường Địa chỉ cụ thể");
+                        err.append("Chưa nhập trường Địa chỉ cụ thể");
                     }
                 }
             } else address.setHomeNo(dataFormatter.formatCellValue(row.getCell(7)));
@@ -230,7 +231,7 @@ public class LeadAssignExcelService implements ILeadAssignExcelService {
                 if (StringUtils.isEmpty(leadAssignExcel.getError())) {
                     if (leadAssignExcel.getStatus() == null) {
                         leadAssignExcel.setStatus(1L);
-                        leadAssignExcel.setError("Chưa nhập trường Giao Bưu cục");
+                        err.append("Chưa nhập trường Giao Bưu cục");
                     }
                 }
             } else {
@@ -239,7 +240,7 @@ public class LeadAssignExcelService implements ILeadAssignExcelService {
                     if (StringUtils.isEmpty(leadAssignExcel.getError())) {
                         if (leadAssignExcel.getStatus() == null) {
                             leadAssignExcel.setStatus(1L);
-                            leadAssignExcel.setError("Bưu cục được giao tiếp xúc không tồn tại: " + dataFormatter.formatCellValue(row.getCell(9)));
+                            err.append("Bưu cục được giao tiếp xúc không tồn tại: " + dataFormatter.formatCellValue(row.getCell(9)));
                             leadAssignExcel.setPostCode(dataFormatter.formatCellValue(row.getCell(9)));
                         }
                     }
@@ -257,7 +258,7 @@ public class LeadAssignExcelService implements ILeadAssignExcelService {
 //                        if (StringUtils.isEmpty(leadAssignExcel.getError())) {
 //                            if (leadAssignExcel.getStatus() == null) {
 //                                leadAssignExcel.setStatus(1L);
-//                                leadAssignExcel.setError("Bưu tá được giao tiếp xúc không tồn tại trong bưu cục: " + dataFormatter.formatCellValue(row.getCell(7)));
+//                                err.appendap("Bưu tá được giao tiếp xúc không tồn tại trong bưu cục: " + dataFormatter.formatCellValue(row.getCell(7)));
 //                                leadAssignExcel.setEmployeeCode(dataFormatter.formatCellValue(row.getCell(7)));
 //                            }
 //                        }
@@ -271,10 +272,13 @@ public class LeadAssignExcelService implements ILeadAssignExcelService {
                 if (StringUtils.isEmpty(leadAssignExcel.getError())) {
                     if (leadAssignExcel.getStatus() == null) {
                         leadAssignExcel.setStatus(1L);
-                        leadAssignExcel.setError("Khách hàng đã tồn tại trên hệ thống , được tạo ngày : " + lstLead.get(0).getCreatedDate() + " " + lstLead.get(0).getCreatedBy());
+                        err.append("Khách hàng đã tồn tại trên hệ thống , được tạo ngày : " + lstLead.get(0).getCreatedDate() + " " + lstLead.get(0).getCreatedBy());
                     }
                 }
             }
+
+            leadAssignExcel.setCreatedBy(users.getEmpSystemId());
+            leadAssignExcel.setError(err.toString().equals("") ? null : (err.length() > 800 ? "Quá nhiều lỗi ở dòng :" + i : err.toString()));
 
             // Neu khong loi -> set status (0 la hop le)
             if (StringUtils.isEmpty(leadAssignExcel.getError()))
@@ -300,27 +304,21 @@ public class LeadAssignExcelService implements ILeadAssignExcelService {
                 leadRequest.setInProvincePercent(0.0);
                 leadRequest.setOutProvincePercent(0.0);
 
-                Lead lead = leadService.createLeadWMO(leadRequest, users);
+                Lead lead = leadService.insertLead(leadRequest, users);
                 // Giao tiep xuc
                 LeadAssignRequest leadAssignRequest = new LeadAssignRequest();
                 leadAssignRequest.setLeadId(lead.getId());
                 leadAssignRequest.setDeptCode(leadAssignExcel.getDeptCode());
                 leadAssignRequest.setPostCode(leadAssignExcel.getPostCode());
-                leadAssignRequest.setUserRecipientId(leadAssignExcel.getEmpSystemId());
+//                leadAssignRequest.setUserRecipientId(leadAssignExcel.getEmpSystemId());
                 leadAssignRequest.setUserAssigneeId(users.getEmpSystemId());
                 leadAssignRequest.setLeadAssignExcel(leadAssignExcel);
 
                 if (leadAssignExcel.getEmpSystemId() == null && StringUtils.isNotEmpty(leadAssignExcel.getPostCode())) {
-                    LeadAssign leadAssign = leadAssignService.assignLeadForPostCode(users, leadAssignExcel.getPostCode(), leadAssignExcel.getDeptCode(), lead.getId());
-                    leadAssignExcel.setLeadAssign(leadAssign);
-                }
-
-                if (leadAssignExcel.getEmpSystemId() != null) {
-                    LeadAssign leadAssign = leadAssignService.createLeadAssign(users, leadAssignRequest);
+                    LeadAssign leadAssign = leadAssignService.assignLeadForPostCode(users, leadAssignRequest);
                     leadAssignExcel.setLeadAssign(leadAssign);
                 }
             }
-
             // save DB
             LeadAssignExcel assignExcel = leadAssignExcelRepository.save(leadAssignExcel);
             responses.add(assignExcel);

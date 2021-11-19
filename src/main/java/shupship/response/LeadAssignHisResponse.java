@@ -50,6 +50,21 @@ public class LeadAssignHisResponse {
             res.setEmpId(his.getFileCreator().getEmpSystemId());
         } else res.setEmpId(null);
         res.setCreatedDate(DateTimeUtils.instantToLocalDateTime(his.getCreatedDate()));
+        return res;
+    }
+
+    public static LeadAssignHisResponse leadAssignHisToExcel(LeadAssignHis his) {
+        LeadAssignHisResponse res = new LeadAssignHisResponse();
+        res.setId(his.getId());
+        res.setFileName(his.getFileName());
+        res.setTotal(his.getTotal());
+        res.setTotalValid(his.getTotalValid());
+        res.setTotalInvalid(his.getTotalInvalid());
+        res.setStatus(his.getStatus());
+        if (his.getFileCreator() != null && his.getFileCreator().getEmpSystemId() != null) {
+            res.setEmpId(his.getFileCreator().getEmpSystemId());
+        } else res.setEmpId(null);
+        res.setCreatedDate(DateTimeUtils.instantToLocalDateTime(his.getCreatedDate()));
         if (CollectionUtils.isNotEmpty(his.getLeadAssignExcels())) {
             List<LeadAssignExcelResponse> leadAssignExcelResponseDtoList = his.getLeadAssignExcels().stream().map(LeadAssignExcelResponse::leadAssignExcelModelToDto).collect(Collectors.toList());
             res.setLeadsAssignByExcel(leadAssignExcelResponseDtoList);

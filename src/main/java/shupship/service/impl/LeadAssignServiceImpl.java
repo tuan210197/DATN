@@ -4,6 +4,8 @@ import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +16,7 @@ import shupship.repo.*;
 import shupship.request.LeadAssignRequest;
 import shupship.request.LeadAssignRequestV2;
 import shupship.response.LeadAssignHisResponse;
+import shupship.response.PagingRs;
 import shupship.service.ILeadAssignExcelService;
 import shupship.service.ILeadAssignService;
 import shupship.service.MailSenderService;
@@ -236,9 +239,6 @@ public class LeadAssignServiceImpl implements ILeadAssignService {
     @Override
     public LeadAssignHisResponse importFileLeadAssign(Users user, MultipartFile reapExcelDataFile) throws Exception {
         String ranName = String.valueOf(System.currentTimeMillis());
-//        File file = null;
-//        file = this.write(reapExcelDataFile, ranName, null);
-//        if (file.exists() && file.isFile()) {
             LeadAssignHis fileLeadAssign = new LeadAssignHis();
             //bc1.2 lưu thông tin db
             fileLeadAssign.setFileName(reapExcelDataFile.getOriginalFilename());
@@ -264,27 +264,43 @@ public class LeadAssignServiceImpl implements ILeadAssignService {
             his.setTotalValid(numValid);
             his.setTotalInvalid(numInValid);
             his.setLeadAssignExcels(listRes);
+            his.setCreatedBy(user.getEmpSystemId());
             leadAssgnHisRepository.save(his);
             return LeadAssignHisResponse.leadAssignHisToDto(his);
 //        }
     }
 
     @Override
-    public LeadAssign assignLeadForPostCode(Users users, String postCode, String deptCode, Long leadId) throws IOException {
-        Lead lead = leadRepository.findLeadById(leadId);
+    public LeadAssign assignLeadForPostCode(Users users, LeadAssignRequest leadAssignRequest) throws IOException {
+        Lead lead = leadRepository.findLeadById(leadAssignRequest.getLeadId());
         if (lead == null) {
             throw new HieuDzException("Không tìm thấy khách hàng");
         }
-
         LeadAssign data = new LeadAssign();
         data.setUserAssigneeId(users.getEmpSystemId());
-//        Map<String, Object> chiNhanhByBuuCuc = elasticService.getChiNhanhByBuuCuc(postCode);
-//        data.setDeptCode((String) chiNhanhByBuuCuc.get("DEPT_CODE"));
-        data.setDeptCode(deptCode);
-        data.setPostCode(postCode);
+        data.setDeptCode(leadAssignRequest.getDeptCode());
+        data.setPostCode(leadAssignRequest.getPostCode());
         data.setStatus(1L);
         data.setLeads(lead);
+        data.setCreatedBy(users.getEmpSystemId());
         return leadAssignRepo.save(data);
+    }
+
+    @Override
+    public PagingRs getLeadAssignHis(Users users, Pageable pageable) {
+        Page<LeadAssignHis> list = leadAssgnHisRepository.findAll(pageable);
+        Page<LeadAssignHisResponse> leadAssignHisResponses = list.map(LeadAssignHisResponse::leadAssignHisToDto);
+        PagingRs pagingRs = new PagingRs();
+        pagingRs.setData(leadAssignHisResponses.getContent());
+        pagingRs.setTotalItem(list.getTotalElements());
+        return pagingRs;
+    }
+
+    @Override
+    public LeadAssignHisResponse getDetailFile(Long fileId) {
+        LeadAssignHis leadAssignHis = leadAssgnHisRepository.findLeadAssignHisById(fileId);
+        LeadAssignHisResponse response = LeadAssignHisResponse.leadAssignHisToExcel(leadAssignHis);
+        return response;
     }
 
     public File write(MultipartFile multipartFile, String uniqueName, String directoryName) throws IOException {

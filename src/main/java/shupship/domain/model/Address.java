@@ -31,6 +31,8 @@ public class Address extends BaseObject {
 
     private String province;
 
+    private String fomatAddress;
+
     private String country;
 
     private String description;

@@ -48,7 +48,7 @@ public class ResultResponse {
         resultResponse.setRefundPercent(result.getRefundPercent());
         resultResponse.setCustomerCode(result.getCustomerCode());
         if (result.getAddress() != null) {
-            resultResponse.setPickupAddress(AddressResponse.leadModelToDto(result.getAddress()));
+            resultResponse.setPickupAddress(AddressResponse.leadModelToDto1(result.getAddress()));
         }
         return resultResponse;
     }

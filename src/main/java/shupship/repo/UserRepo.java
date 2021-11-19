@@ -25,7 +25,7 @@ public interface UserRepo extends JpaRepository<Users, String> {
 //    @Query(value = "INSERT INTO APP_USER(UID, AVATAR, BIRTHDAY, FULL_NAME, GENDER, IS_ACTIVE, IS_DELETED, MOBILE, NAME) " +
 //            "VALUES(:#{#appUser.getUid()}, :#{#appUser.getAvatar()}, :#{#appUser.getBirthday()}, :#{#appUser.getFullName()}, " +
 //            ":#{#appUser.getGender()}, :#{#appUser.getIsActive()}, :#{#appUser.getIsDeleted()}, " +
-//            ":#{#appUser.getMobile()}, :#{#appUser.getName()});\n"
+//            ":#{#appUser.getMobile()}, :#{#appUser.getName()});"
 //            , nativeQuery = true)
 //    Users insertAppUser(@Param("user") Users user);
     @Query("Select e from Users e where e.empSystemId = :id and e.deletedStatus = 0")
