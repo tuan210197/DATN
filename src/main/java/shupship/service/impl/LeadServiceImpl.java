@@ -71,6 +71,10 @@ public class LeadServiceImpl implements ILeadService {
 
     @Autowired
     ILeadAssignService leadAssignService;
+
+    @Autowired
+    IWardRepository wardRepository;
+
     @Override
     public PagingRs getListLead(Pageable pageable, Timestamp from, Timestamp to, Long status, Users users) throws ApplicationContextException {
 
@@ -156,6 +160,8 @@ public class LeadServiceImpl implements ILeadService {
             throw new HieuDzException("Số điện thoại đã tồn tại trên hệ thống!");
         else data.setPhone(CommonUtils.convertPhone(leadRequest.getPhone()));
 
+        Ward ward = wardRepository.findWardByCode(leadRequest.getAddress().getWard());
+
         data.setType(LeadType.TU_NHAP.getType());
         data.setIsFromEVTP(1L);
         data.setRepresentation(leadRequest.getRepresentation());
@@ -164,6 +170,7 @@ public class LeadServiceImpl implements ILeadService {
         data.setExpectedRevenue(leadRequest.getExpectedRevenue());
         data.setStatus(LeadStatus.NEW.getType());
         Address address = AddressRequest.addressDtoToModel(leadRequest.getAddress());
+        address.setFomatAddress(ward.getFormattedAddress());
         data.setAddress(address);
 
         if (CollectionUtils.isNotEmpty(leadRequest.getIndustry())) {
@@ -229,6 +236,10 @@ public class LeadServiceImpl implements ILeadService {
             } else {
                 throw new HieuDzException("Chưa chọn sản phẩm kinh doanh");
             }
+            existData.setExpectedRevenue(leadRequest.getExpectedRevenue());
+            existData.setInProvincePrice(leadRequest.getInProvincePercent());
+            existData.setOutProvincePrice(leadRequest.getOutProvincePercent());
+            existData.setWeight(leadRequest.getWeight());
         } catch (Exception e) {
             e.getLocalizedMessage();
             throw e;
@@ -285,7 +296,9 @@ public class LeadServiceImpl implements ILeadService {
         data.setWeight(inputData.getWeight());
         data.setExpectedRevenue(inputData.getExpectedRevenue());
         data.setTitle(inputData.getTitle());
+        Ward ward = wardRepository.findWardByCode(inputData.getAddress().getWard());
         Address address = AddressRequest.addressDtoToModel(inputData.getAddress());
+        address.setFomatAddress(ward.getFormattedAddress());
         data.setAddress(address);
 
         if (CollectionUtils.isNotEmpty(inputData.getIndustry())) {
@@ -344,6 +357,10 @@ public class LeadServiceImpl implements ILeadService {
             existData.setRepresentation(inputData.getRepresentation());
             existData.setTitle(inputData.getTitle());
             existData.setLeadSource(inputData.getLeadSource());
+            existData.setWeight(inputData.getWeight());
+            existData.setInProvincePrice(inputData.getInProvincePercent());
+            existData.setOutProvincePrice(inputData.getOutProvincePercent());
+            existData.setExpectedRevenue(inputData.getExpectedRevenue());
 
 
             if (CollectionUtils.isNotEmpty(inputData.getIndustry())) {
@@ -359,6 +376,7 @@ public class LeadServiceImpl implements ILeadService {
                 existAddress.setStreet(inputData.getAddress().getWard());
                 existAddress.setDistrict(inputData.getAddress().getDistrict());
                 existAddress.setProvince(inputData.getAddress().getProvince());
+                existAddress.setFomatAddress(inputData.getAddress().getFomatAddress());
             }
 
         } catch (Exception e) {

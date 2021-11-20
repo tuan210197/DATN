@@ -215,6 +215,8 @@ public class LeadAssignExcelService implements ILeadAssignExcelService {
                 }
             } else address.setHomeNo(dataFormatter.formatCellValue(row.getCell(7)));
 
+            address.setFomatAddress(ward1.get(0).getFormattedAddress());
+
             if (address.getProvince() != null && address.getDistrict() != null && address.getWard() != null) {
                 leadAssignExcel.setAddress(address);
             }

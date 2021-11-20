@@ -35,13 +35,15 @@ public class AddressRequest extends BaseRequest {
 
     private String objectName;
 
+    private String fomatAddress;
+
     public static Address addressDtoToModel(AddressRequest addressRequest) {
         Address address = new Address();
         address.setHomeNo(addressRequest.getHomeNo());
         address.setWard(addressRequest.getWard());
         address.setDistrict(addressRequest.getDistrict());
         address.setProvince(addressRequest.getProvince());
-
+        address.setFomatAddress(addressRequest.getFomatAddress());
         return address;
     }
 
@@ -51,6 +53,7 @@ public class AddressRequest extends BaseRequest {
         addressRequest.setWard(address.getWard());
         addressRequest.setDistrict(address.getDistrict());
         addressRequest.setProvince(address.getProvince());
+        addressRequest.setFomatAddress(address.getFomatAddress());
         return addressRequest;
     }
 
