@@ -1,50 +1,50 @@
-spring:
-  jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: false
-    #    open-in-view: false
-    hibernate:
-      naming:
-        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-      ddl-auto: update
-
-  datasource:
-    type: com.zaxxer.hikari.HikariDataSource
-    #    172.104.190.139
-    url: jdbc:postgresql://172.104.190.139:5432/erp_crm
-    driverClassName: org.postgresql.Driver
-    username: postgres
-    password: admin
-    hikari:
-      idle-timeout: 1000000
-      maximum-pool-size: 200
-      minimum-idle: 2
-      connection-timeout: 60000
-
-
-  mail:
-    host: smtp.gmail.com
-    port: 465
-    username: doanvantuan197bg@gmail.com
-    password: tuanyeutinh97
-    properties:
-      mail:
-        transport:
-          protocol: smtp
-        smtp:
-          auth: true
-          starttls:
-            enable: true
-
-jwt:
-  secret: supship
-  expireToken:  3600000
-
-
-#twilio:
-#  account_sid: ACae2f5cbcb84e3ec4a95ef275d2b3d99a
-#  auth_token: b6c598522e3fd7180cea68095657c8a9
-#  trial_number: +12183048442
-
-server:
-  port: 8085
+#spring:
+#  jpa:
+#    database-platform: org.hibernate.dialect.PostgreSQLDialect
+#    show-sql: false
+#    #    open-in-view: false
+#    hibernate:
+#      naming:
+#        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+#      ddl-auto: update
+#
+#  datasource:
+#    type: com.zaxxer.hikari.HikariDataSource
+#    #    172.104.190.139
+#    jdbc-url: jdbc:postgresql://172.104.190.139:5432/erp_crm
+#    driver-class-name: org.postgresql.Driver
+#    username: postgres
+#    password: admin
+#    hikari:
+#      idle-timeout: 1000000
+#      maximum-pool-size: 200
+#      minimum-idle: 2
+#      connection-timeout: 60000
+#
+#
+#  mail:
+#    host: smtp.gmail.com
+#    port: 465
+#    username: doanvantuan197bg@gmail.com
+#    password: tuanyeutinh97
+#    properties:
+#      mail:
+#        transport:
+#          protocol: smtp
+#        smtp:
+#          auth: true
+#          starttls:
+#            enable: true
+#
+#jwt:
+#  secret: supship
+#  expireToken: 3600000
+#
+#
+##twilio:
+##  account_sid: ACae2f5cbcb84e3ec4a95ef275d2b3d99a
+##  auth_token: b6c598522e3fd7180cea68095657c8a9
+##  trial_number: +12183048442
+#
+#server:
+#  port: 8085
