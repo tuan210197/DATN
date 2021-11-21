@@ -31,18 +31,20 @@ public class ReportDao {
 
     public List<ReportMonthlyDeptDto> reportAllCrm(Timestamp startDate, Timestamp endDate) {
 
-        String query = "SELECT a.dept_code, a.post_code," +
-                " (select count(*) from users e where a.post_code = e.post_code and e.is_active = 1) as employees, " +
-                " sum(case when la.lead_id is not null then 1 else 0 end)                             as total_assigns, " +
-                " sum(case when la.status = 2 then 1 else 0 end)                                      as contacting, " +
-                " sum(case when la.status = 3 then 1 else 0 end)                                      as successes, " +
-                " sum(case when la.status = 4 then 1 else 0 end)                                      as fails, " +
-                " (select count(*) " +
-                " from (select e1.emp_system_id from employee e1 where e1.is_view = 0 and e1.post_code = a.post_code and e1.emp_system_id not in " +
-                " (select user_recipient_id from lead_assign la1 where la1.post_code = a.post_code)) as foo)   as employee_not_assigned, " +
-                " sum(case when la.user_assignee_id != la.user_recipient_id then 1 else 0 end)        as assigned " +
-                " FROM post_office a left join lead_assign la on a.post_code = la.post_code and la.created_date between :startDate and :endDate " +
-                " group by (a.dept_code, a.post_code) ";
+        String query = "SELECT d.deptcode, a.postcode," +
+                "                 (select count(*) from users e where a.postcode = e.post_code and e.is_active = 1) as employees," +
+                "                 sum(case when la.lead_id is not null then 1 else 0 end)                             as total_assigns," +
+                "                 sum(case when la.status = 2 then 1 else 0 end)                                      as contacting," +
+                "                 sum(case when la.status = 3 then 1 else 0 end)                                      as successes," +
+                "                 sum(case when la.status = 4 then 1 else 0 end)                                      as fails," +
+                "                 (select count(*)" +
+                "                 from (select e1.emp_system_id from users e1 where e1.is_active = 1 and e1.post_code = a.postcode and e1.emp_system_id not in" +
+                "                 (select user_recipient_id from lead_assign la1 where la1.post_code = a.postcode)) as foo)   as employee_not_assigned," +
+                "                 sum(case when la.user_assignee_id != la.user_recipient_id then 1 else 0 end)        as assigned" +
+                "                 FROM post_office a" +
+                "                     left join dept_office d on a.dept_office_id = d.id" +
+                "                     left join lead_assign la on a.postcode = la.post_code and la.created_date between :startDate and :endDate " +
+                "                 group by (d.deptcode, a.postcode) ";
 
         Query nativeQuery = entityManager.createNativeQuery(query);
         nativeQuery.setParameter("startDate", startDate);

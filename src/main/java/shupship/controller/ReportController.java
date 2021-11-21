@@ -35,6 +35,7 @@ public class ReportController {
     @Autowired
     IReportService reportService;
 
+    @GetMapping(value = "")
     public ResponseEntity reportAllCrm(@PageableDefault(page = 1)
                                        @SortDefault.SortDefaults({@SortDefault(sort = "id", direction = Sort.Direction.DESC)}) Pageable pageable,
                                        @RequestParam(required = false) String from,
