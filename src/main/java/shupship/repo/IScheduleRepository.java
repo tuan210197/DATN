@@ -35,6 +35,9 @@ public interface IScheduleRepository extends JpaRepository<Schedule, Long> {
     @Query("Select a from Schedule a where a.fromDate >= :startDate and a.fromDate <=:endDate and a.deletedStatus = 0 and a.createdBy = :userId")
     Page<Schedule> findAll(Pageable pageable, LocalDateTime startDate, LocalDateTime endDate, Long userId);
 
+    @Query("Select a from Schedule a where a.fromDate >= :startDate and a.fromDate <= :endDate and a.deletedStatus = 0 and a.createdBy = :userId")
+    List<Schedule> findAllByUserId(LocalDateTime startDate, LocalDateTime endDate, Long userId);
+
     @Query("update Schedule s set s.deletedStatus = 1 where s.id = :id and s.createdBy = :userId")
     @Modifying
     void deleteSchedule(long id, Long userId);
