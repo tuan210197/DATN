@@ -3,7 +3,13 @@ package shupship.service.impl;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,6 +21,7 @@ import shupship.enums.LeadType;
 import shupship.repo.*;
 import shupship.request.LeadAssignRequest;
 import shupship.request.LeadAssignRequestV2;
+import shupship.response.LeadAssignExcelResponse;
 import shupship.response.LeadAssignHisResponse;
 import shupship.response.PagingRs;
 import shupship.service.ILeadAssignExcelService;
@@ -22,12 +29,8 @@ import shupship.service.ILeadAssignService;
 import shupship.service.MailSenderService;
 import shupship.util.exception.HieuDzException;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -239,34 +242,34 @@ public class LeadAssignServiceImpl implements ILeadAssignService {
     @Override
     public LeadAssignHisResponse importFileLeadAssign(Users user, MultipartFile reapExcelDataFile) throws Exception {
         String ranName = String.valueOf(System.currentTimeMillis());
-            LeadAssignHis fileLeadAssign = new LeadAssignHis();
-            //bc1.2 lưu thông tin db
-            fileLeadAssign.setFileName(reapExcelDataFile.getOriginalFilename());
-            fileLeadAssign.setFileCreator(userRepo.getUserById(user.getEmpSystemId()));
-            LeadAssignHis his = leadAssgnHisRepository.save(fileLeadAssign);
+        LeadAssignHis fileLeadAssign = new LeadAssignHis();
+        //bc1.2 lưu thông tin db
+        fileLeadAssign.setFileName(reapExcelDataFile.getOriginalFilename());
+        fileLeadAssign.setFileCreator(userRepo.getUserById(user.getEmpSystemId()));
+        LeadAssignHis his = leadAssgnHisRepository.save(fileLeadAssign);
 
-            //bc2
-            List<LeadAssignExcel> listRes = leadAssignExcelService.importFile(user, reapExcelDataFile, his.getId());
-            long numValid = 0;
-            long numInValid = 0;
-            if (CollectionUtils.isNotEmpty(listRes)) {
-                his.setTotal((long) listRes.size());
-                for (LeadAssignExcel i : listRes) {
-                    if (i.getStatus() == 0) {
-                        numValid += 1;
-                    } else {
-                        numInValid += 1;
-                    }
+        //bc2
+        List<LeadAssignExcel> listRes = leadAssignExcelService.importFile(user, reapExcelDataFile, his.getId());
+        long numValid = 0;
+        long numInValid = 0;
+        if (CollectionUtils.isNotEmpty(listRes)) {
+            his.setTotal((long) listRes.size());
+            for (LeadAssignExcel i : listRes) {
+                if (i.getStatus() == 0) {
+                    numValid += 1;
+                } else {
+                    numInValid += 1;
                 }
-            } else throw new HieuDzException("File tải lên không có dữ liệu");
+            }
+        } else throw new HieuDzException("File tải lên không có dữ liệu");
 
-            //bc3 update file info
-            his.setTotalValid(numValid);
-            his.setTotalInvalid(numInValid);
-            his.setLeadAssignExcels(listRes);
-            his.setCreatedBy(user.getEmpSystemId());
-            leadAssgnHisRepository.save(his);
-            return LeadAssignHisResponse.leadAssignHisToDto(his);
+        //bc3 update file info
+        his.setTotalValid(numValid);
+        his.setTotalInvalid(numInValid);
+        his.setLeadAssignExcels(listRes);
+        his.setCreatedBy(user.getEmpSystemId());
+        leadAssgnHisRepository.save(his);
+        return LeadAssignHisResponse.leadAssignHisToDto(his);
 //        }
     }
 
@@ -303,20 +306,50 @@ public class LeadAssignServiceImpl implements ILeadAssignService {
         return response;
     }
 
-    public File write(MultipartFile multipartFile, String uniqueName, String directoryName) throws IOException {
-            if (StringUtils.isEmpty(directoryName))
-                directoryName = System.getProperty("user.dir") + "/files/uploaded";
+    @Override
+    public ByteArrayInputStream exportExcel(Collection<LeadAssignExcelResponse> list) throws IOException, InvalidFormatException {
+        InputStream resource = new ClassPathResource("ChiTietFile.xlsx").getInputStream();
+        Workbook workbook = WorkbookFactory.create(resource);
+        Sheet sheet = workbook.getSheetAt(0);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-            File directory = new File(directoryName);
-            if (!directory.exists()) {
-                directory.mkdir();
-                // If you require it to make the entire directory directoryName including parents,
-                // use directory.mkdirs(); here instead.
-            }
-            uniqueName = StringUtils.isEmpty(uniqueName) ? "" : uniqueName;
-            File file = new File(directoryName + "/" + uniqueName + multipartFile.getOriginalFilename());
-            multipartFile.transferTo(file);
-            return file;
+        int i = 3;
+        int stt = 1;
+        for (LeadAssignExcelResponse data : list) {
+            Row row = sheet.createRow(i);
+            row.createCell((short) 0).setCellValue(String.valueOf(stt));
+            row.createCell((short) 1).setCellValue(String.valueOf(data.getCompanyName()) != null ? data.getCompanyName() : "");
+            row.createCell((short) 2).setCellValue(Optional.ofNullable(data.getStatus()).isPresent() && data.getStatus() == 1 ? "Thất bại" : "Thành công");
+            row.createCell((short) 3).setCellValue(String.valueOf(data.getRepresentation()) != null ? data.getRepresentation() : "");
+            row.createCell((short) 4).setCellValue(String.valueOf(data.getTitle()) != null ? data.getTitle() : "");
+            row.createCell((short) 5).setCellValue(String.valueOf(data.getPhone()) != null ? data.getPhone() : "");
+            row.createCell((short) 6).setCellValue(String.valueOf(data.getAddress()) != null ? data.getAddress().getHomeNo() + " - " + data.getAddress().getFomatAddress() : "");
+            row.createCell((short) 7).setCellValue(String.valueOf(data.getLeadSource()) != null && data.getLeadSource().equals("PRIVATE") ? "Cá nhân" : "Doanh nghiệp");
+            row.createCell((short) 8).setCellValue(String.valueOf(data.getDeptCode()) != null ? data.getDeptCode() : "");
+            row.createCell((short) 9).setCellValue(String.valueOf(data.getPostCode()) != null ? data.getPostCode() : "");
+            i++;
+            stt++;
+        }
+
+        workbook.write(out);
+        out.close();
+        return new ByteArrayInputStream(out.toByteArray());
+    }
+
+    public File write(MultipartFile multipartFile, String uniqueName, String directoryName) throws IOException {
+        if (StringUtils.isEmpty(directoryName))
+            directoryName = System.getProperty("user.dir") + "/files/uploaded";
+
+        File directory = new File(directoryName);
+        if (!directory.exists()) {
+            directory.mkdir();
+            // If you require it to make the entire directory directoryName including parents,
+            // use directory.mkdirs(); here instead.
+        }
+        uniqueName = StringUtils.isEmpty(uniqueName) ? "" : uniqueName;
+        File file = new File(directoryName + "/" + uniqueName + multipartFile.getOriginalFilename());
+        multipartFile.transferTo(file);
+        return file;
     }
 
     public void sendEmailAssign(LeadAssign leadAssign, Long userAssigned, String reason) {
