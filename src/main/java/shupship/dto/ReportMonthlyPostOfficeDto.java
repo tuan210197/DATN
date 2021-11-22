@@ -9,19 +9,19 @@ public class ReportMonthlyPostOfficeDto {
 
     private String postCode;
 
-    private BigInteger totalEmployees;
+    private Long totalEmployees;
 
-    private BigInteger totalAssigns;
+    private Long totalAssigns;
 
-    private BigInteger successes;
+    private Long successes;
 
-    private BigInteger contacting;
+    private Long contacting;
 
-    private BigInteger fails;
+    private Long fails;
 
-    private BigInteger employeeNotAssigned; // SL cá nhân chưa có tiếp xúc
+    private Long employeeNotAssigned; // SL cá nhân chưa có tiếp xúc
 
-    private BigInteger assigned;
+    private Long assigned;
 
     public static ReportMonthlyPostOfficeDto convertObject(ReportAllDepts reportAllDept) {
 

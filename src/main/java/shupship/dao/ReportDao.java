@@ -57,13 +57,13 @@ public class ReportDao {
 
             report.setDeptCode((String) o[0]);
             report.setPostCode((String) o[1]);
-            report.setEmployees((BigInteger) o[2]);
-            report.setTotalAssigns((BigInteger) o[3]);
-            report.setContacting((BigInteger) o[4]);
-            report.setSuccesses((BigInteger) o[5]);
-            report.setFails((BigInteger) o[6]);
-            report.setEmployeeNotAssigned((BigInteger) o[7]);
-            report.setAssigned((BigInteger) o[8]);
+            report.setEmployees(Long.valueOf(String.valueOf((BigInteger) o[2])));
+            report.setTotalAssigns(Long.valueOf(String.valueOf((BigInteger) o[3])));
+            report.setContacting(Long.valueOf(String.valueOf((BigInteger) o[4])));
+            report.setSuccesses(Long.valueOf(String.valueOf((BigInteger) o[5])));
+            report.setFails(Long.valueOf(String.valueOf((BigInteger) o[6])));
+            report.setEmployeeNotAssigned(Long.valueOf(String.valueOf((BigInteger) o[7])));
+            report.setAssigned(Long.valueOf(String.valueOf((BigInteger) o[8])));
 
             results.add(report);
         }

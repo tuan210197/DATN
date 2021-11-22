@@ -15,6 +15,7 @@ import shupship.domain.model.BasicLogin;
 import shupship.domain.model.Schedule;
 import shupship.domain.model.Users;
 import shupship.dto.ReportMonthlyDeptDto;
+import shupship.dto.ReportMonthlyPostOfficeDto;
 import shupship.dto.SchedulesMonthlyDto;
 import shupship.dto.SchedulesOfEmployeeMonthlyDto;
 import shupship.helper.PagingRs;
@@ -67,9 +68,42 @@ public class ReportService implements IReportService {
 
         reportPage = new PageImpl<>(rs, pageRequest, rs.size());
 
+        Long countDept = 0L;
+        Long countPost = 0L;
+        Long totalEmployees = 0L;
+        Long totalAssigns = 0L;
+        Long successes = 0L;
+        Long contacting = 0L;
+        Long fails = 0L;
+        Long employeeNotAssigned = 0L;
+        Long assigned = 0L;
+        for (ReportMonthlyDeptDto data : rs) {
+            countDept += 1;
+            List<ReportMonthlyPostOfficeDto> post = data.getReportMonthlyPostOfficeDtos();
+            for(ReportMonthlyPostOfficeDto postOffice : post){
+                countPost += 1;
+                totalEmployees += postOffice.getTotalEmployees();
+                totalAssigns += postOffice.getTotalAssigns();
+                successes += postOffice.getSuccesses();
+                contacting += postOffice.getContacting();
+                fails += postOffice.getFails();
+                employeeNotAssigned += postOffice.getEmployeeNotAssigned();
+                assigned += postOffice.getAssigned();
+            }
+        }
+
         PagingRs pagingRs = new PagingRs();
         pagingRs.setData(reportPage.getContent());
         pagingRs.setTotalCount(reportPage.getTotalElements());
+        pagingRs.setTotalAssigned(assigned);
+        pagingRs.setTotalDept(countDept);
+        pagingRs.setTotalPost(countPost);
+        pagingRs.setTotalCountEmp(totalEmployees);
+        pagingRs.setTotalAssigns(totalAssigns);
+        pagingRs.setTotalSuccesses(successes);
+        pagingRs.setTotalContacting(contacting);
+        pagingRs.setTotalFails(fails);
+        pagingRs.setTotalEmployeeNotAssigned(employeeNotAssigned);
         return pagingRs;
     }
 
