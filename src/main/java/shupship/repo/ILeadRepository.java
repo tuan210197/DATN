@@ -43,20 +43,26 @@ public interface ILeadRepository extends PagingAndSortingRepository<Lead, Long>,
                                      Pageable pageRequest);
 
 
-    @Query(" Select distinct a from Lead a left join LeadAssign b on a.id = b.leads " +
-            " where ( a.deletedStatus = 0" +
-            " and (COALESCE(:status) is null or a.status = :status) " +
-            " and (( COALESCE(:start) is null or a.createdDate >= :start) and ( COALESCE(:end) is null or a.createdDate <= :end))" +
-            " and a.createdBy = -1 or a.createdBy = :userId )" +
-            " or (" +
-            " (" +
-            " ( COALESCE(:start) is null or a.createdDate >= :start) " +
-            " and " +
-            " ( COALESCE(:end) is null or a.createdDate <= :end)" +
-            " )" +
-            " and (COALESCE(:key) is null or (a.fullName = :key or a.customerCode = :key or a.companyName = :key) ) " +
-            " and (COALESCE(:status) is null or a.status = :status) " +
-            " and (COALESCE(:code) is null or (b.postCode = :code or b.deptCode = :code))) ")
+    @Query("  Select distinct a from Lead a left join LeadAssign b on a.id = b.leads  " +
+            "             where a.deletedStatus = 0 and  " +
+            "             (a.createdBy = :userId and  " +
+            "             ( " +
+            "             ( COALESCE(:start) is null or a.createdDate >= :start)  " +
+            "             and  " +
+            "             ( COALESCE(:end) is null or a.createdDate <= :end) " +
+            "             ) " +
+            "             and (COALESCE(:key) is null or ( a.customerCode = :key or a.phone = :key) )  " +
+            "             and (COALESCE(:status) is null or a.status = :status )  " +
+            "             and (COALESCE(:code) is null or (b.postCode = :code or b.deptCode = :code))) " +
+            "             or ( " +
+            "             ( " +
+            "             ( COALESCE(:start) is null or a.createdDate >= :start)  " +
+            "             and  " +
+            "             ( COALESCE(:end) is null or a.createdDate <= :end) " +
+            "             ) " +
+            "             and (COALESCE(:key) is null or ( a.customerCode = :key or a.phone = :key) )  " +
+            "             and (COALESCE(:status) is null or a.status = :status )  " +
+            "             and (COALESCE(:code) is null or (b.postCode = :code or b.deptCode = :code)))")
     Page<Lead> findAllLeadbyCriteriaByCNBC(@Param("status") Long status,
                                            @Param("key") String key,
                                            @Param("start") Instant start,
@@ -66,7 +72,7 @@ public interface ILeadRepository extends PagingAndSortingRepository<Lead, Long>,
                                            Pageable pageRequest);
 
     @Query("select distinct a from Lead a left join LeadAssign b on a.id = b.leads " +
-            " where b.recallStatus = 1 and b.userRecipientId = :id " +
+            " where b.userRecipientId = :id " +
             " and (COALESCE(:key) is null or (a.fullName = :key or a.customerCode = :key or a.companyName = :key) )  " +
             " and " +
             " (" +

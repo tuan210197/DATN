@@ -112,7 +112,7 @@ public class LeadResponseWithDescriptionDto {
             response.setAddress(addressResponse);
         }
         response.setPhone(data.getPhone());
-        response.setLeadSource(StringUtils.isNotBlank(data.getLeadSource()) ? LeadSource.valueOf(data.getLeadSource()).getValue() : "");
+        response.setLeadSource(StringUtils.isNotBlank(data.getLeadSource()) ? data.getLeadSource(): "");
 
         if (CollectionUtils.isNotEmpty(data.getIndustries())) {
             List<IndustryResponseDto> industryResponses = data.getIndustries().stream().map(e -> new IndustryResponseDto(e.getId(), e.getCode(), e.getName(), e.getDescription())).collect(Collectors.toList());

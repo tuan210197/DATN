@@ -2,6 +2,7 @@ package shupship.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import shupship.dto.ScheduleResponseDto;
 import shupship.request.ScheduleRequest;
 import shupship.domain.model.Schedule;
 import shupship.response.ScheduleLstResponse;
@@ -17,4 +18,7 @@ public interface ScheduleService {
     Schedule getLatestScheduleByUserIdAndLeadId(Long sysId, Long leadId) throws BusinessException;
 
     Page<ScheduleLstResponse> findAllSchedulesPageable(Pageable pageable, LocalDateTime startDate, LocalDateTime endDate);
+
+    ScheduleResponseDto detailSchedule(Long id) throws  Exception;
+
 }

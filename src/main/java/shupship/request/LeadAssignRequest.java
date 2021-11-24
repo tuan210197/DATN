@@ -3,6 +3,7 @@ package shupship.request;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import shupship.domain.model.LeadAssign;
+import shupship.domain.model.LeadAssignExcel;
 
 import javax.validation.constraints.Size;
 
@@ -32,7 +33,7 @@ public class LeadAssignRequest extends BaseRequest {
 
     private Long status;
 
-    ////private LeadAssignExcel leadAssignExcel;
+    private LeadAssignExcel leadAssignExcel;
 
     public static LeadAssign leadAssignDtoToModel(LeadAssignRequest leadAssignRequest) {
         LeadAssign leadAssign = new LeadAssign();

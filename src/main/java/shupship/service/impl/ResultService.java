@@ -180,12 +180,6 @@ public class ResultService implements IResultService {
         updateLeadAndScheduleStatus(outData, lead, schedule, leadAssign);
 
         ResultResponse response = ResultResponse.resultModelToDto(outData);
-//        CommonCodeResponseDto reasonDescription = getReasonDescription(response.getReason());
-//        if (reasonDescription != null)
-//            response.setReasonDescription(reasonDescription.getName());
-//        CommonCodeResponseDto statusDescription = getStatusDescription(response.getStatus());
-//        if (statusDescription != null)
-//            response.setStatusDescription(statusDescription.getName());
         if (nextSchedule != null) {
             response.setNextSchedule(ScheduleResponseResultDto.scheduleModelToDto(nextSchedule));
         }

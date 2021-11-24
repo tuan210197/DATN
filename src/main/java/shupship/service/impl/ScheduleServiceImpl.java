@@ -12,6 +12,7 @@ import org.threeten.bp.LocalDate;
 import shupship.domain.dto.CommonCodeResponseDto;
 import shupship.domain.model.*;
 import shupship.dto.ResultLeadResponse;
+import shupship.dto.ScheduleResponseDto;
 import shupship.enums.LeadStatus;
 import shupship.enums.ScheduleStatus;
 import shupship.repo.*;
@@ -26,7 +27,6 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
-
 
 import static shupship.util.DateTimeUtils.validateOverlapTime;
 
@@ -95,7 +95,6 @@ public class ScheduleServiceImpl implements ScheduleService {
             leadRepository.save(lead);
         }
 
-
         LeadAssign leadAssign = leadAssignRepository.getLeadAssignById(lead.getId());
         if (leadAssign.getStatus() == 5 || leadAssign.getStatus() == 4) {
             leadAssign.setStatus(2L);
@@ -155,29 +154,15 @@ public class ScheduleServiceImpl implements ScheduleService {
         Page<ScheduleLstResponse> scheduleResponseLeadDtoPage = schedulePage.map(ScheduleLstResponse::scheduleModelToDto);
 
         for (ScheduleLstResponse s : scheduleResponseLeadDtoPage) {
-
             ResultLeadResponse resultLeadResponse = s.getResult();
-
             if (resultLeadResponse == null) {
                 continue;
             }
-//            CommonCodeResponseDto reasonDescription = getReasonDescription(result());
-//            if (reasonDescription != null) {
-//                resultLeadResponse.setReasonDescription(reasonDescription.getName());
-//            }
-//            CommonCodeResponseDto statusDescription = getStatusDescription(resultLeadResponse.getStatus());
-//            if (statusDescription != null)
-//                resultLeadResponse.setStatusDescription(statusDescription.getName());
-
             s.setResult(resultLeadResponse);
         }
 
         return scheduleResponseLeadDtoPage;
     }
-
-//    private CommonCodeResponseDto getReasonDescription(Long reasonId) {
-//        return commonService.findCommonCodeByClassCdAndExtValue("RESULT_FAIL_STATUS", reasonId);
-//    }
 
     private CommonCodeResponseDto getStatusDescription(Long statusId) {
         return commonService.findCommonCodeByClassCdAndExtValue("RESULT_STATUS", statusId);
@@ -185,6 +170,17 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     private CommonCodeResponseDto getTypeDescription(Long priceId) {
         return commonService.findCommonCodeByClassCdAndExtValue("PRICE_TYPE", priceId);
+    }
+
+    @Override
+    public ScheduleResponseDto detailSchedule(Long id) throws Exception {
+        Users users = getCurrentUser();
+        Schedule existData = scheduleRepository.getScheduleById(id, users.getEmpSystemId());
+        if (existData == null) {
+            throw new NotFoundException(new ErrorMessage("ERR_001", "Lịch không tồn tại"));
+        }
+        ScheduleResponseDto scheduleResponseDto = ScheduleResponseDto.scheduleModelToDto(existData);
+        return scheduleResponseDto;
     }
 
     private void validateSchedule(LocalDateTime fromDate, LocalDateTime toDate) {
@@ -198,6 +194,7 @@ public class ScheduleServiceImpl implements ScheduleService {
             throw new BusinessException(new ErrorMessage("ERR_102", "Thời gian tiếp xúc cách nhau ít nhất 30 phút"));
         }
     }
+
     private void validateScheduleUpdate(LocalDateTime fromDate, LocalDateTime toDate) {
         if (toDate.isBefore(LocalDateTime.now())) {
             throw new BusinessException(new ErrorMessage("ERR_100", "Không thể đặt thời gian trong quá khứ"));

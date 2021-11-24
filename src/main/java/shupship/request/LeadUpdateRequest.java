@@ -37,6 +37,16 @@ public class LeadUpdateRequest extends BaseRequest {
 
     private String subscriptionStatus;
 
+    private Double quantityMonth;
+
+    private Double weight;
+
+    private Double expectedRevenue;
+
+    private Double inProvincePercent;
+
+    private Double outProvincePercent;
+
     private String leadSource;
 
     private Long status;

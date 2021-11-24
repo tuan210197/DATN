@@ -37,7 +37,7 @@ public class UserInfoDTO {
     private String postCode;
     private String deptCode;
     private Address address;
-    private String empCode;
-    private Long empId;
+    private String employeeCode;
+    private Long empSystemId;
     private String roles;
 }

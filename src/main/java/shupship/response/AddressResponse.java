@@ -10,21 +10,37 @@ import shupship.domain.model.Address;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @NoArgsConstructor
-public class AddressResponse{
-	private Long id;
-	private String homeNo;
-	private String ward;
-	private String district;
-	private String province;
+public class AddressResponse {
+    private Long id;
+    private String homeNo;
+    private String ward;
+    private String district;
+    private String province;
+    private String provinceName;
+    private String districtName;
+    private String wardName;
+    private String fomatAddress;
 
-	public static AddressResponse leadModelToDto(Address model) {
-		AddressResponse addressResponse = new AddressResponse();
-		addressResponse.setId(model.getId());
-		addressResponse.setHomeNo(model.getHomeNo());
-		addressResponse.setWard(model.getWard());
-		addressResponse.setDistrict(model.getDistrict());
-		addressResponse.setProvince(model.getProvince());
-		return addressResponse;
-	}
+    public static AddressResponse leadModelToDto(Address model) {
+        AddressResponse addressResponse = new AddressResponse();
+        addressResponse.setId(model.getId());
+        addressResponse.setHomeNo(model.getHomeNo());
+        addressResponse.setWard(model.getWard());
+        addressResponse.setDistrict(model.getDistrict());
+        addressResponse.setProvince(model.getProvince());
+        addressResponse.setFomatAddress(model.getFomatAddress());
+        return addressResponse;
+    }
 
+
+    public static AddressResponse leadModelToDto1(Address model) {
+        AddressResponse addressResponse = new AddressResponse();
+//        addressResponse.setId(model.getId());
+        addressResponse.setHomeNo(model.getHomeNo());
+        addressResponse.setWard(model.getWard());
+        addressResponse.setDistrict(model.getDistrict());
+        addressResponse.setProvince(model.getProvince());
+        addressResponse.setFomatAddress(model.getFomatAddress());
+        return addressResponse;
+    }
 }

@@ -16,7 +16,7 @@ import shupship.enums.LeadType;
 import shupship.repo.BasicLoginRepo;
 import shupship.repo.ILeadAssignRepository;
 import shupship.repo.ILeadRepository;
-import shupship.repo.UserRepository;
+import shupship.repo.UserRepo;
 import shupship.request.LeadAssignRequest;
 import shupship.request.LeadAssignRequestV2;
 import shupship.service.ILeadAssignService;
@@ -36,7 +36,7 @@ public class LeadAssignServiceImpl implements ILeadAssignService {
     ILeadRepository iLeadRepository;
 
     @Autowired
-    UserRepository userRepo;
+    UserRepo userRepo;
 
     @Autowired
     BasicLoginRepo basicLoginRepo;

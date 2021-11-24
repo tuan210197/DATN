@@ -57,6 +57,7 @@ public class ScheduleController {
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
     @Transactional
     @PutMapping(value = "/update/{scheduleId}")
     public ResponseEntity updateSchedule(@RequestBody ScheduleRequest inputData, @PathVariable Long scheduleId) throws Exception {
@@ -102,16 +103,11 @@ public class ScheduleController {
         pagingRs.setData(resp.getContent());
         pagingRs.setTotalItem(resp.getTotalElements());
         return new ResponseEntity(resp, HttpStatus.OK);
-//        if (CollectionUtils.isEmpty(resp.getContent())) {
-//            return new ResponseEntity(HttpStatus.NO_CONTENT);
-//        }
-//        if (startDate != null || endDate != null) {
-//            List<ScheduleLstResponse> scheduleLstResponseDtoList = new ArrayList<>(resp.getContent());
-//            if (CollectionUtils.isNotEmpty(scheduleLstResponseDtoList)) {
-//                scheduleLstResponseDtoList.sort(Comparator.nullsLast(naturalOrder()));
-//            }
-//            return ResponseUtil.wrapOrNotFound(Optional.ofNullable(scheduleLstResponseDtoList));
-//        }
-//        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(pagingRs));
+    }
+
+    @GetMapping(value = "/{scheduleId}")
+    public ResponseEntity getSchedulebyId(@PathVariable Long scheduleId) throws Exception {
+        ScheduleResponseDto schedule = scheduleService.detailSchedule(scheduleId);
+        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(schedule));
     }
 }

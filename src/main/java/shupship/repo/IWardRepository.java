@@ -3,6 +3,7 @@ package shupship.repo;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.transaction.annotation.Transactional;
+import shupship.domain.model.District;
 import shupship.domain.model.Ward;
 
 import java.util.List;
@@ -14,4 +15,7 @@ public interface IWardRepository extends PagingAndSortingRepository<Ward, Long> 
 
     @Query("Select w from Ward w where w.districtCode = :districtCode")
     List<Ward> getWardByDistrictCode(String districtCode);
+
+    @Query("select d from Ward d where d.wardName like %:ward% and d.districtCode = :districtCode")
+    List<Ward> getWardByName(String ward, String districtCode);
 }
