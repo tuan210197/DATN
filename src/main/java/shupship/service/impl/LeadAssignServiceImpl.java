@@ -307,7 +307,7 @@ public class LeadAssignServiceImpl implements ILeadAssignService {
     }
 
     @Override
-    public ByteArrayInputStream exportExcel(Collection<LeadAssignExcelResponse> list) throws IOException, InvalidFormatException {
+    public ByteArrayInputStream exportExcel(Collection<LeadAssignExcelResponse> list) throws IOException, InvalidFormatException, org.apache.poi.openxml4j.exceptions.InvalidFormatException {
         InputStream resource = new ClassPathResource("ChiTietFile.xlsx").getInputStream();
         Workbook workbook = WorkbookFactory.create(resource);
         Sheet sheet = workbook.getSheetAt(0);

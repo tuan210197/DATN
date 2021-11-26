@@ -32,6 +32,6 @@ public interface ILeadAssignService {
 
     LeadAssignHisResponse getDetailFile(Long fileId);
 
-    ByteArrayInputStream exportExcel(Collection<LeadAssignExcelResponse> list) throws IOException, InvalidFormatException;
+    ByteArrayInputStream exportExcel(Collection<LeadAssignExcelResponse> list) throws IOException, InvalidFormatException, org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 
 }
