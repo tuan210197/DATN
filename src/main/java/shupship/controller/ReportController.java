@@ -156,6 +156,26 @@ public class ReportController {
         return ResponseUtil.wrapOrNotFound(Optional.ofNullable(pagingRs));
     }
 
+    @GetMapping(value = "/export-excel")
+    public ResponseEntity<Resource> exportExcel(HttpServletRequest request, @RequestParam(required = false) String from,
+                                                @RequestParam(required = false) String to,
+                                                @RequestParam(required = false) String dept) throws Exception {
+        Resource resource = new ClassPathResource("Giao-tiep-xuc-khach-hang-mau-sup-ship.xlsx");
+        String contentType = null;
+        try {
+            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+        } catch (IOException ex) {
+            log.info("Lỗi");
+        }
+        if (contentType == null) {
+            contentType = "application/octet-stream";
+        }
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename() + "")
+                .body(resource);
+    }
+
     @GetMapping(value = "/export-route")
     public ResponseEntity<Resource> exportRoute(HttpServletRequest request, @RequestParam(required = false) String from,
                                                 @RequestParam(required = false) String to,

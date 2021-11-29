@@ -20,6 +20,7 @@ import shupship.domain.dto.JwtResponse;
 import shupship.domain.dto.UserInfoDTO;
 import shupship.domain.dto.UserLoginDTO;
 import shupship.service.JwtUserDetailsService;
+import shupship.util.exception.HieuDzException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
