@@ -471,19 +471,15 @@ public class JwtUserDetailsServiceImpl extends BaseController implements JwtUser
 
     @Override
     public UserInfoDTO getUserInfo(String userUid) {
-        log.info("Start query Table app_user at time: "
-                + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
+
         Users user = userRepo.findByUid(userUid);
-        log.info("End query Table app_user at time: "
-                + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
+
         Assert.notNull(user, "USER_NOT_FOUND");
         UserInfoDTO userInfoDTO = new UserInfoDTO();
         BeanUtils.copyProperties(user, userInfoDTO);
-        log.info("Start query Table basic_login at time: "
-                + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
+
         BasicLogin basicLogin = basicLoginRepo.findByUserUid(userUid);
-        log.info("End query Table basic_login at time: "
-                + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
+
         userInfoDTO.setEmail(basicLogin.getEmail());
         return userInfoDTO;
     }

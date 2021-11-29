@@ -67,14 +67,8 @@ public class LeadResponseWithDescriptionDto {
 
     private String customerCode;
 
-//    @JsonInclude(JsonInclude.Include.NON_NULL)
-//    private List<CompetitorResponseDto> competitors;
-
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<IndustryResponseDto> industries;
-
-//    @JsonInclude(JsonInclude.Include.NON_NULL)
-//    private List<ProductResponseDto> products;
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<ScheduleResponseLeadDto> schedules;
@@ -96,7 +90,6 @@ public class LeadResponseWithDescriptionDto {
         response.setWeight(data.getWeight());
         response.setQuality(data.getQuality());
         response.setCompensation(data.getCompensation());
-        ///response.setPayment(data.getPayment());
         response.setOther(data.getOther());
         response.setType(LeadType.getByValue(data.getType()).name());
         response.setCustomerCode(data.getCustomerCode());
@@ -120,16 +113,6 @@ public class LeadResponseWithDescriptionDto {
         }
         response.setPhone(data.getPhone());
         response.setLeadSource(StringUtils.isNotBlank(data.getLeadSource()) ? LeadSource.valueOf(data.getLeadSource()).getValue() : "");
-
-//        if (CollectionUtils.isNotEmpty(data.getCompetitors())) {
-//            List<CompetitorResponseDto> competitorResponseDtos = data.getCompetitors().stream().map(e -> new CompetitorResponseDto(e.getId(), e.getCode(), e.getName(), e.getDescription(), e.getStatus())).collect(Collectors.toList());
-//            response.setCompetitors(competitorResponseDtos);
-//        } else response.setCompetitors(new ArrayList<>());
-
-//        if (CollectionUtils.isNotEmpty(data.getProducts())) {
-//            List<ProductResponseDto> productResponses = data.getProducts().stream().map(e -> new ProductResponseDto(e.getId(), e.getCode(), e.getName(), e.getType(), e.getDescription(), e.getStatus())).collect(Collectors.toList());
-//            response.setProducts(productResponses);
-//        } else response.setProducts(new ArrayList<>());
 
         if (CollectionUtils.isNotEmpty(data.getIndustries())) {
             List<IndustryResponseDto> industryResponses = data.getIndustries().stream().map(e -> new IndustryResponseDto(e.getId(), e.getCode(), e.getName(), e.getDescription())).collect(Collectors.toList());

@@ -1,19 +1,16 @@
 package shupship.repo;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.transaction.annotation.Transactional;
-import shupship.domain.model.Lead;
 import shupship.domain.model.Schedule;
 
 import java.util.List;
 
 @Transactional
-public interface IScheduleRepository extends PagingAndSortingRepository<Schedule, Long>, JpaSpecificationExecutor<Schedule> {
-    @Query(value = "select * from Schedule s where s.lead_id = ?1 and s.deleted_status = 0", nativeQuery = true)
+public interface IScheduleRepository extends JpaRepository<Schedule, Long> {
+    @Query("select s from Schedule s where s.lead.id = :leadId and s.deletedStatus = 0")
     List<Schedule> getSchedulesByLeadId(Long leadId);
 
     @Query(value = "select s from Schedule s where s.createdBy = ?1 and s.deletedStatus = 0")

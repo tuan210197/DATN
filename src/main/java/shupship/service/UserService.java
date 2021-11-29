@@ -12,4 +12,7 @@ import java.util.List;
 public interface UserService extends CrudService<Users, java.lang.String> {
 
     List<Users> searchUser(String keyword);
+
+    List<Users> getUsersByPostCode(String postCode);
+
 }

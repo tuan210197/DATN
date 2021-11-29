@@ -230,11 +230,12 @@ public class LeadAssignServiceImpl implements ILeadAssignService {
         String content = "Hệ thống đã chuyển tiếp xúc khách hàng " + lead.getFullName() + "cho nhân viên khác. Lý do " + reason +
                 "GIAO TIẾP XÚC THÌ ĐÉO ĐẶT LỊCH CÒN OM";
         mailSenderService.sendSimpleMessage(basicLogin.getEmail(), sub, content);
+//        log.info("Send email for: " + users.getEmpSystemId());
 
         String sub1 = "THÔNG BÁO TIẾP XÚC";
         String content1 = "Đồng chí vừa được chuyển tiếp xúc 1 khách hàng. Vui lòng kiểm tra lại. LO MÀ ĐẶT LỊCH KO THÌ BỐ XỬ";
         mailSenderService.sendSimpleMessage(basicLogin1.getEmail(), sub1, content1);
-
+//        log.info("Send email for: " + users1.getEmpSystemId());
     }
 
 }

@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import shupship.domain.model.Address;
 
+import javax.persistence.Column;
 import java.time.LocalDate;
 
 @Data
@@ -27,7 +28,6 @@ public class UserInfoDTO {
     private Integer isActive;
     private Integer isDeleted;
     private String email;
-    private String avatar;
     @JsonSerialize(using = ToStringSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate birthday;
@@ -38,5 +38,11 @@ public class UserInfoDTO {
     private String postCode;
     private String deptCode;
     private Address address;
+
+
+    private String employeeCode;
+
+
+    private Long empSystemId;;
     private String roles;
 }

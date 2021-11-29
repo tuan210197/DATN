@@ -9,9 +9,13 @@ import java.util.List;
 public class LeadRequest extends BaseRequest {
     private static final long serialVersionUID = 1L;
     private int page;
+
     private int pageSize;
+
     private Long id;
+
     private String representation;
+
     @Size(max = 100)
     private String fullName;
 
@@ -27,11 +31,13 @@ public class LeadRequest extends BaseRequest {
     @Size(max = 100)
     private String companyName;
 
+    private Double quantityMonth;
+
+    private Double weight;
+
+    private Double expectedRevenue;
+
     private String industrys;
-
-    private Long leadScore;
-
-    private String leadStage;
 
     private String subscriptionStatus;
 
