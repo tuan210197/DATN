@@ -13,7 +13,7 @@ public interface IPostOfficeRepository extends PagingAndSortingRepository<PostOf
     @Query("select a from PostOffice a where a.postCode = ?1 ")
     PostOffice findPostOfficeByCode(String code);
 
-    @Query("select a from PostOffice a where a.deptOffice.deptCode = :deptCode ")
+    @Query("select a from PostOffice a where a.deptCode = :deptCode ")
     List<PostOffice> getPostOfficeByDeptCode(String deptCode);
 
 }
