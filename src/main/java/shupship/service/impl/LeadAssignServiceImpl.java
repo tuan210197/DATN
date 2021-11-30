@@ -68,7 +68,7 @@ public class LeadAssignServiceImpl implements ILeadAssignService {
             throw new HieuDzException("Khách hàng không tồn tại.");
         Users users = userRepo.getUserById(leadAssginReq.getUserRecipientId());
         if (users == null)
-            throw new HieuDzException("Bưu tá không tồn tại.");
+            throw new HieuDzException("Nhân viên không tồn tại.");
 
         LeadAssign findLeadAssignById = leadAssignRepo.findLeadAssignByLeadIdAndEmpId(leadAssginReq.getLeadId(), leadAssginReq.getUserRecipientId());
         if (findLeadAssignById != null && !findLeadAssignById.getUserAssigneeId().equals(findLeadAssignById.getUserRecipientId()))

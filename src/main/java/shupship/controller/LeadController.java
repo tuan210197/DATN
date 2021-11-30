@@ -191,9 +191,7 @@ public class LeadController extends BaseController {
         if (StringUtils.isNotBlank(inputData.getPhone())) {
             LeadHadPhoneResponseDto responseHadPhoneUser = leadService.findLeadHadPhoneByUser(inputData, users.getEmpSystemId());
             if (responseHadPhoneUser != null) {
-                responseHadPhoneUser.setErrorCode(HAD_PHONE_CRM);
-                responseHadPhoneUser.setMessage("Khách hàng đã được thêm vào hệ thống.");
-                return new ResponseEntity<>(responseHadPhoneUser, HttpStatus.BAD_REQUEST);
+                throw new HieuDzException("Khách hàng đã được thêm vào hệ thống");
             }
         }
         Lead data = leadService.createLeadWMO(inputData, users);
