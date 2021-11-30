@@ -33,7 +33,7 @@ import java.util.*;
 @Service
 @Slf4j
 @Transactional
-public class JwtUserDetailsServiceImpl extends BaseController implements JwtUserDetailsService{
+public class JwtUserDetailsServiceImpl extends BaseController implements JwtUserDetailsService {
 
 
     @Autowired
@@ -131,7 +131,7 @@ public class JwtUserDetailsServiceImpl extends BaseController implements JwtUser
         Users user = userRepo.findByUid(checkBasicLogin.getUserUid());
         log.info("End query Table basic_login at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
-        if(user.getStatus_update() == 1) {
+        if (user.getStatus_update() == 1) {
             return true;
         } else {
             return false;
@@ -145,14 +145,14 @@ public class JwtUserDetailsServiceImpl extends BaseController implements JwtUser
 //        BasicLogin basicLogin = basicLoginRepo.findByEmail(email);
         String uid = userLoginDTO.getUserUid();
 
-            if (uid != null) {
-                Users users = userRepo.findByUid(uid);
-                users.setIsActive(0);
-                userRepo.save(users);
-                return true;
-            } else {
-                return false;
-            }
+        if (uid != null) {
+            Users users = userRepo.findByUid(uid);
+            users.setIsActive(0);
+            userRepo.save(users);
+            return true;
+        } else {
+            return false;
+        }
 
     }
 
@@ -204,7 +204,7 @@ public class JwtUserDetailsServiceImpl extends BaseController implements JwtUser
                 .status_update(0)
                 .roles(user.getRoles())
                 .empSystemId(sysid)
-                .employeeCode("SS"+sysid.toString())
+                .employeeCode("SS" + sysid.toString())
 //                .roleName(user.getRoleName())
                 .build();
         log.info("Start save Table user at time: "
@@ -289,11 +289,13 @@ public class JwtUserDetailsServiceImpl extends BaseController implements JwtUser
             Assert.hasText(userLoginDTO.getTokenCode(), "OTP_NOT_FOUND");
             Assert.isTrue(basicLogin.getExpireDate().isAfter(LocalDateTime.now()), "TOKEN_EXPIRED");
             Assert.isTrue(basicLogin.getRetryCount() < Const.RETRY_TIMES, "TRIED_TOO_MANY_TIMES");
+
             if (userLoginDTO.getTokenCode().equals(basicLogin.getTokenCode())) {
                 basicLogin.setIsVerified(Const.COMMON_CONST_VALUE.VERIFIED);
             } else {
                 int retry = Objects.nonNull(basicLogin.getRetryCount()) ? basicLogin.getRetryCount() : 0;
                 basicLogin.setRetryCount(++retry);
+
                 log.info("Start save Table basic_login at time: "
                         + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
                 basicLoginRepo.save(basicLogin);
@@ -303,8 +305,9 @@ public class JwtUserDetailsServiceImpl extends BaseController implements JwtUser
             }
         } else {
             Assert.hasText(userLoginDTO.getPassword(), "PASSWORD_NOT_FOUND");
-            Assert.isTrue(bcryptEncoder.matches(userLoginDTO.getPassword(), basicLogin.getPassword()), "PASSWORD_NOT_MATCH");
-            Assert.isTrue(userLoginDTO.getNewPassword().equals(userLoginDTO.getReNewPassword()), "NEW_RETYPE_PASSWORD_NOT_MATCH");
+            Assert.isTrue(bcryptEncoder.matches(userLoginDTO.getPassword(), basicLogin.getPassword()), "PASSWORD_KHÔNG_KHỚP");
+            Assert.isTrue(bcryptEncoder.matches( basicLogin.getPassword(),userLoginDTO.getNewPassword()), "PASSWORD MỚI KHÔNG ĐƯỢC GIỐNG PASSWORD CŨ");
+            Assert.isTrue(userLoginDTO.getNewPassword().equals(userLoginDTO.getReNewPassword()), "NEW_RETYPE_PASSWORD_KHÔNG_KHỚP");
             basicLogin.setPassword(bcryptEncoder.encode(userLoginDTO.getNewPassword()));
             log.info("Start save Table basic_login at time: "
                     + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
@@ -313,7 +316,7 @@ public class JwtUserDetailsServiceImpl extends BaseController implements JwtUser
                     + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
             return true;
         }
-        Assert.isTrue(userLoginDTO.getNewPassword().equals(userLoginDTO.getReNewPassword()), "NEW_RETYPE_PASSWORD_NOT_MATCH");
+        Assert.isTrue(userLoginDTO.getNewPassword().equals(userLoginDTO.getReNewPassword()), "NEW_RETYPE_PASSWORD_KHÔNG_KHỚP");
         basicLogin.setPassword(bcryptEncoder.encode(userLoginDTO.getNewPassword()));
         log.info("Start save Table basic_login at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
@@ -383,7 +386,7 @@ public class JwtUserDetailsServiceImpl extends BaseController implements JwtUser
         long maxNum = 999999999;
         long randomNumber = (int) (Math.random() * (maxNum - minNum + 1) + minNum);
         Long users = userRepo.getSysId(randomNumber);
-        if ( users == null) {
+        if (users == null) {
 
             return randomNumber;
         } else {

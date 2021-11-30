@@ -28,7 +28,7 @@ public class AddressResponse {
         addressResponse.setWard(model.getWard());
         addressResponse.setDistrict(model.getDistrict());
         addressResponse.setProvince(model.getProvince());
-        addressResponse.setFomatAddress(model.getFomatAddress());
+//        addressResponse.setFomatAddress(model.getFomatAddress());
         return addressResponse;
     }
 
@@ -40,7 +40,7 @@ public class AddressResponse {
         addressResponse.setWard(model.getWard());
         addressResponse.setDistrict(model.getDistrict());
         addressResponse.setProvince(model.getProvince());
-        addressResponse.setFomatAddress(model.getFomatAddress());
+//        addressResponse.setFomatAddress(model.getFomatAddress());
         return addressResponse;
     }
 }

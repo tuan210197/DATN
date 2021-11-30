@@ -118,7 +118,7 @@ public class LeadResponse {
             addressResponse.setWard(data.getAddress().getWard() == null ? "" : data.getAddress().getWard());
             addressResponse.setDistrict(data.getAddress().getDistrict() == null ? "" : data.getAddress().getDistrict());
             addressResponse.setProvince(data.getAddress().getProvince() == null ? "" : data.getAddress().getProvince());
-            addressResponse.setFomatAddress(data.getAddress().getFomatAddress() == null ? "" : data.getAddress().getFomatAddress());
+//            addressResponse.setFomatAddress(data.getAddress().getFomatAddress() == null ? "" : data.getAddress().getFomatAddress());
             response.setAddress(addressResponse);
         }
         response.setUnmaskPhone(data.getPhone() == null ? "" : data.getPhone().replaceAll(".(?=.{4})", "*"));

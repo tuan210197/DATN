@@ -3,9 +3,12 @@ package shupship.service.impl;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import shupship.controller.BaseController;
 import shupship.domain.model.BasicLogin;
 import shupship.domain.model.Lead;
@@ -19,10 +22,15 @@ import shupship.repo.ILeadRepository;
 import shupship.repo.UserRepo;
 import shupship.request.LeadAssignRequest;
 import shupship.request.LeadAssignRequestV2;
+import shupship.response.LeadAssignExcelResponse;
+import shupship.response.LeadAssignHisResponse;
+import shupship.response.PagingRs;
 import shupship.service.ILeadAssignService;
 import shupship.service.MailSenderService;
 import shupship.util.exception.HieuDzException;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -215,6 +223,36 @@ public class LeadAssignServiceImpl implements ILeadAssignService {
             }
         }
         return assigns;
+    }
+
+    @Override
+    public String checkFileInput(MultipartFile multipartFile) {
+        return null;
+    }
+
+    @Override
+    public LeadAssignHisResponse importFileLeadAssign(Users user, MultipartFile reapExcelDataFile) throws Exception {
+        return null;
+    }
+
+    @Override
+    public LeadAssign assignLeadForPostCode(Users users, LeadAssignRequest leadAssignRequest) throws IOException {
+        return null;
+    }
+
+    @Override
+    public PagingRs getLeadAssignHis(Users users, Pageable pageable) {
+        return null;
+    }
+
+    @Override
+    public LeadAssignHisResponse getDetailFile(Long fileId) {
+        return null;
+    }
+
+    @Override
+    public ByteArrayInputStream exportExcel(Collection<LeadAssignExcelResponse> list) throws IOException, InvalidFormatException {
+        return null;
     }
 
     public void sendEmailAssign(LeadAssign leadAssign, Long userAssigned, String reason) {

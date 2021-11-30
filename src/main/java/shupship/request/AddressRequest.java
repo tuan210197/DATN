@@ -43,7 +43,7 @@ public class AddressRequest extends BaseRequest {
         address.setWard(addressRequest.getWard());
         address.setDistrict(addressRequest.getDistrict());
         address.setProvince(addressRequest.getProvince());
-        address.setFomatAddress(addressRequest.getFomatAddress());
+//        address.setFomatAddress(addressRequest.getFomatAddress());
         return address;
     }
 
@@ -53,7 +53,7 @@ public class AddressRequest extends BaseRequest {
         addressRequest.setWard(address.getWard());
         addressRequest.setDistrict(address.getDistrict());
         addressRequest.setProvince(address.getProvince());
-        addressRequest.setFomatAddress(address.getFomatAddress());
+//        addressRequest.setFomatAddress(address.getFomatAddress());
         return addressRequest;
     }
 

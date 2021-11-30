@@ -6,6 +6,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
+
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -215,7 +216,7 @@ public class LeadAssignExcelService implements ILeadAssignExcelService {
                 }
             } else address.setHomeNo(dataFormatter.formatCellValue(row.getCell(7)));
 
-            address.setFomatAddress(ward1.get(0).getFormattedAddress());
+//            address.setFomatAddress(ward1.get(0).getFormattedAddress());
 
             if (address.getProvince() != null && address.getDistrict() != null && address.getWard() != null) {
                 leadAssignExcel.setAddress(address);
@@ -335,12 +336,12 @@ public class LeadAssignExcelService implements ILeadAssignExcelService {
         if (row.getLastCellNum() <= 0) {
             return true;
         }
-        for (int cellNum = row.getFirstCellNum(); cellNum < row.getLastCellNum(); cellNum++) {
-            Cell cell = row.getCell(cellNum);
-            if (cell != null && cell.getCellTypeEnum() != CellType.BLANK && StringUtils.isNotBlank(cell.toString())) {
-                return false;
-            }
-        }
+//        for (int cellNum = row.getFirstCellNum(); cellNum < row.getLastCellNum(); cellNum++) {
+//            Cell cell = row.getCell(cellNum);
+//            if (cell != null && cell.getCellTypeEnum() != CellType.BLANK && StringUtils.isNotBlank(cell.toString())) {
+//                return false;
+//            }
+//        }
         return true;
     }
 }

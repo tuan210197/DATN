@@ -170,7 +170,7 @@ public class LeadServiceImpl implements ILeadService {
         data.setExpectedRevenue(leadRequest.getExpectedRevenue());
         data.setStatus(LeadStatus.NEW.getType());
         Address address = AddressRequest.addressDtoToModel(leadRequest.getAddress());
-        address.setFomatAddress(ward.getFormattedAddress());
+//        address.setFomatAddress(ward.getFormattedAddress());
         data.setAddress(address);
 
         if (CollectionUtils.isNotEmpty(leadRequest.getIndustry())) {
@@ -298,7 +298,7 @@ public class LeadServiceImpl implements ILeadService {
         data.setTitle(inputData.getTitle());
         Ward ward = wardRepository.findWardByCode(inputData.getAddress().getWard());
         Address address = AddressRequest.addressDtoToModel(inputData.getAddress());
-        address.setFomatAddress(ward.getFormattedAddress());
+//        address.setFomatAddress(ward.getFormattedAddress());
         data.setAddress(address);
 
         if (CollectionUtils.isNotEmpty(inputData.getIndustry())) {
@@ -376,7 +376,7 @@ public class LeadServiceImpl implements ILeadService {
                 existAddress.setStreet(inputData.getAddress().getWard());
                 existAddress.setDistrict(inputData.getAddress().getDistrict());
                 existAddress.setProvince(inputData.getAddress().getProvince());
-                existAddress.setFomatAddress(inputData.getAddress().getFomatAddress());
+//                existAddress.setFomatAddress(inputData.getAddress().getFomatAddress());
             }
 
         } catch (Exception e) {
