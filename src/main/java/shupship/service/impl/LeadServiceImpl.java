@@ -442,6 +442,14 @@ public class LeadServiceImpl implements ILeadService {
     }
 
     @Override
+    public Lead searchLead(String key) {
+        Lead lead = iLeadRepository.searLead(key);
+        if (lead == null)
+            throw new HieuDzException("Khách hàng không tồn tại");
+        return lead;
+    }
+
+    @Override
     public HashMap getCustomerByPhone(String phone) {
         HashMap customer = new HashMap();
         return customer;

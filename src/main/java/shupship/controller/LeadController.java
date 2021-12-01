@@ -3,6 +3,7 @@ package shupship.controller;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -34,10 +35,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.Comparator.naturalOrder;
 
@@ -227,6 +226,17 @@ public class LeadController extends BaseController {
         return ResponseUtil.wrapOrNotFound(Optional.ofNullable(data));
     }
 
+
+    @GetMapping(value = "/search")
+    public ResponseEntity searchlead(@PageableDefault(page = 1)
+                                     @SortDefault.SortDefaults({@SortDefault(sort = "lastModifiedDate", direction = Sort.Direction.DESC)}) Pageable pageable,
+                                     @RequestParam(required = false) String key) throws Exception {
+        Pageable pageRequest = PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), pageable.getSort());
+        Users users = getCurrentUser();
+        Lead leads = leadService.searchLead(key);
+        LeadResponse response = LeadResponse.leadModelToDto(leads);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
     private HashMap getPhoneEVTP(String phone) {
         if (StringUtils.isNotBlank(phone)) {

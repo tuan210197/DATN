@@ -24,6 +24,10 @@ public interface ILeadRepository extends PagingAndSortingRepository<Lead, Long>,
     @Query("select l from Lead l where l.deletedStatus = 0 and l.phone = :phone")
     List<Lead> findLeadWithPhoneOnWEB(String phone);
 
+    @Query("select a from Lead a join LeadAssign b on a.id = b.leads where a.deletedStatus = 0 " +
+            " and (COALESCE(:key) is null or ( a.customerCode = :key or a.phone = :key) ) ")
+    Lead searLead(String key);
+
     @Query(" Select distinct a from Lead a left join LeadAssign b on a.id = b.leads " +
             " where  a.deletedStatus = 0" +
             " and " +
