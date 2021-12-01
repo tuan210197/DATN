@@ -31,7 +31,7 @@ public class ReportDao {
 
     public List<ReportMonthlyDeptDto> reportAllCrm(Timestamp startDate, Timestamp endDate) {
 
-        String query = "SELECT d.deptcode, a.postcode," +
+        String query = "SELECT d.code, a.postcode," +
                 "                 (select count(*) from users e where a.postcode = e.post_code and e.is_active = 1) as employees," +
                 "                 sum(case when la.lead_id is not null then 1 else 0 end)                             as total_assigns," +
                 "                 sum(case when la.status = 2 then 1 else 0 end)                                      as contacting," +
@@ -42,9 +42,9 @@ public class ReportDao {
                 "                 (select user_recipient_id from lead_assign la1 where la1.post_code = a.postcode)) as foo)   as employee_not_assigned," +
                 "                 sum(case when la.user_assignee_id != la.user_recipient_id then 1 else 0 end)        as assigned" +
                 "                 FROM post_office a" +
-                "                     left join dept_office d on a.dept_office_id = d.id" +
+                "                     left join dept_office d on a.deptCode = d.code" +
                 "                     left join lead_assign la on a.postcode = la.post_code and la.created_date between :startDate and :endDate " +
-                "                 group by (d.deptcode, a.postcode) ";
+                "                 group by (d.code, a.postcode) ";
 
         Query nativeQuery = entityManager.createNativeQuery(query);
         nativeQuery.setParameter("startDate", startDate);
@@ -66,6 +66,11 @@ public class ReportDao {
             report.setAssigned(Long.valueOf(String.valueOf((BigInteger) o[8])));
 
             results.add(report);
+        }
+
+        for (ReportAllDepts model : results){
+            if (model.getDeptCode() == null || StringUtils.isEmpty(model.getDeptCode()))
+                System.out.println("NULL " + model);
         }
 
         Map<String, List<ReportAllDepts>> map = results.stream().collect(Collectors.groupingBy(ReportAllDepts::getDeptCode));
@@ -158,8 +163,8 @@ public class ReportDao {
                 "                   on e.emp_system_id = la.user_recipient_id and la.created_date between :startDate and :endDate " +
                 "         left join lead l on la.lead_id = l.id and l.deleted_status = 0 " +
                 "         left join post_office po on e.post_code = po.postcode " +
-                "         left join dept_office d on po.dept_office_id = d.id " +
-                "         where d.deptcode = :deptCode " +
+                "         left join dept_office d on po.deptCode = d.code " +
+                "         where d.code = :deptCode " +
                 "   and e.is_active = 1 " +
                 "   group by (e.emp_system_id, e.employee_code, e.full_name, po.postcode) " +
                 "   order by po.postcode ";

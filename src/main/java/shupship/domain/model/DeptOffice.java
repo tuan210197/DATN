@@ -15,7 +15,7 @@ public class DeptOffice implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String deptCode;
+    private String code;
 
     private String deptName;
 

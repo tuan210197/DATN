@@ -14,7 +14,7 @@ public class DeptOfficeResponse {
     public static DeptOfficeResponse leadModelToDto(DeptOffice deptOffice){
         DeptOfficeResponse model = new DeptOfficeResponse();
         model.setId(deptOffice.getId());
-        model.setDeptCode(deptOffice.getDeptCode());
+        model.setDeptCode(deptOffice.getCode());
         model.setDeptName(deptOffice.getDeptName());
         return model;
     }

@@ -248,7 +248,7 @@ public class LeadAssignExcelService implements ILeadAssignExcelService {
                     }
                 } else {
                     leadAssignExcel.setPostCode(dataFormatter.formatCellValue(row.getCell(9)));
-                    leadAssignExcel.setDeptCode(deptCode.getDeptOffice().getDeptCode());
+                    leadAssignExcel.setDeptCode(deptCode.getDeptOffice().getCode());
                 }
             }
 

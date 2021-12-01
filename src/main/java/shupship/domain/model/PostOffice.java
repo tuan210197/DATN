@@ -22,10 +22,8 @@ public class PostOffice extends AuditEntity implements Serializable {
 
     private String postPhone;
 
-    private String deptCode;
-
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "dept_office_id", referencedColumnName = "id")
+    @JoinColumn(name = "deptCode", referencedColumnName = "code")
     private DeptOffice deptOffice;
 
     //kinh do
