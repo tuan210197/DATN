@@ -121,7 +121,7 @@ public class LeadAssignExcelService implements ILeadAssignExcelService {
                         }
                     }
                 } else
-                    leadAssignExcel.setPhone(CommonUtils.convertPhone(dataFormatter.formatCellValue(row.getCell(3))));
+                    leadAssignExcel.setPhone(dataFormatter.formatCellValue(row.getCell(3)));
             } else {
                 if (StringUtils.isEmpty(leadAssignExcel.getError())) {
                     if (leadAssignExcel.getStatus() == null) {
@@ -269,7 +269,7 @@ public class LeadAssignExcelService implements ILeadAssignExcelService {
 //                }
 //            }
 
-            List<Lead> lstLead = leadRepository.findLeadWithPhoneOnWEB(CommonUtils.convertPhone(leadAssignExcel.getPhone()));
+            List<Lead> lstLead = leadRepository.findLeadWithPhoneOnWEB(leadAssignExcel.getPhone());
             if (CollectionUtils.isNotEmpty(lstLead)) {
                 if (StringUtils.isEmpty(leadAssignExcel.getError())) {
                     if (leadAssignExcel.getStatus() == null) {

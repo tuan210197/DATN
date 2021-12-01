@@ -57,6 +57,7 @@ public class LeadScheduleResponse {
             addressResponse.setWard(data.getAddress().getWard());
             addressResponse.setDistrict(data.getAddress().getDistrict());
             addressResponse.setProvince(data.getAddress().getProvince());
+            addressResponse.setFomatAddress(data.getAddress().getFomatAddress());
             response.setAddress(addressResponse);
         }
         return response;

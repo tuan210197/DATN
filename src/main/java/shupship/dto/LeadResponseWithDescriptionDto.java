@@ -109,6 +109,7 @@ public class LeadResponseWithDescriptionDto {
             addressResponse.setWard(data.getAddress().getWard() == null ? "" : data.getAddress().getWard());
             addressResponse.setDistrict(data.getAddress().getDistrict() == null ? "" : data.getAddress().getDistrict());
             addressResponse.setProvince(data.getAddress().getProvince() == null ? "" : data.getAddress().getProvince());
+            addressResponse.setFomatAddress(data.getAddress().getFomatAddress() == null ? "" : data.getAddress().getFomatAddress());
             response.setAddress(addressResponse);
         }
         response.setPhone(data.getPhone());
@@ -122,7 +123,7 @@ public class LeadResponseWithDescriptionDto {
         if (CollectionUtils.isNotEmpty(data.getSchedules())) {
             List<ScheduleResponseLeadDto> scheduleResponsDtos = data.getSchedules().stream().map(ScheduleResponseLeadDto::scheduleModelToDto).collect(Collectors.toList());
             response.setSchedules(scheduleResponsDtos);
-        }
+        } response.setSchedules(new ArrayList<>());
 
         if (CollectionUtils.isNotEmpty(data.getLeadAssigns())) {
             List<LeadAssignResponseDto> leadAssignResponseDtos = data.getLeadAssigns().stream().map(LeadAssignResponseDto::leadAssignModelToDto).collect(Collectors.toList());

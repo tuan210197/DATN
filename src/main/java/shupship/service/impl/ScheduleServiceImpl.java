@@ -177,7 +177,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         Users users = getCurrentUser();
         Schedule existData = scheduleRepository.getScheduleById(id, users.getEmpSystemId());
         if (existData == null) {
-            throw new NotFoundException(new ErrorMessage("ERR_001", "Lịch không tồn tại"));
+            throw new HieuDzException("Lịch không tồn tại");
         }
         ScheduleResponseDto scheduleResponseDto = ScheduleResponseDto.scheduleModelToDto(existData);
         return scheduleResponseDto;
@@ -185,25 +185,25 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     private void validateSchedule(LocalDateTime fromDate, LocalDateTime toDate) {
         if (fromDate.plusMinutes(5).isBefore(LocalDateTime.now()) || toDate.isBefore(LocalDateTime.now())) {
-            throw new BusinessException(new ErrorMessage("ERR_100", "Không thể đặt thời gian trong quá khứ"));
+            throw new HieuDzException("Không thể đặt thời gian trong quá khứ");
         }
         if (toDate.isBefore(fromDate)) {
-            throw new BusinessException(new ErrorMessage("ERR_101", "Ngày kết thúc không thể trước ngày bắt đầu"));
+            throw new HieuDzException("Ngày kết thúc không thể trước ngày bắt đầu");
         }
         if (fromDate.until(toDate, ChronoUnit.MINUTES) < 30) {
-            throw new BusinessException(new ErrorMessage("ERR_102", "Thời gian tiếp xúc cách nhau ít nhất 30 phút"));
+            throw new HieuDzException("Thời gian tiếp xúc cách nhau ít nhất 30 phút");
         }
     }
 
     private void validateScheduleUpdate(LocalDateTime fromDate, LocalDateTime toDate) {
         if (toDate.isBefore(LocalDateTime.now())) {
-            throw new BusinessException(new ErrorMessage("ERR_100", "Không thể đặt thời gian trong quá khứ"));
+            throw new HieuDzException("Không thể đặt thời gian trong quá khứ");
         }
         if (toDate.isBefore(fromDate)) {
-            throw new BusinessException(new ErrorMessage("ERR_101", "Ngày kết thúc không thể trước ngày bắt đầu"));
+            throw new HieuDzException( "Ngày kết thúc không thể trước ngày bắt đầu");
         }
         if (fromDate.until(toDate, ChronoUnit.MINUTES) < 30) {
-            throw new BusinessException(new ErrorMessage("ERR_102", "Thời gian tiếp xúc cách nhau ít nhất 30 phút"));
+            throw new HieuDzException("Thời gian tiếp xúc cách nhau ít nhất 30 phút");
         }
     }
 }

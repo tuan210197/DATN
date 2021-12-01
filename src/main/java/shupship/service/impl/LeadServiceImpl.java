@@ -153,12 +153,12 @@ public class LeadServiceImpl implements ILeadService {
         } else throw new HieuDzException("Chưa chọn phân loại khách hàng");
 
         if (StringUtils.isNotEmpty(leadRequest.getPhone())) {
-            data.setPhone(CommonUtils.convertPhone(leadRequest.getPhone()));
+            data.setPhone((leadRequest.getPhone()));
         } else throw new HieuDzException("Không được để trống số điện thoại");
 
-        if (CollectionUtils.isNotEmpty(iLeadRepository.findLeadWithPhoneOnWEB(CommonUtils.convertPhone(leadRequest.getPhone()))))
+        if (CollectionUtils.isNotEmpty(iLeadRepository.findLeadWithPhoneOnWEB((leadRequest.getPhone()))))
             throw new HieuDzException("Số điện thoại đã tồn tại trên hệ thống!");
-        else data.setPhone(CommonUtils.convertPhone(leadRequest.getPhone()));
+        else data.setPhone((leadRequest.getPhone()));
 
         Ward ward = wardRepository.findWardByCode(leadRequest.getAddress().getWard());
 
@@ -201,15 +201,15 @@ public class LeadServiceImpl implements ILeadService {
                     if (CollectionUtils.isNotEmpty(schedules)) {
                         throw new HieuDzException("Chỉ cho phép sửa SĐT của khách hàng khi khách hàng chưa có lịch tiếp xúc và chưa có kết quả tiếp xúc");
                     } else {
-                        if (existData.getPhone().equals(CommonUtils.convertPhone(leadRequest.getPhone()))) {
-                            existData.setPhone(CommonUtils.convertPhone(leadRequest.getPhone()));
+                        if (existData.getPhone().equals((leadRequest.getPhone()))) {
+                            existData.setPhone((leadRequest.getPhone()));
                         } else {
-                            if (CollectionUtils.isNotEmpty(iLeadRepository.findLeadWithPhoneOnWEB(CommonUtils.convertPhone(leadRequest.getPhone()))))
+                            if (CollectionUtils.isNotEmpty(iLeadRepository.findLeadWithPhoneOnWEB((leadRequest.getPhone()))))
                                 throw new HieuDzException("Số điện thoại đã tồn tại trên hệ thống!");
-                            else existData.setPhone(CommonUtils.convertPhone(leadRequest.getPhone()));
+                            else existData.setPhone((leadRequest.getPhone()));
                         }
                     }
-                } else existData.setPhone(CommonUtils.convertPhone(leadRequest.getPhone()));
+                } else existData.setPhone((leadRequest.getPhone()));
             }
 
             if (StringUtils.isNotEmpty(leadRequest.getCompanyName())) {
@@ -289,7 +289,7 @@ public class LeadServiceImpl implements ILeadService {
         }
         data.setStatus(LeadStatus.NOT_CONTACTED.getType());
         data.setLeadSource(LeadSource.valueOf(inputData.getLeadSource()).name());
-        data.setPhone(CommonUtils.convertPhone(inputData.getPhone()));
+        data.setPhone((inputData.getPhone()));
         data.setType(LeadType.TU_NHAP.getType());
         data.setRepresentation(inputData.getRepresentation());
         data.setQuantityMonth(inputData.getQuantityMonth());
@@ -337,16 +337,16 @@ public class LeadServiceImpl implements ILeadService {
                     if (CollectionUtils.isNotEmpty(schedules)) {
                         throw new HieuDzException("Chỉ cho phép sửa SĐT của khách hàng khi khách hàng chưa có lịch tiếp xúc và chưa có kết quả tiếp xúc");
                     } else {
-                        if (existData.getPhone().equals(CommonUtils.convertPhone(inputData.getPhone()))) {
-                            existData.setPhone(CommonUtils.convertPhone(inputData.getPhone()));
+                        if (existData.getPhone().equals((inputData.getPhone()))) {
+                            existData.setPhone((inputData.getPhone()));
                         } else {
-                            Lead leadHadPhoneByUser = iLeadRepository.findLeadWithPhoneByUser(CommonUtils.convertPhone(inputData.getPhone()), user.getEmpSystemId());
+                            Lead leadHadPhoneByUser = iLeadRepository.findLeadWithPhoneByUser((inputData.getPhone()), user.getEmpSystemId());
                             if (leadHadPhoneByUser != null)
                                 throw new HieuDzException("Số điện thoại đã tồn tại trên hệ thống!");
-                            else existData.setPhone(CommonUtils.convertPhone(inputData.getPhone()));
+                            else existData.setPhone((inputData.getPhone()));
                         }
                     }
-                } else existData.setPhone(CommonUtils.convertPhone(inputData.getPhone()));
+                } else existData.setPhone((inputData.getPhone()));
             }
 
             if (StringUtils.isNotEmpty(inputData.getFullName())) {
@@ -434,7 +434,7 @@ public class LeadServiceImpl implements ILeadService {
 
     @Override
     public LeadHadPhoneResponseDto findLeadHadPhoneByUser(LeadRequest inputData, Long userId) {
-        List<Lead> leadWithPhone = iLeadRepository.findLeadWithPhoneOnWEB(CommonUtils.convertPhone(inputData.getPhone()));
+        List<Lead> leadWithPhone = iLeadRepository.findLeadWithPhoneOnWEB((inputData.getPhone()));
         if (CollectionUtils.isEmpty(leadWithPhone)) {
             return null;
         }

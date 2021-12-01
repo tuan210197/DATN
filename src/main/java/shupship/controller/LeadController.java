@@ -230,7 +230,7 @@ public class LeadController extends BaseController {
 
     private HashMap getPhoneEVTP(String phone) {
         if (StringUtils.isNotBlank(phone)) {
-            HashMap resp = leadService.getCustomerByPhone(CommonUtils.convertPhone(phone));
+            HashMap resp = leadService.getCustomerByPhone((phone));
             return resp;
         }
         return null;
