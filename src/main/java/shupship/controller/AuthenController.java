@@ -85,14 +85,13 @@ public class AuthenController extends BaseController {
         } catch (DisabledException e) {
             e.printStackTrace();
             return toExceptionResult("USER BỊ KHÓA HÃY LIÊN HỆ VỚI QUẢN TRỊ VIÊN", Const.API_RESPONSE.RETURN_CODE_ERROR);
-//            throw new HieuDzException("USER BỊ KHÓA HÃY LIÊN HỆ VỚI QUẢN TRỊ VIÊN");
 
         } catch (BadCredentialsException e) {
             e.printStackTrace();
             userDetailsService.loginFailRetryCount(authenticationRequest.getEmail(), true);
             return toExceptionResult("MẬT KHẨU KHÔNG ĐÚNG", Const.API_RESPONSE.RETURN_CODE_ERROR);
 
-//            throw new HieuDzException("MẬT KHẨU CHƯA ĐÚNG");
+
         } catch (Exception e) {
             e.printStackTrace();
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
