@@ -112,12 +112,20 @@ public class JwtUserDetailsServiceImpl extends BaseController implements JwtUser
 
         log.info("End query Table basic_login at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
-        int check = checkBasicLogin.getIsVerified();
-        if (check == 1) {
-            return true;
-        } else {
+        if (checkBasicLogin != null) {
+
+            int check = checkBasicLogin.getIsVerified();
+            if (check == 1) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        else{
             return false;
         }
+
+
     }
 
     @Override
@@ -244,7 +252,7 @@ public class JwtUserDetailsServiceImpl extends BaseController implements JwtUser
         basicLogin.setIsVerified(Const.COMMON_CONST_VALUE.NOT_VERIFIED);
         basicLogin.setTokenCode(otpToken);
 //        basicLogin.setPassword(bcryptEncoder.encode(password));
-        basicLogin.setExpireDate(LocalDateTime.now().plusMinutes(15));
+        basicLogin.setExpireDate(LocalDateTime.now().plusMinutes(5));
         basicLogin.setRetryCount(0);
         log.info("Start save Table basic_login at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
@@ -331,9 +339,7 @@ public class JwtUserDetailsServiceImpl extends BaseController implements JwtUser
     public boolean updateUser(String userId, UserLoginDTO userLoginDTO) {
         Users userCheck = userRepo.findByUid(userId);
         Assert.notNull(userCheck, "USER_NOT_FOUND");
-//        Assert.notNull(userLoginDTO.getBirthday(), "DATE_NOT_VALID");
-//        Assert.notNull(userLoginDTO.getName(), "NAME_NOT_VALID");
-//        Assert.notNull(userLoginDTO.getFullName(), "FULL_NAME_NOT_VALID");
+
         Assert.isTrue(ValidateUtil.regexValidation(userLoginDTO.getMobile(), Const.VALIDATE_INPUT.regexPhone), "PHONE_WRONG_FORMAT");
         Assert.isTrue(Const.VALIDATE_INPUT.phoneNum.contains(userLoginDTO.getMobile().substring(0, 3)), "PHONE_NOT_VALID");
         Assert.isTrue(userCheck.getIsActive().equals(1), "USER_NOT_ACTIVE");

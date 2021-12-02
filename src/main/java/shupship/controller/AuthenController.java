@@ -20,6 +20,7 @@ import shupship.domain.dto.JwtResponse;
 import shupship.domain.dto.UserInfoDTO;
 import shupship.domain.dto.UserLoginDTO;
 import shupship.service.JwtUserDetailsService;
+import shupship.util.exception.HieuDzException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -68,7 +69,8 @@ public class AuthenController extends BaseController {
                     authenticationRequest.getPassword()));
             UserLoginDTO userLoginDTO = userDetailsService.getBasicAuthByEmail(authenticationRequest.getEmail(), true);
             if (Objects.isNull(userLoginDTO)) {
-                return toExceptionResult("USER_NOT_VERIFY_RESEND_OTP", Const.API_RESPONSE.RETURN_CODE_ERROR);
+                return toExceptionResult("USER CHƯA XÁC THỰC, GỬI LẠI OTP", Const.API_RESPONSE.RETURN_CODE_ERROR);
+//                throw new HieuDzException("USER CHƯA XÁC THỰC, GỬI LẠI OTP");
             }
             String uid = userLoginDTO.getUserUid();
             UserInfoDTO userInfoDTO = userDetailsService.getUserInfo(uid);
@@ -82,11 +84,15 @@ public class AuthenController extends BaseController {
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.RETURN_CODE_ERROR);
         } catch (DisabledException e) {
             e.printStackTrace();
-            return toExceptionResult("USER_DISABLED", Const.API_RESPONSE.RETURN_CODE_ERROR);
+            return toExceptionResult("USER BỊ KHÓA HÃY LIÊN HỆ VỚI QUẢN TRỊ VIÊN", Const.API_RESPONSE.RETURN_CODE_ERROR);
+//            throw new HieuDzException("USER BỊ KHÓA HÃY LIÊN HỆ VỚI QUẢN TRỊ VIÊN");
+
         } catch (BadCredentialsException e) {
             e.printStackTrace();
             userDetailsService.loginFailRetryCount(authenticationRequest.getEmail(), true);
-            return toExceptionResult("INVALID_CREDENTIALS", Const.API_RESPONSE.RETURN_CODE_ERROR);
+            return toExceptionResult("MẬT KHẨU KHÔNG ĐÚNG", Const.API_RESPONSE.RETURN_CODE_ERROR);
+
+//            throw new HieuDzException("MẬT KHẨU CHƯA ĐÚNG");
         } catch (Exception e) {
             e.printStackTrace();
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
@@ -103,17 +109,17 @@ public class AuthenController extends BaseController {
             if (userDetailsService.checkEmail(userLoginDTO)) {
                 log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
                         + " [" + request.getRequestURI() + "] #END " + requestId);
-                return toSuccessResult(null, "EMAIL_VERIFY");
+                return toSuccessResult(null, "EMAIL ĐÃ XÁC NHẬN");
             } else {
-                return toExceptionResult("EMAIL_NOT_VERIFY", Const.API_RESPONSE.RETURN_CODE_SUCCESS);
+                return toExceptionResult("EMAIL KHÔNG TỒN TẠI HOẶC CHƯA XÁC THỰC", Const.API_RESPONSE.RETURN_CODE_SUCCESS);
+//                throw new HieuDzException("EMAIL KHÔNG TỒN TẠI HOẶC CHƯA XÁC THỰC");
             }
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-            return toExceptionResult(e.getMessage(), Const.API_RESPONSE.RETURN_CODE_ERROR);
         } catch (Exception e) {
             e.printStackTrace();
-            return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
+//            throw new HieuDzException(e.getMessage());
+            return toExceptionResult(e.getMessage(), Const.API_RESPONSE.RETURN_CODE_ERROR);
         }
+
     }
 
     @PostMapping(value = "/check-update")
@@ -125,16 +131,19 @@ public class AuthenController extends BaseController {
             if (userDetailsService.checkUpdate(userLoginDTO)) {
                 log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
                         + " [" + request.getRequestURI() + "] #END " + requestId);
-                return toSuccessResult(null, "EMAIL_IS_UPDATED");
+                return toSuccessResult(null, "EMAIL ĐÃ ĐƯỢC CẬP NHẬT");
             } else {
-                return toExceptionResult("EMAIL_IS_NOT_UPDATED", Const.API_RESPONSE.RETURN_CODE_SUCCESS);
+                return toExceptionResult("EMAIL CHƯA ĐƯỢC CẬP NHẬT", Const.API_RESPONSE.RETURN_CODE_SUCCESS);
+//                throw new HieuDzException("EMAIL CHƯA ĐƯỢC CẬP NHẬT");
             }
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.RETURN_CODE_ERROR);
+//            throw new HieuDzException(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
+//            throw new HieuDzException(e.getMessage());
         }
     }
 
@@ -156,19 +165,23 @@ public class AuthenController extends BaseController {
                 if (userDetailsService.registerUser(userLoginDTO)) {
                     log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
                             + " [" + request.getRequestURI() + "] #END " + requestId);
-                    return toSuccessResult(null, "REGISTER_COMPLETED");
+                    return toSuccessResult(null, "ĐĂNG KÝ THÀNH CÔNG");
                 } else {
-                    return toExceptionResult("REGISTER_FAILED", Const.API_RESPONSE.RETURN_CODE_ERROR);
+                    return toExceptionResult("ĐĂNG KÝ LỖI", Const.API_RESPONSE.RETURN_CODE_ERROR);
+//                    throw new HieuDzException("ĐĂNG KÝ LỖI");
                 }
             } catch (IllegalArgumentException e) {
                 e.printStackTrace();
                 return toExceptionResult(e.getMessage(), Const.API_RESPONSE.RETURN_CODE_ERROR);
+//                throw new HieuDzException(e.getMessage());
             } catch (Exception e) {
                 e.printStackTrace();
                 return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
+//                throw new HieuDzException(e.getMessage());
             }
         } else {
-            return toExceptionResult("NO_PERMISSION", Const.API_RESPONSE.RETURN_CODE_ERROR_NOTFOUND);
+            return toExceptionResult("KHÔNG CÓ QUYỀN TRUY CẬP", Const.API_RESPONSE.RETURN_CODE_ERROR_NOTFOUND);
+//            throw new HieuDzException("KHÔNG CÓ QUYỀN TRUY CẬP");
         }
     }
 
@@ -187,13 +200,15 @@ public class AuthenController extends BaseController {
             userDetailsService.forgetPassword(userLoginDTO);
             log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
                     + " [" + request.getRequestURI() + "] #END " + requestId);
-            return toSuccessResult(null, "SEND_OTP_SUCCESS");
+            return toSuccessResult(null, "GỬI OTP THÀNH CÔNG");
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.RETURN_CODE_ERROR);
+//            throw new HieuDzException(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
+//            throw new HieuDzException(e.getMessage());
         }
     }
 
@@ -212,16 +227,19 @@ public class AuthenController extends BaseController {
             if (userDetailsService.updatePassword(userLoginDTO)) {
                 log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
                         + " [" + request.getRequestURI() + "] #END " + requestId);
-                return toSuccessResult(null, "PASSWORD_CHANGE_SUCCESS");
+                return toSuccessResult(null, "THAY ĐỔI MẬT KHẨU THÀNH CÔNG");
             } else {
                 return toExceptionResult("TOKEN_INVALID", Const.API_RESPONSE.RETURN_CODE_ERROR);
+//                throw new HieuDzException("TOKEN_INVALID");
             }
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
+//            throw new HieuDzException(e.getMessage());
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.RETURN_CODE_ERROR);
         } catch (Exception e) {
             e.printStackTrace();
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
+//            throw new HieuDzException(e.getMessage());
         }
     }
 
@@ -239,17 +257,22 @@ public class AuthenController extends BaseController {
                     return toSuccessResult(null, "BAN_SUCCESS");
                 } else {
                     return toExceptionResult("BAN_FAILED", Const.API_RESPONSE.RETURN_CODE_ERROR);
+//                    throw new HieuDzException("BAN_FAILED");
                 }
+
             } catch (IllegalArgumentException e) {
                 e.printStackTrace();
                 return toExceptionResult(e.getMessage(), Const.API_RESPONSE.RETURN_CODE_ERROR);
+//                throw new HieuDzException(e.getMessage());
             } catch (Exception e) {
                 e.printStackTrace();
+//                throw new HieuDzException(e.getMessage());
                 return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
             }
 
         } else {
-            return toExceptionResult("NO_PERMISSION", Const.API_RESPONSE.RETURN_CODE_ERROR_NOTFOUND);
+            return toExceptionResult("KHÔNG PHẬN SỰ MIỄN VÀO", Const.API_RESPONSE.RETURN_CODE_ERROR_NOTFOUND);
+//            throw new HieuDzException("KHÔNG PHẬN SỰ MIỄN VÀO");
         }
     }
 
@@ -267,17 +290,21 @@ public class AuthenController extends BaseController {
                     return toSuccessResult(null, "UNLOCK_SUCCESS");
                 } else {
                     return toExceptionResult("UNLOCK_FAILED", Const.API_RESPONSE.RETURN_CODE_ERROR);
+//                    throw new HieuDzException("UNLOCK_FAILED");
                 }
             } catch (IllegalArgumentException e) {
                 e.printStackTrace();
                 return toExceptionResult(e.getMessage(), Const.API_RESPONSE.RETURN_CODE_ERROR);
+//                throw new HieuDzException(e.getMessage());
             } catch (Exception e) {
                 e.printStackTrace();
                 return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
+//                throw new HieuDzException(e.getMessage());
             }
 
         } else {
-            return toExceptionResult("NO_PERMISSION", Const.API_RESPONSE.RETURN_CODE_ERROR_NOTFOUND);
+            return toExceptionResult("KHÔNG PHẬN SỰ MIỄN VÀO", Const.API_RESPONSE.RETURN_CODE_ERROR_NOTFOUND);
+//            throw new HieuDzException("KHÔNG PHẬN SỰ MIỄN VÀO");
         }
     }
 
@@ -298,16 +325,20 @@ public class AuthenController extends BaseController {
             if (userDetailsService.updateUser(userId, userLoginDTO)) {
                 log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
                         + " [" + request.getRequestURI() + "] #END " + requestId);
-                return toSuccessResult(null, "UPDATE_PROFILE_SUCCESS");
+                return toSuccessResult(null, "CẬP NHẬT THÔNG TIN THÀNH CÔNG");
             } else {
-                return toExceptionResult("UPDATE_PROFILE_FAIL", Const.API_RESPONSE.RETURN_CODE_ERROR);
+                return toExceptionResult("CẬP NHẬT THÔNG TIN THẤT BẠI", Const.API_RESPONSE.RETURN_CODE_ERROR);
+//                throw new HieuDzException("CẬP NHẬT THÔNG TIN THẤT BẠI");
             }
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
+//            throw new HieuDzException(e.getMessage());
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.RETURN_CODE_ERROR);
         } catch (Exception e) {
             e.printStackTrace();
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
+//            throw new HieuDzException(e.getMessage());
+
         }
     }
 
@@ -335,8 +366,11 @@ public class AuthenController extends BaseController {
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.RETURN_CODE_ERROR);
+//            throw new HieuDzException(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
+//            throw new HieuDzException("SYSTEM_ERROR");
+
             return toExceptionResult("SYSTEM_ERROR", Const.API_RESPONSE.SYSTEM_CODE_ERROR);
         }
     }
@@ -364,15 +398,18 @@ public class AuthenController extends BaseController {
             if (userDetailsService.checkTokenForUser(userLoginDTO)) {
                 log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
                         + " [" + request.getRequestURI() + "] #END " + requestId);
-                return toSuccessResult(null, "VERIFY_COMPLETED");
+                return toSuccessResult(null, "XÁC THỰC THÀNH CÔNG");
             } else {
                 return toExceptionResult("TOKEN_INVALID", Const.API_RESPONSE.RETURN_CODE_ERROR);
+//                throw new HieuDzException("TOKEN_INVALID");
             }
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
+//            throw new HieuDzException(e.getMessage());
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.RETURN_CODE_ERROR);
         } catch (Exception e) {
             e.printStackTrace();
+//            throw new HieuDzException(e.getMessage());
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
         }
     }
@@ -392,12 +429,15 @@ public class AuthenController extends BaseController {
             userDetailsService.resendOTP(userLoginDTO);
             log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
                     + " [" + request.getRequestURI() + "] #END " + requestId);
-            return toSuccessResult(null, "RESEND_OTP_COMPLETED");
+//            return toSuccessResult(null, "GỬI LẠI OTP THÀNH CÔNG");
+            throw new HieuDzException("GỬI LẠI OTP THÀNH CÔNG");
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.RETURN_CODE_ERROR);
+//            throw new HieuDzException(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
+//            throw new HieuDzException(e.getMessage());
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
         }
     }
@@ -421,11 +461,14 @@ public class AuthenController extends BaseController {
             log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
                     + " [" + request.getRequestURI() + "] #END " + requestId);
             return toSuccessResult(userInfoDTO, "COMPLETED");
+//            throw new HieuDzException("COMPLETED");
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
+//            throw new HieuDzException(e.getMessage());
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.RETURN_CODE_ERROR);
         } catch (Exception e) {
             e.printStackTrace();
+//            throw new HieuDzException(e.getMessage());
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
         }
     }
@@ -445,9 +488,11 @@ public class AuthenController extends BaseController {
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.RETURN_CODE_ERROR);
+//            throw new HieuDzException(e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
+//            throw new HieuDzException(e.getMessage());
         }
     }
 //        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
