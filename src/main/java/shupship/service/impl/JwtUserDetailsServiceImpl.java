@@ -114,9 +114,14 @@ public class JwtUserDetailsServiceImpl extends BaseController implements JwtUser
 
         log.info("End query Table basic_login at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
-        int check = checkBasicLogin.getIsVerified();
-        if (check == 1) {
-            return true;
+        if (checkBasicLogin != null) {
+
+            int check = checkBasicLogin.getIsVerified();
+            if (check == 1) {
+                return true;
+            } else {
+                return false;
+            }
         } else {
             return false;
         }
