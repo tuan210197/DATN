@@ -3,6 +3,7 @@ package shupship.controller;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContextException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -50,7 +51,7 @@ public class LeadController extends BaseController {
     public ResponseEntity getListLead(@PageableDefault(page = 1)
                                       @SortDefault.SortDefaults({@SortDefault(sort = "lastModifiedDate", direction = Sort.Direction.DESC)}) Pageable pageable,
                                       @RequestParam(required = false) String status,
-                                      @RequestParam(required = false) String from, @RequestParam(required = false) String to) throws Exception {
+                                      @RequestParam(required = false) String from, @RequestParam(required = false) String to) throws Exception, ApplicationContextException {
         Users users = getCurrentUser();
         Pageable pageablerequest = PageRequest.of(pageable.getPageNumber() - 1, Constants.PAGE_SIZE, pageable.getSort());
         Long leadStatus = null;
@@ -100,7 +101,7 @@ public class LeadController extends BaseController {
     public ResponseEntity getListLeadOnEmp(@PageableDefault(page = 1)
                                            @SortDefault.SortDefaults({@SortDefault(sort = "lastModifiedDate", direction = Sort.Direction.DESC)}) Pageable pageable,
                                            @RequestParam(required = false) String status, @RequestParam(required = false) String key,
-                                           @RequestParam(required = false) String from, @RequestParam(required = false) String to) throws Exception {
+                                           @RequestParam(required = false) String from, @RequestParam(required = false) String to) throws Exception, ApplicationContextException {
         Users users = getCurrentUser();
         Pageable pageablerequest = PageRequest.of(pageable.getPageNumber() - 1, Constants.PAGE_SIZE, pageable.getSort());
         Long leadStatus = null;
@@ -145,7 +146,7 @@ public class LeadController extends BaseController {
     }
 
     @PostMapping(value = "/createWeb")
-    public ResponseEntity createLeadOnWEB(HttpServletRequest request, @Valid @RequestBody LeadRequest inputData) throws Exception {
+    public ResponseEntity createLeadOnWEB(HttpServletRequest request, @Valid @RequestBody LeadRequest inputData) throws Exception, ApplicationContextException {
         Users users = getCurrentUser();
         Lead data = leadService.insertLead(inputData, users);
         LeadResponse response = LeadResponse.leadModelToDto(data);
