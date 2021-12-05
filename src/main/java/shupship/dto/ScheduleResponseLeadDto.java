@@ -37,12 +37,12 @@ public class ScheduleResponseLeadDto implements Comparable<ScheduleResponseLeadD
     public static ScheduleResponseLeadDto scheduleModelToDto(Schedule schedule) {
         ScheduleResponseLeadDto scheduleResponseDto = new ScheduleResponseLeadDto();
 
-        ZoneId zone = ZoneId.of("Asia/Ho_Chi_Minh");
-        LocalDateTime date = LocalDateTime.ofInstant(schedule.getCreatedDate(), zone);
+//        ZoneId zone = ZoneId.of("Asia/Ho_Chi_Minh");
+//        LocalDateTime date = LocalDateTime.ofInstant(schedule.getCreatedDate(), zone);
 
         scheduleResponseDto.setId(schedule.getId());
         scheduleResponseDto.setCreatedBy(schedule.getUser().getFullName());
-        scheduleResponseDto.setCreateDate(date);
+        scheduleResponseDto.setCreateDate(schedule.getCreatedDate());
         scheduleResponseDto.setFromDate(schedule.getFromDate());
         scheduleResponseDto.setToDate(schedule.getToDate());
         scheduleResponseDto.setStatus(ScheduleStatus.getByValue(schedule.getStatus()).name());
@@ -75,6 +75,6 @@ public class ScheduleResponseLeadDto implements Comparable<ScheduleResponseLeadD
         if (this.getResult() == null && o.getResult() == null) {
             return (o.getFromDate()).compareTo((this.getFromDate()));
         }
-        return DateTimeUtils.StringToLocalDateTime2(o.getResult().getCreatedDate()).compareTo(DateTimeUtils.StringToLocalDateTime2(this.getResult().getCreatedDate()));
+        return o.getResult().getCreatedDate().compareTo(this.getResult().getCreatedDate());
     }
 }

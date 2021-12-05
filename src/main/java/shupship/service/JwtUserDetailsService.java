@@ -42,7 +42,7 @@ public interface JwtUserDetailsService extends UserDetailsService {
 
 	boolean logout(String token);
 
-	boolean checkEmail(UserLoginDTO userLoginDTO);
+	int checkEmail(UserLoginDTO userLoginDTO);
 
 	boolean checkUpdate(UserLoginDTO userLoginDTO);
 

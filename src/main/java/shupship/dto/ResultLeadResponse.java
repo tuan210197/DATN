@@ -50,7 +50,7 @@ public class ResultLeadResponse implements Comparable<ResultLeadResponse>{
         resultResponse.setDiscount(result.getDiscount());
         resultResponse.setDistrictPercent(result.getDistrictPercent());
         resultResponse.setRefundPercent(result.getRefundPercent());
-        resultResponse.setCreatedDate(instantToLocalDateTime(result.getLastModifiedDate()).toString());
+        resultResponse.setCreatedDate(result.getLastModifiedDate().toString());
         if (result.getAddress() != null) {
             resultResponse.setAddress(AddressResponse.leadModelToDto(result.getAddress()));
         }

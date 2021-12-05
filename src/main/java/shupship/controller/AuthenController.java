@@ -91,7 +91,6 @@ public class AuthenController extends BaseController {
             userDetailsService.loginFailRetryCount(authenticationRequest.getEmail(), true);
             return toExceptionResult("MẬT KHẨU KHÔNG ĐÚNG", Const.API_RESPONSE.RETURN_CODE_SUCCESS);
 
-
         } catch (Exception e) {
             e.printStackTrace();
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.RETURN_CODE_SUCCESS);
@@ -102,15 +101,15 @@ public class AuthenController extends BaseController {
     @PostMapping(value = "/check-email")
     public ResponseEntity<?> checkEmailVerify(HttpServletRequest request, @RequestBody UserLoginDTO userLoginDTO) {
         try {
-            String requestId = request.getHeader("request-id");
-            log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-                    + " [" + request.getRequestURI() + "] #START " + requestId);
-            if (userDetailsService.checkEmail(userLoginDTO)) {
-                log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
-                        + " [" + request.getRequestURI() + "] #END " + requestId);
+//            String requestId = request.getHeader("request-id");
+//            log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+//                    + " [" + request.getRequestURI() + "] #START " + requestId);
+            if (userDetailsService.checkEmail(userLoginDTO)==1) {
+//                log.info(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+//                        + " [" + request.getRequestURI() + "] #END " + requestId);
                 return toSuccessResult(1, "EMAIL ĐÃ XÁC THỰC");
-            }else if(!userDetailsService.checkEmail(userLoginDTO)) {
-                return toSuccessResult(2,"EMAIL CHƯA XÁC THỰC");
+            }else if(userDetailsService.checkEmail(userLoginDTO)==0) {
+                return toSuccessResult(0,"EMAIL CHƯA XÁC THỰC");
             }
             else {
                 return toExceptionResult("EMAIL KHÔNG TỒN TẠI", Const.API_RESPONSE.RETURN_CODE_SUCCESS);

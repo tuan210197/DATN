@@ -82,13 +82,14 @@ public class LeadResponseWithDescriptionDto {
 
     public static LeadResponseWithDescriptionDto leadModelToDto(Lead data) {
 
-        ZoneId zone = ZoneId.of("Asia/Ho_Chi_Minh");
-        LocalDateTime date = LocalDateTime.ofInstant(data.getCreatedDate(), zone);
+//        ZoneId zone = ZoneId.of("Asia/Ho_Chi_Minh");
+//        LocalDateTime date = LocalDateTime.ofInstant(data.getCreatedDate(), zone);
 
         LeadResponseWithDescriptionDto response = new LeadResponseWithDescriptionDto();
         response.setId(data.getId());
         response.setFullName(data.getFullName());
-        response.setCreateDate(date);
+        response.setCreateDate(data.getCreatedDate());
+
         response.setTitle(data.getTitle());
         response.setExpectedRevenue(data.getExpectedRevenue());
         response.setAnnualQuantity(data.getAnnualQuantity());
