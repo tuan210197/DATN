@@ -234,7 +234,7 @@ public class LeadController extends BaseController {
                                      @RequestParam(required = false) String key) throws Exception {
         Pageable pageRequest = PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), pageable.getSort());
         Users users = getCurrentUser();
-        Lead leads = leadService.searchLead(key);
+        Lead leads = leadService.searchLead(key, users);
         LeadResponse response = LeadResponse.leadModelToDto(leads);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

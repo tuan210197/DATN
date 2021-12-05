@@ -39,7 +39,7 @@ public interface ILeadService {
 
     LeadHadPhoneResponseDto findLeadHadPhoneByUser(LeadRequest inputData, Long userId);
 
-    Lead searchLead(String key);
+    Lead searchLead(String key, Users users);
 
     HashMap getCustomerByPhone(String phone);
 }

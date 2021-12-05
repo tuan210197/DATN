@@ -27,8 +27,9 @@ public interface ILeadRepository extends PagingAndSortingRepository<Lead, Long>,
     List<Lead> findLeadWithPhoneOnWEB(String phone);
 
     @Query("select a from Lead a join LeadAssign b on a.id = b.leads where a.deletedStatus = 0 " +
-            " and (COALESCE(:key) is null or ( a.customerCode = :key or a.phone = :key or a.id = :key)) ")
-    Lead searLead(String key);
+            " and (COALESCE(:key) is null or ( a.customerCode = :key or a.phone = :key)) " +
+            " and (COALESCE(:createBy) is null or ( a.createdBy = :createBy))")
+    Lead searLead(String key, Long createBy);
 
     @Query(" Select distinct a from Lead a left join LeadAssign b on a.id = b.leads " +
             " where  a.deletedStatus = 0" +
@@ -78,7 +79,7 @@ public interface ILeadRepository extends PagingAndSortingRepository<Lead, Long>,
                                            Pageable pageRequest);
 
     @Query("select distinct a from Lead a left join LeadAssign b on a.id = b.leads " +
-            " where b.userRecipientId = :id " +
+            " where b.userRecipientId = :id and a.deletedStatus = 0" +
             " and (COALESCE(:key) is null or (a.fullName = :key or a.customerCode = :key or a.companyName = :key) )  " +
             " and " +
             " (" +
