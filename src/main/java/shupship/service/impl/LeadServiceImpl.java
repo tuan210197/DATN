@@ -452,10 +452,7 @@ public class LeadServiceImpl implements ILeadService {
 
     @Override
     public Lead searchLead(String key, Users users) {
-        Long empId = null;
-        if (users.getRoles().equals("NV"))
-            empId = users.getEmpSystemId();
-        Lead lead = iLeadRepository.searLead(key, empId);
+        Lead lead = iLeadRepository.searLead(key,  users.getRoles().equals("NV") ? users.getEmpSystemId() : null);
         if (lead == null)
             throw new HieuDzException("Không tìm thấy khách hàng");
         return lead;
