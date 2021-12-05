@@ -129,8 +129,7 @@ public class LeadServiceImpl implements ILeadService {
 
         if (StringUtils.isNotEmpty(key)) {
             leadPage = new PageImpl<>(leadPage.stream().filter(Objects::nonNull)
-                    .filter(e -> (Objects.nonNull(e.getCompanyName()) && e.getCompanyName().toLowerCase().contains(key.toLowerCase()))
-                            || (Objects.nonNull(e.getFullName()) && e.getFullName().toLowerCase().contains(key.toLowerCase()))
+                    .filter(e -> (Objects.nonNull(e.getPhone()) && e.getPhone().contains(key))
                             || (Objects.nonNull(e.getCustomerCode()) && e.getCustomerCode().toLowerCase().contains(key.toLowerCase()))).collect(Collectors.toList()));
         }
 
@@ -452,10 +451,13 @@ public class LeadServiceImpl implements ILeadService {
     }
 
     @Override
-    public Lead searchLead(String key) {
-        Lead lead = iLeadRepository.searLead(key);
+    public Lead searchLead(String key, Users users) {
+        Long empId = null;
+        if (users.getRoles().equals("NV"))
+            empId = users.getEmpSystemId();
+        Lead lead = iLeadRepository.searLead(key, empId);
         if (lead == null)
-            throw new HieuDzException("Khách hàng không tồn tại");
+            throw new HieuDzException("Không tìm thấy khách hàng");
         return lead;
     }
 
