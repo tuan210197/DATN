@@ -9,6 +9,7 @@ import shupship.enums.ScheduleStatus;
 import shupship.util.DateTimeUtils;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @Data
 @AllArgsConstructor
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 public class ScheduleResponseLeadDto implements Comparable<ScheduleResponseLeadDto> {
     private Long id;
     private String createdBy;
+    private LocalDateTime createDate;
     private LocalDateTime fromDate;
     private LocalDateTime toDate;
     private String description;
@@ -34,8 +36,13 @@ public class ScheduleResponseLeadDto implements Comparable<ScheduleResponseLeadD
 
     public static ScheduleResponseLeadDto scheduleModelToDto(Schedule schedule) {
         ScheduleResponseLeadDto scheduleResponseDto = new ScheduleResponseLeadDto();
+
+        ZoneId zone = ZoneId.of("Asia/Ho_Chi_Minh");
+        LocalDateTime date = LocalDateTime.ofInstant(schedule.getCreatedDate(), zone);
+
         scheduleResponseDto.setId(schedule.getId());
         scheduleResponseDto.setCreatedBy(schedule.getUser().getFullName());
+        scheduleResponseDto.setCreateDate(date);
         scheduleResponseDto.setFromDate(schedule.getFromDate());
         scheduleResponseDto.setToDate(schedule.getToDate());
         scheduleResponseDto.setStatus(ScheduleStatus.getByValue(schedule.getStatus()).name());

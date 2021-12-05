@@ -14,6 +14,8 @@ import shupship.enums.LeadStatusVi;
 import shupship.enums.LeadType;
 import shupship.response.AddressResponse;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,6 +27,8 @@ public class LeadResponseWithDescriptionDto {
     private long id;
 
     private String title;
+
+    private LocalDateTime createDate;
 
     private String fullName;
 
@@ -78,9 +82,13 @@ public class LeadResponseWithDescriptionDto {
 
     public static LeadResponseWithDescriptionDto leadModelToDto(Lead data) {
 
+        ZoneId zone = ZoneId.of("Asia/Ho_Chi_Minh");
+        LocalDateTime date = LocalDateTime.ofInstant(data.getCreatedDate(), zone);
+
         LeadResponseWithDescriptionDto response = new LeadResponseWithDescriptionDto();
         response.setId(data.getId());
         response.setFullName(data.getFullName());
+        response.setCreateDate(date);
         response.setTitle(data.getTitle());
         response.setExpectedRevenue(data.getExpectedRevenue());
         response.setAnnualQuantity(data.getAnnualQuantity());
@@ -123,7 +131,7 @@ public class LeadResponseWithDescriptionDto {
         if (CollectionUtils.isNotEmpty(data.getSchedules())) {
             List<ScheduleResponseLeadDto> scheduleResponsDtos = data.getSchedules().stream().map(ScheduleResponseLeadDto::scheduleModelToDto).collect(Collectors.toList());
             response.setSchedules(scheduleResponsDtos);
-        } response.setSchedules(new ArrayList<>());
+        } else response.setSchedules(new ArrayList<>());
 
         if (CollectionUtils.isNotEmpty(data.getLeadAssigns())) {
             List<LeadAssignResponseDto> leadAssignResponseDtos = data.getLeadAssigns().stream().map(LeadAssignResponseDto::leadAssignModelToDto).collect(Collectors.toList());
