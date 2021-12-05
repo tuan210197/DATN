@@ -39,6 +39,8 @@ import shupship.util.exception.HieuDzException;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -78,8 +80,12 @@ public class LeadServiceImpl implements ILeadService {
     @Override
     public PagingRs getListLead(Pageable pageable, Timestamp from, Timestamp to, Long status, Users users) throws ApplicationContextException {
 
-        Instant startDate = from.toInstant();
-        Instant endDate = to.toInstant();
+        Instant startDate1 = from.toInstant();
+        Instant endDate1 = to.toInstant();
+
+        LocalDateTime startDate = LocalDateTime.ofInstant(startDate1, ZoneId.of("Asia/Ho_Chi_Minh"));
+        LocalDateTime endDate = LocalDateTime.ofInstant(endDate1, ZoneId.of("Asia/Ho_Chi_Minh"));
+
 
         Page<Lead> leadList = null;
 
@@ -100,8 +106,11 @@ public class LeadServiceImpl implements ILeadService {
 
     @Override
     public PagingRs getListLeadOnEmp(Pageable pageable, Timestamp from, Timestamp to, Long status, Users users, String key) throws ApplicationContextException {
-        Instant startDate = from.toInstant();
-        Instant endDate = to.toInstant();
+        Instant startDate1 = from.toInstant();
+        Instant endDate1 = to.toInstant();
+
+        LocalDateTime startDate = LocalDateTime.ofInstant(startDate1, ZoneId.of("Asia/Ho_Chi_Minh"));
+        LocalDateTime endDate = LocalDateTime.ofInstant(endDate1, ZoneId.of("Asia/Ho_Chi_Minh"));
         Page<Lead> leadPage = null;
         if (status != null && status == 7) {
             leadPage = iLeadRepository.findAllLeadbyCriteriaOnApp2(startDate, endDate, users.getEmpSystemId(), key, pageable);
@@ -183,6 +192,7 @@ public class LeadServiceImpl implements ILeadService {
         data.setCreatedBy(users.getEmpSystemId());
         Lead lead = iLeadRepository.save(data);
         lead.setCustomerCode("KH".concat(String.valueOf(lead.getId())));
+        iLeadRepository.save(data);
         BeanUtils.copyProperties(data, lead);
         return lead;
     }

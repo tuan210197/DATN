@@ -105,7 +105,7 @@ public class JwtUserDetailsServiceImpl extends BaseController implements JwtUser
     }
 
     @Override
-    public boolean checkEmail(UserLoginDTO user) {
+    public int checkEmail(UserLoginDTO user) {
         Assert.hasText(user.getEmail(), "EMAIL_EMPTY");
         Assert.isTrue(ValidateUtil.regexValidation(user.getEmail(), Const.VALIDATE_INPUT.regexEmail), "EMAIL_WRONG_FORMAT");
         log.info("Start query Table basic_login at time: "
@@ -118,12 +118,12 @@ public class JwtUserDetailsServiceImpl extends BaseController implements JwtUser
 
             int check = checkBasicLogin.getIsVerified();
             if (check == 1) {
-                return true;
+                return 1;
             } else {
-                return false;
+                return 0;
             }
         } else {
-            return false;
+            return 2;
         }
     }
 
@@ -138,8 +138,12 @@ public class JwtUserDetailsServiceImpl extends BaseController implements JwtUser
         Users user = userRepo.findByUid(checkBasicLogin.getUserUid());
         log.info("End query Table basic_login at time: "
                 + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS")));
-        if(user.getStatus_update() == 1) {
-            return true;
+        if (checkBasicLogin != null) {
+            if (user.getStatus_update() == 1) {
+                return true;
+            } else {
+                return false;
+            }
         } else {
             return false;
         }

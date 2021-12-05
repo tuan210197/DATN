@@ -91,6 +91,7 @@ public class LeadResponse {
         LeadResponse response = new LeadResponse();
         response.setId(data.getId());
         response.setFullName(data.getFullName());
+        response.setCustomerCode(data.getCustomerCode());
         response.setTitle(data.getTitle());
         response.setExpectedRevenue(data.getExpectedRevenue() == null ? 0 :data.getExpectedRevenue());
         response.setCompanyName(data.getCompanyName() == null ? "" :data.getCompanyName());
@@ -138,15 +139,15 @@ public class LeadResponse {
             if (model.getStatus() == 1 || model.getStatus() == 5) {
                 response.setStatusLa(LeadStatus.getByValue(LeadStatus.NEW.getType()).name());
                 response.setStatusDescLa(LeadStatusVi.valueOf(LeadStatus.NEW.name()).getType());
-                response.setCreatedDate(DateTimeUtils.instantToLocalDateTime(model.getCreatedDate()));
-                response.setImpactDate(DateTimeUtils.instantToLocalDateTime(model.getCreatedDate()));
+                response.setCreatedDate(model.getCreatedDate());
+                response.setImpactDate(model.getCreatedDate());
             } else if (model.getStatus() == 3 || model.getStatus() == 4) {
                 List<Result> listResult = null;
                 listResult = model.getLeads().getSchedules().stream().map(Schedule::getResult).collect(Collectors.toList());
                 Result result = listResult.get(listResult.size() - 1);
-                response.setCreatedDate(DateTimeUtils.instantToLocalDateTime(model.getCreatedDate()));
+                response.setCreatedDate(model.getCreatedDate());
                 if (result != null) {
-                    response.setImpactDate(DateTimeUtils.instantToLocalDateTime(result.getCreatedDate()));
+                    response.setImpactDate(result.getCreatedDate());
                 }
             } else {
                 if (CollectionUtils.isNotEmpty(model.getLeads().getSchedules())) {
@@ -154,11 +155,11 @@ public class LeadResponse {
                     schedule = model.getLeads().getSchedules().stream().collect(Collectors.toList()).get(0);
                     response.setImpactDate(schedule.getFromDate());
                 }
-                response.setCreatedDate(DateTimeUtils.instantToLocalDateTime(model.getCreatedDate()));
+                response.setCreatedDate(model.getCreatedDate());
             }
 
         } else {
-            response.setCreatedDate(DateTimeUtils.instantToLocalDateTime(data.getCreatedDate()));
+            response.setCreatedDate(data.getCreatedDate());
             response.setLeadAssigns(new ArrayList<>());
         }
         if (CollectionUtils.isNotEmpty(data.getIndustries())) {

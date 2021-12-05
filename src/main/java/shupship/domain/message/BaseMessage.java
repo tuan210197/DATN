@@ -11,17 +11,17 @@ import java.io.Serializable;
  */
 public class BaseMessage implements Serializable {
     private String code;
-    private boolean success;
+    private String error;
     private String description;
     private String message;
 
     public BaseMessage() {
     }
 
-    public BaseMessage(String code, boolean success, String description) {
+    public BaseMessage(String code, String error, String description) {
         this.code = code;
         this.description = description;
-        this.success = success;
+        this.error = error;
     }
 
     public BaseMessage(String code, String description) {
@@ -37,20 +37,20 @@ public class BaseMessage implements Serializable {
         this.code = code;
     }
 
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
+    }
+
     public String getDescription() {
         return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public boolean isSuccess() {
-        return success;
-    }
-
-    public void setSuccess(boolean success) {
-        this.success = success;
     }
 
     public String getMessage() {
@@ -60,4 +60,5 @@ public class BaseMessage implements Serializable {
     public void setMessage(String message) {
         this.message = message;
     }
+
 }

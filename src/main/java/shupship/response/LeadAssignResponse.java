@@ -41,7 +41,7 @@ public class LeadAssignResponse {
     public static LeadAssignResponse leadAssignModelToDto(LeadAssign data) {
         LeadAssignResponse response = new LeadAssignResponse();
         response.setId(data.getId());
-        response.setCreatedDate(DateTimeUtils.instantToLocalDateTime(data.getCreatedDate()));
+        response.setCreatedDate(data.getCreatedDate());
         response.setUserAssigneeId(data.getUserAssigneeId());
         if (data.getUserRecipientId() != null)
             response.setUserRecipientId(data.getUserRecipientId());

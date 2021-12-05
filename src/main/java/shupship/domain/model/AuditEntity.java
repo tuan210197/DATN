@@ -12,16 +12,18 @@ import shupship.util.exception.ApplicationException;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 @MappedSuperclass
 public abstract class AuditEntity extends BaseController implements Serializable{
     @Column(name = "created_date")
-    @Convert(converter = InstantConverter.class)
-    private Instant createdDate;
+//    @Convert(converter = InstantConverter.class)
+    private LocalDateTime createdDate;
 
     @Column(name = "last_modified_date")
-    @Convert(converter = InstantConverter.class)
-    private Instant lastModifiedDate;
+//    @Convert(converter = InstantConverter.class)
+    private LocalDateTime lastModifiedDate;
 
     @Column(name = "created_by", nullable = true)
     private Long createdBy;
@@ -36,13 +38,13 @@ public abstract class AuditEntity extends BaseController implements Serializable
     private Long deletedBy;
 
     @Column(name = "deleted_date", nullable = true)
-    @Convert(converter = InstantConverter.class)
-    private Instant deletedDate;
+//    @Convert(converter = InstantConverter.class)
+    private LocalDateTime deletedDate;
 
     public AuditEntity() {
     }
 
-    public AuditEntity(Instant createdDate, Instant lastModifiedDate, Long createdBy, Long lastModifiedBy) {
+    public AuditEntity(LocalDateTime createdDate, LocalDateTime lastModifiedDate, Long createdBy, Long lastModifiedBy) {
         super();
         this.createdDate = createdDate;
         this.lastModifiedDate = lastModifiedDate;
@@ -50,20 +52,24 @@ public abstract class AuditEntity extends BaseController implements Serializable
         this.lastModifiedBy = lastModifiedBy;
     }
 
-    public Instant getCreatedDate() {
+    public LocalDateTime getCreatedDate() {
         return createdDate;
     }
 
-    public void setCreatedDate(Instant createdDate) {
+    public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = createdDate;
     }
 
-    public Instant getLastModifiedDate() {
+    public LocalDateTime getLastModifiedDate() {
         return lastModifiedDate;
     }
 
-    public void setLastModifiedDate(Instant lastModifiedDate) {
+    public void setLastModifiedDate(LocalDateTime lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
+    }
+
+    public void setDeletedDate(LocalDateTime deletedDate) {
+        this.deletedDate = deletedDate;
     }
 
     public Long getCreatedBy() {
@@ -98,17 +104,11 @@ public abstract class AuditEntity extends BaseController implements Serializable
         this.deletedBy = deletedBy;
     }
 
-    public Instant getDeletedDate() {
-        return deletedDate;
-    }
-
-    public void setDeletedDate(Instant deletedDate) {
-        this.deletedDate = deletedDate;
-    }
 
     @PrePersist
     void prePersit() {
-        this.createdDate = Instant.now();
+        ZoneId zone = ZoneId.of("Asia/Ho_Chi_Minh");
+        this.createdDate = LocalDateTime.ofInstant(Instant.now(), zone);
 //        try {
 //            if (createdBy == null) {
 //                this.createdBy = getCurrentUser().getEmpSystemId();
@@ -130,6 +130,9 @@ public abstract class AuditEntity extends BaseController implements Serializable
 //        }else{
 //            this.lastModifiedBy = -1L;
 //        }
-        this.lastModifiedDate = Instant.now();
+        ZoneId zone = ZoneId.of("Asia/Ho_Chi_Minh");
+        this.lastModifiedDate = LocalDateTime.ofInstant(Instant.now(), zone);
     }
+
+
 }

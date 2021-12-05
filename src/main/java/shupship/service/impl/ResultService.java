@@ -87,12 +87,11 @@ public class ResultService implements IResultService {
         }
         //check chi co cap nhat sau thoi diem dat lich
         LocalDateTime currentTime = LocalDateTime.now();
-
         LocalDateTime startDate = schedule.getFromDate();
         LocalDateTime endDate = schedule.getToDate();
-        if (!DateTimeUtils.isSameDay(currentTime, startDate)) {
-            throw new HieuDzException("Không được cập nhập kết quả tiếp xúc tại thời điểm này");
-        }
+//        if (!DateTimeUtils.isSameDay(currentTime, startDate)) {
+//            throw new HieuDzException("Không được cập nhập kết quả tiếp xúc tại thời điểm này");
+//        }
         Result result = schedule.getResult();
         Result outData;
         Schedule nextSchedule = scheduleRepository.getNextScheduleByUserIdAndScheduleId(user.getEmpSystemId(), schedule.getId());

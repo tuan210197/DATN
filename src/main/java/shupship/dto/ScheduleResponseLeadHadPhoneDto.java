@@ -28,7 +28,7 @@ public class ScheduleResponseLeadHadPhoneDto implements Comparable<ScheduleRespo
 //        Users user = getCurrentUser();
         scheduleResponseDto.setCreatedBy(map.get(schedule.getCreatedBy()));
         if (schedule.getResult() != null) {
-            scheduleResponseDto.setCreatedDate(DateTimeUtils.instantToLocalDateTime(schedule.getResult().getCreatedDate()));
+            scheduleResponseDto.setCreatedDate(schedule.getResult().getCreatedDate());
         } else {
             scheduleResponseDto.setCreatedDate((schedule.getFromDate()));
         }
