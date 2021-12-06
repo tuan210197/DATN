@@ -349,7 +349,7 @@ public class LeadServiceImpl implements ILeadService {
                         if (existData.getPhone().equals((inputData.getPhone()))) {
                             existData.setPhone((inputData.getPhone()));
                         } else {
-                            Lead leadHadPhoneByUser = iLeadRepository.findLeadWithPhoneByUser((inputData.getPhone()), user.getEmpSystemId());
+                            Lead leadHadPhoneByUser = iLeadRepository.findLeadWithPhoneByUser((inputData.getPhone()));
                             if (leadHadPhoneByUser != null)
                                 throw new HieuDzException("Số điện thoại đã tồn tại trên hệ thống!");
                             else existData.setPhone((inputData.getPhone()));

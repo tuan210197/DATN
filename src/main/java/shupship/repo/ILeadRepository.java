@@ -151,6 +151,6 @@ public interface ILeadRepository extends PagingAndSortingRepository<Lead, Long>,
                                              Pageable pageable);
 
 
-    @Query("select l from Lead l where l.deletedStatus = 0 and l.phone = :phone and l.createdBy = :userId")
-    Lead findLeadWithPhoneByUser(String phone, Long userId);
+    @Query("select l from Lead l where l.deletedStatus = 0 and l.phone = :phone")
+    Lead findLeadWithPhoneByUser(String phone);
 }
