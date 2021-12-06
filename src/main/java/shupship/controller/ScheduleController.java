@@ -74,7 +74,7 @@ public class ScheduleController {
 
     @GetMapping
     public ResponseEntity getSchedulesPaging(@PageableDefault(page = 1)
-                                             @SortDefault.SortDefaults({@SortDefault(sort = "id", direction = Sort.Direction.DESC)}) Pageable pageable,
+                                             @SortDefault.SortDefaults({@SortDefault(sort = "createdDate", direction = Sort.Direction.DESC)}) Pageable pageable,
                                              @RequestParam(required = false) String date, @RequestParam(required = false) String month) {
 
         Pageable pageRequest = PageRequest.of(pageable.getPageNumber() - 1, pageable.getPageSize(), pageable.getSort());
