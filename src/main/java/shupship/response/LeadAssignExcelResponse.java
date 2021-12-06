@@ -47,7 +47,8 @@ public class LeadAssignExcelResponse {
         leadAssignExcelResponseDto.setTitle(leadAssignExcel.getTitle());
         leadAssignExcelResponseDto.setPhone(leadAssignExcel.getPhone());
         leadAssignExcelResponseDto.setLeadSource(leadAssignExcel.getLeadSource());
-        leadAssignExcelResponseDto.setAddress(AddressResponse.leadModelToDto(leadAssignExcel.getAddress()));
+        if (leadAssignExcel.getAddress() != null && leadAssignExcel.getAddress().getId() != null)
+            leadAssignExcelResponseDto.setAddress(AddressResponse.leadModelToDto(leadAssignExcel.getAddress()));
         leadAssignExcelResponseDto.setDeptCode(leadAssignExcel.getDeptCode());
         leadAssignExcelResponseDto.setPostCode(leadAssignExcel.getPostCode());
         leadAssignExcelResponseDto.setEmpSystemId(leadAssignExcel.getEmpSystemId());
