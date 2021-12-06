@@ -113,18 +113,18 @@ public class LeadServiceImpl implements ILeadService {
         LocalDateTime endDate = LocalDateTime.ofInstant(endDate1, ZoneId.of("Asia/Ho_Chi_Minh"));
         Page<Lead> leadPage = null;
         if (status != null && status == 7) {
-            leadPage = iLeadRepository.findAllLeadbyCriteriaOnApp2(startDate, endDate, users.getEmpSystemId(), key, pageable);
+            leadPage = iLeadRepository.findAllLeadbyCriteriaOnApp2(key == null ? startDate : null, key == null ? endDate : null, users.getEmpSystemId(), key, pageable);
             for (Lead model : leadPage) {
                 model.setStatus(LeadStatus.RECALL.getType());
             }
         } else if (status == 6) {
-            leadPage = iLeadRepository.findAllLeadbyCriteriaOnApp(startDate, endDate, users.getEmpSystemId(), null, key, pageable);
+            leadPage = iLeadRepository.findAllLeadbyCriteriaOnApp(key == null ? startDate : null, key == null ? endDate : null, users.getEmpSystemId(), null, key, pageable);
         } else if (status == 5 || status == 1) {
             Long sts = 5L;
             Long sts1 = 1L;
-            leadPage = iLeadRepository.findAllLeadbyCriteriaOnAppNew(startDate, endDate, users.getEmpSystemId(), sts, sts1, key, pageable);
+            leadPage = iLeadRepository.findAllLeadbyCriteriaOnAppNew(key == null ? startDate : null, key == null ? endDate : null, users.getEmpSystemId(), sts, sts1, key, pageable);
         } else {
-            leadPage = iLeadRepository.findAllLeadbyCriteriaOnApp(startDate, endDate, users.getEmpSystemId(), status, key, pageable);
+            leadPage = iLeadRepository.findAllLeadbyCriteriaOnApp(key == null ? startDate : null, key == null ? endDate : null, users.getEmpSystemId(), status, key, pageable);
         }
 
         if (StringUtils.isNotEmpty(key)) {

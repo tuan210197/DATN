@@ -80,7 +80,7 @@ public interface ILeadRepository extends PagingAndSortingRepository<Lead, Long>,
 
     @Query("select distinct a from Lead a left join LeadAssign b on a.id = b.leads " +
             " where b.userRecipientId = :id and a.deletedStatus = 0" +
-            " and (COALESCE(:key) is null or (a.fullName = :key or a.customerCode = :key or a.companyName = :key) )  " +
+            " and (COALESCE(:key) is null or (a.phone = :key or a.customerCode = :key) )  " +
             " and " +
             " (" +
             " ( COALESCE(:start) is null or b.createdDate >= :start) " +
@@ -110,7 +110,7 @@ public interface ILeadRepository extends PagingAndSortingRepository<Lead, Long>,
             " ( COALESCE(:end) is null or a.createdDate <= :end)" +
             " ) " +
             " and a.deletedStatus = 0 and a.isFromEVTP is null" +
-            " and (COALESCE(:key) is null or (a.fullName = :key or a.customerCode = :key or a.companyName = :key) )  " +
+            " and (COALESCE(:key) is null or (a.phone = :key or a.customerCode = :key) )  " +
             " and a.createdBy = :userId" +
             " and (COALESCE(:status) is null or a.status = :status)" +
             " )")
@@ -138,7 +138,7 @@ public interface ILeadRepository extends PagingAndSortingRepository<Lead, Long>,
             " ( COALESCE(:end) is null or a.createdDate <= :end)" +
             " ) " +
             " and a.deletedStatus = 0 and a.isFromEVTP is null" +
-            " and (COALESCE(:key) is null or (a.fullName = :key or a.customerCode = :key or a.companyName = :key) )  " +
+            " and (COALESCE(:key) is null or (a.phone = :key or a.customerCode = :key) )  " +
             " and a.createdBy = :userId" +
             " and ((COALESCE(:status) is null or a.status = :status) or (COALESCE(:status1) is null or a.status = :status1))" +
             " )")

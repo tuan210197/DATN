@@ -96,6 +96,8 @@ public class ScheduleServiceImpl implements ScheduleService {
         }
 
         LeadAssign leadAssign = leadAssignRepository.getLeadAssignById(lead.getId());
+        if (leadAssign == null)
+            throw new HieuDzException("Khách hàng chưa dc giao tiếp xúc");
         if (leadAssign.getStatus() == 5 || leadAssign.getStatus() == 4) {
             leadAssign.setStatus(2L);
             leadAssignRepository.save(leadAssign);
