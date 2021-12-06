@@ -35,7 +35,9 @@ import shupship.util.exception.HieuDzException;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -66,8 +68,8 @@ public class LeadController extends BaseController {
         Date startDate1 = null;
         Date endDate1 = null;
 
-        Timestamp startTimestamp = Timestamp.valueOf(LocalDateTime.now().withDayOfMonth(1).toLocalDate().atStartOfDay());
-        Timestamp endTimestamp = Timestamp.valueOf(LocalDateTime.now());
+        Timestamp startTimestamp = Timestamp.valueOf(LocalDateTime.ofInstant(Instant.now(),ZoneId.of("Asia/Ho_Chi_Minh")).withDayOfMonth(1).toLocalDate().atStartOfDay());
+        Timestamp endTimestamp = Timestamp.valueOf(LocalDateTime.ofInstant(Instant.now(),ZoneId.of("Asia/Ho_Chi_Minh")));
 
         if (StringUtils.isNotBlank(from) || StringUtils.isNotBlank(to)) {
             if ((StringUtils.isBlank(from) && !DateTimeUtils.isValidDate(from)) || (StringUtils.isBlank(to) && !DateTimeUtils.isValidDate(to)))
@@ -114,8 +116,8 @@ public class LeadController extends BaseController {
         Date startDate1 = null;
         Date endDate1 = null;
 
-        Timestamp startTimestamp = Timestamp.valueOf(LocalDateTime.now().withDayOfMonth(1).toLocalDate().atStartOfDay());
-        Timestamp endTimestamp = Timestamp.valueOf(LocalDateTime.now());
+        Timestamp startTimestamp = Timestamp.valueOf(LocalDateTime.ofInstant(Instant.now(),ZoneId.of("Asia/Ho_Chi_Minh")).withDayOfMonth(1).toLocalDate().atStartOfDay());
+        Timestamp endTimestamp = Timestamp.valueOf(LocalDateTime.ofInstant(Instant.now(),ZoneId.of("Asia/Ho_Chi_Minh")));
 
         if (StringUtils.isNotBlank(from) || StringUtils.isNotBlank(to)) {
             if ((StringUtils.isBlank(from) && !DateTimeUtils.isValidDate(from)) || (StringUtils.isBlank(to) && !DateTimeUtils.isValidDate(to)))
