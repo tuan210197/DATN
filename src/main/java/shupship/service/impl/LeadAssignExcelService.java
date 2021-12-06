@@ -112,13 +112,12 @@ public class LeadAssignExcelService implements ILeadAssignExcelService {
 
             // check valid phone
             if (StringUtils.isNotBlank(dataFormatter.formatCellValue(row.getCell(3)))) {
-                if (!CommonUtils.isValidPhone(dataFormatter.formatCellValue(row.getCell(3)))) {
-                    if (StringUtils.isEmpty(leadAssignExcel.getError())) {
-                        if (leadAssignExcel.getStatus() == null) {
-                            leadAssignExcel.setStatus(1L);
-                            err.append("Số điện thoại không đúng định dạng: " + dataFormatter.formatCellValue(row.getCell(3)));
-                            leadAssignExcel.setPhone(dataFormatter.formatCellValue(row.getCell(3)));
-                        }
+
+                if (StringUtils.isEmpty(leadAssignExcel.getError())) {
+                    if (leadAssignExcel.getStatus() == null) {
+                        leadAssignExcel.setStatus(1L);
+                        err.append("Số điện thoại không đúng định dạng: " + dataFormatter.formatCellValue(row.getCell(3)));
+                        leadAssignExcel.setPhone(dataFormatter.formatCellValue(row.getCell(3)));
                     }
                 } else
                     leadAssignExcel.setPhone(dataFormatter.formatCellValue(row.getCell(3)));
