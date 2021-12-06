@@ -95,7 +95,7 @@ public interface ILeadRepository extends PagingAndSortingRepository<Lead, Long>,
 
     @Query("Select distinct a from Lead a left join LeadAssign b on a.id = b.leads " +
             " where " +
-            " (b.userRecipientId = :userId" +
+            " (b.userRecipientId = :userId and a.deletedStatus = 0" +
             " and (COALESCE(:status) is null or a.status = :status)" +
             " and " +
             " ( COALESCE(:start) is null or b.createdDate >= :start) " +
