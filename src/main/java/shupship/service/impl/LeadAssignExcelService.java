@@ -86,48 +86,32 @@ public class LeadAssignExcelService implements ILeadAssignExcelService {
 
             if (StringUtils.isBlank(dataFormatter.formatCellValue(row.getCell(0)))) {
                 leadAssignExcel.setStatus(1L);
-                err.append("Chưa nhập trường Công ty/Cửa hàng");
+                err.append("\nChưa nhập trường Công ty/Cửa hàng, ");
             } else {
                 leadAssignExcel.setFullName(dataFormatter.formatCellValue(row.getCell(0)));
                 leadAssignExcel.setCompanyName(dataFormatter.formatCellValue(row.getCell(0)));
             }
 
             if (StringUtils.isBlank(dataFormatter.formatCellValue(row.getCell(1)))) {
-                if (StringUtils.isEmpty(leadAssignExcel.getError())) {
-                    if (leadAssignExcel.getStatus() == null) {
-                        leadAssignExcel.setStatus(1L);
-                        err.append("Chưa nhập trường Người liên hệ");
-                    }
-                }
+                leadAssignExcel.setStatus(1L);
+                err.append("\nChưa nhập trường Người liên hệ, ");
             } else leadAssignExcel.setRepresentation(dataFormatter.formatCellValue(row.getCell(1)));
 
             if (StringUtils.isBlank(dataFormatter.formatCellValue(row.getCell(2)))) {
-                if (StringUtils.isEmpty(leadAssignExcel.getError())) {
-                    if (leadAssignExcel.getStatus() == null) {
-                        leadAssignExcel.setStatus(1L);
-                        err.append("Chưa nhập trường Chức danh");
-                    }
-                }
+                leadAssignExcel.setStatus(1L);
+                err.append("\nChưa nhập trường Chức danh");
             } else leadAssignExcel.setTitle(dataFormatter.formatCellValue(row.getCell(2)));
 
             // check valid phone
             if (StringUtils.isNotBlank(dataFormatter.formatCellValue(row.getCell(3)))) {
-
-                if (StringUtils.isEmpty(leadAssignExcel.getError())) {
-                    if (leadAssignExcel.getStatus() == null) {
-                        leadAssignExcel.setStatus(1L);
-                        err.append("Số điện thoại không đúng định dạng: " + dataFormatter.formatCellValue(row.getCell(3)));
-                        leadAssignExcel.setPhone(dataFormatter.formatCellValue(row.getCell(3)));
-                    }
-                } else
+                if (dataFormatter.formatCellValue(row.getCell(3)).length() < 10 || dataFormatter.formatCellValue(row.getCell(3)).length() > 11) {
+                    leadAssignExcel.setStatus(1L);
+                    err.append("\nSố điện thoại không đúng định dạng: " + dataFormatter.formatCellValue(row.getCell(3)) + ", ");
                     leadAssignExcel.setPhone(dataFormatter.formatCellValue(row.getCell(3)));
+                } else leadAssignExcel.setPhone(dataFormatter.formatCellValue(row.getCell(3)));
             } else {
-                if (StringUtils.isEmpty(leadAssignExcel.getError())) {
-                    if (leadAssignExcel.getStatus() == null) {
-                        leadAssignExcel.setStatus(1L);
-                        err.append("Chưa nhập trường Số điện thoại");
-                    }
-                }
+                leadAssignExcel.setStatus(1L);
+                err.append("\nChưa nhập trường Số điện thoại, ");
             }
             // Kiem tra Dia chi cu the voi Cac truong dia chi khac
             String province = dataFormatter.formatCellValue(row.getCell(4));
@@ -140,83 +124,71 @@ public class LeadAssignExcelService implements ILeadAssignExcelService {
             if (StringUtils.isNotBlank(province)) {
                 if (province1.get(0) == null) {
                     if (StringUtils.isEmpty(leadAssignExcel.getError())) {
-                        if (leadAssignExcel.getStatus() == null) {
-                            leadAssignExcel.setStatus(1L);
-                            err.append("Tỉnh không tồn tại hoặc sai tên Tỉnh/TP");
-                        }
+                        leadAssignExcel.setStatus(1L);
+                        err.append("\nTỉnh không tồn tại hoặc sai tên Tỉnh/TP, ");
+                        address.setProvince(province);
                     }
                 } else address.setProvince(province1.get(0).getProvinceCode());
             } else {
                 if (StringUtils.isEmpty(leadAssignExcel.getError())) {
-                    if (leadAssignExcel.getStatus() == null) {
-                        leadAssignExcel.setStatus(1L);
-                        err.append("Chưa nhập trường Tỉnh/TP");
-                    }
+                    leadAssignExcel.setStatus(1L);
+                    err.append("\nChưa nhập trường Tỉnh/TP, ");
                 }
             }
 
             if (StringUtils.isNotBlank(district)) {
                 if (district1.get(0) == null) {
                     if (StringUtils.isEmpty(leadAssignExcel.getError())) {
-                        if (leadAssignExcel.getStatus() == null) {
-                            leadAssignExcel.setStatus(1L);
-                            err.append("Quận/huyện không tồn tại hoặc sai định dạng Quận/huyện");
-                        }
+                        leadAssignExcel.setStatus(1L);
+                        err.append("\nQuận/huyện không tồn tại hoặc sai định dạng Quận/huyện, ");
+                        address.setDistrict(district);
                     }
                 } else if (!(district1.get(0).getProvinceCode().equals(province1.get(0).getProvinceCode()))) {
                     if (StringUtils.isEmpty(leadAssignExcel.getError())) {
-                        if (leadAssignExcel.getStatus() == null) {
-                            leadAssignExcel.setStatus(1L);
-                            err.append("Quận/huyện không thuộc " + province1.get(0).getProvinceName());
-                        }
+                        leadAssignExcel.setStatus(1L);
+                        err.append("\nQuận/huyện không thuộc " + province1.get(0).getProvinceName());
+                        address.setDistrict(district);
                     }
                 } else address.setDistrict(district1.get(0).getDistrictCode());
             } else {
                 if (StringUtils.isEmpty(leadAssignExcel.getError())) {
-                    if (leadAssignExcel.getStatus() == null) {
-                        leadAssignExcel.setStatus(1L);
-                        err.append("Chưa nhập trường Tỉnh/TP");
-                    }
+                    leadAssignExcel.setStatus(1L);
+                    err.append("\nChưa nhập trường Quận/huyện, ");
+
                 }
             }
 
             if (StringUtils.isNotBlank(ward)) {
                 if (ward1.get(0) == null) {
                     if (StringUtils.isEmpty(leadAssignExcel.getError())) {
-                        if (leadAssignExcel.getStatus() == null) {
-                            leadAssignExcel.setStatus(1L);
-                            err.append("Phường/xã không tồn tại hoặc sai định dạng Phường/xã");
-                        }
+                        leadAssignExcel.setStatus(1L);
+                        err.append("\nPhường/xã không tồn tại hoặc sai định dạng Phường/xã, ");
+                        address.setWard(ward);
                     }
                 } else if (!(ward1.get(0).getDistrictCode().equals(district1.get(0).getDistrictCode()))) {
                     if (StringUtils.isEmpty(leadAssignExcel.getError())) {
-                        if (leadAssignExcel.getStatus() == null) {
-                            leadAssignExcel.setStatus(1L);
-                            err.append("Phường/xã không thuộc " + district1.get(0).getDistrictName());
-                        }
+                        leadAssignExcel.setStatus(1L);
+                        err.append("\nPhường/xã không thuộc " + district1.get(0).getDistrictName());
+                        address.setWard(ward);
                     }
                 } else address.setWard(ward1.get(0).getWardCode());
             } else {
                 if (StringUtils.isEmpty(leadAssignExcel.getError())) {
-                    if (leadAssignExcel.getStatus() == null) {
-                        leadAssignExcel.setStatus(1L);
-                        err.append("Chưa nhập trường Tỉnh/TP");
-                    }
+                    leadAssignExcel.setStatus(1L);
+                    err.append("\nChưa nhập trường Phường/Xã, ");
                 }
             }
 
             if (StringUtils.isBlank(dataFormatter.formatCellValue(row.getCell(7)))) {
                 if (StringUtils.isEmpty(leadAssignExcel.getError())) {
-                    if (leadAssignExcel.getStatus() == null) {
-                        leadAssignExcel.setStatus(1L);
-                        err.append("Chưa nhập trường Địa chỉ cụ thể");
-                    }
+                    leadAssignExcel.setStatus(1L);
+                    err.append("\nChưa nhập trường Địa chỉ cụ thể, ");
                 }
             } else address.setHomeNo(dataFormatter.formatCellValue(row.getCell(7)));
 
             address.setFomatAddress(ward1.get(0).getFormattedAddress());
 
-            if (address.getProvince() != null && address.getDistrict() != null && address.getWard() != null) {
+            if (address.getProvince() != null || address.getDistrict() != null || address.getWard() != null) {
                 leadAssignExcel.setAddress(address);
             }
 
@@ -230,20 +202,16 @@ public class LeadAssignExcelService implements ILeadAssignExcelService {
 
             if (StringUtils.isBlank(dataFormatter.formatCellValue(row.getCell(9)))) {
                 if (StringUtils.isEmpty(leadAssignExcel.getError())) {
-                    if (leadAssignExcel.getStatus() == null) {
-                        leadAssignExcel.setStatus(1L);
-                        err.append("Chưa nhập trường Giao Bưu cục");
-                    }
+                    leadAssignExcel.setStatus(1L);
+                    err.append("\nChưa nhập trường Giao Bưu cục, ");
                 }
             } else {
                 PostOffice deptCode = postOfficeRepository.findPostOfficeByCode(dataFormatter.formatCellValue(row.getCell(9)));
                 if (deptCode == null) {
                     if (StringUtils.isEmpty(leadAssignExcel.getError())) {
-                        if (leadAssignExcel.getStatus() == null) {
-                            leadAssignExcel.setStatus(1L);
-                            err.append("Bưu cục được giao tiếp xúc không tồn tại: " + dataFormatter.formatCellValue(row.getCell(9)));
-                            leadAssignExcel.setPostCode(dataFormatter.formatCellValue(row.getCell(9)));
-                        }
+                        leadAssignExcel.setStatus(1L);
+                        err.append("\nBưu cục được giao tiếp xúc không tồn tại: " + dataFormatter.formatCellValue(row.getCell(9)));
+                        leadAssignExcel.setPostCode(dataFormatter.formatCellValue(row.getCell(9)));
                     }
                 } else {
                     leadAssignExcel.setPostCode(dataFormatter.formatCellValue(row.getCell(9)));
@@ -271,15 +239,13 @@ public class LeadAssignExcelService implements ILeadAssignExcelService {
             List<Lead> lstLead = leadRepository.findLeadWithPhoneOnWEB(leadAssignExcel.getPhone());
             if (CollectionUtils.isNotEmpty(lstLead)) {
                 if (StringUtils.isEmpty(leadAssignExcel.getError())) {
-                    if (leadAssignExcel.getStatus() == null) {
-                        leadAssignExcel.setStatus(1L);
-                        err.append("Khách hàng đã tồn tại trên hệ thống , được tạo ngày : " + lstLead.get(0).getCreatedDate() + " " + lstLead.get(0).getCreatedBy());
-                    }
+                    leadAssignExcel.setStatus(1L);
+                    err.append("\nKhách hàng đã tồn tại trên hệ thống, ");
                 }
             }
 
             leadAssignExcel.setCreatedBy(users.getEmpSystemId());
-            leadAssignExcel.setError(err.toString().equals("") ? null : (err.length() > 800 ? "Quá nhiều lỗi ở dòng :" + i : err.toString()));
+            leadAssignExcel.setError(err.toString().equals("") ? null : (err.length() > 1000 ? "Quá nhiều lỗi ở dòng :" + i : err.toString()));
 
             // Neu khong loi -> set status (0 la hop le)
             if (StringUtils.isEmpty(leadAssignExcel.getError()))
