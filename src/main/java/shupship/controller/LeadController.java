@@ -103,7 +103,8 @@ public class LeadController extends BaseController {
     public ResponseEntity getListLeadOnEmp(@PageableDefault(page = 1)
                                            @SortDefault.SortDefaults({@SortDefault(sort = "lastModifiedDate", direction = Sort.Direction.DESC)}) Pageable pageable,
                                            @RequestParam(required = false) String status, @RequestParam(required = false) String key,
-                                           @RequestParam(required = false) String from, @RequestParam(required = false) String to) throws Exception, ApplicationContextException {
+                                           @RequestParam(required = false) String from, @RequestParam(required = false) String to,
+                                           @RequestParam(required = false) String role) throws Exception, ApplicationContextException {
         Users users = getCurrentUser();
         Pageable pageablerequest = PageRequest.of(pageable.getPageNumber() - 1, Constants.PAGE_SIZE, pageable.getSort());
         Long leadStatus = null;
@@ -143,7 +144,7 @@ public class LeadController extends BaseController {
             endTimestamp = Timestamp.valueOf(endDate);
 
         }
-        PagingRs pagingRs = leadService.getListLeadOnEmp(pageablerequest, startTimestamp, endTimestamp, leadStatus, users, key);
+        PagingRs pagingRs = leadService.getListLeadOnEmp(pageablerequest, startTimestamp, endTimestamp, leadStatus, users, key, role);
         return new ResponseEntity<>(pagingRs, HttpStatus.OK);
     }
 

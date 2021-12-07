@@ -95,7 +95,7 @@ public interface ILeadRepository extends PagingAndSortingRepository<Lead, Long>,
 
     @Query("Select distinct a from Lead a left join LeadAssign b on a.id = b.leads " +
             " where " +
-            " (b.userRecipientId = :userId and a.deletedStatus = 0" +
+            " (b.userRecipientId = :userId" +
             " and (COALESCE(:status) is null or a.status = :status)" +
             " and " +
             " ( COALESCE(:start) is null or b.createdDate >= :start) " +
@@ -150,6 +150,9 @@ public interface ILeadRepository extends PagingAndSortingRepository<Lead, Long>,
                                              @Param("key") String key,
                                              Pageable pageable);
 
+    @Query("select a from Lead a join LeadAssign b on a.id = b.leads where a.deletedStatus = 0 and b.userRecipientId = :userid" +
+            " and a.isFromEVTP is null and (COALESCE(:key) is null or ( a.customerCode = :key or a.phone = :key)) ")
+    Page<Lead> searchLeadOnAppForTCT(@Param("key") String key, Long userid, Pageable pageable);
 
     @Query("select l from Lead l where l.deletedStatus = 0 and l.phone = :phone")
     Lead findLeadWithPhoneByUser(String phone);

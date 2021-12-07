@@ -105,7 +105,7 @@ public class LeadServiceImpl implements ILeadService {
     }
 
     @Override
-    public PagingRs getListLeadOnEmp(Pageable pageable, Timestamp from, Timestamp to, Long status, Users users, String key) throws ApplicationContextException {
+    public PagingRs getListLeadOnEmp(Pageable pageable, Timestamp from, Timestamp to, Long status, Users users, String key, String role) throws ApplicationContextException {
         Instant startDate1 = from.toInstant();
         Instant endDate1 = to.toInstant();
 
@@ -126,6 +126,9 @@ public class LeadServiceImpl implements ILeadService {
         } else {
             leadPage = iLeadRepository.findAllLeadbyCriteriaOnApp(key == null ? startDate : null, key == null ? endDate : null, users.getEmpSystemId(), status, key, pageable);
         }
+
+        if (key != null)
+            leadPage = iLeadRepository.searchLeadOnAppForTCT(key, users.getEmpSystemId(), pageable);
 
         if (StringUtils.isNotEmpty(key)) {
             leadPage = new PageImpl<>(leadPage.stream().filter(Objects::nonNull)
@@ -452,7 +455,7 @@ public class LeadServiceImpl implements ILeadService {
 
     @Override
     public Lead searchLead(String key, Users users) {
-        Lead lead = iLeadRepository.searLead(key,  users.getRoles().equals("NV") ? users.getEmpSystemId() : null);
+        Lead lead = iLeadRepository.searLead(key, users.getRoles().equals("NV") ? users.getEmpSystemId() : null);
         if (lead == null)
             throw new HieuDzException("Không tìm thấy khách hàng");
         return lead;

@@ -19,7 +19,7 @@ public interface ILeadService {
 
     PagingRs getListLead(Pageable pageable, Timestamp from, Timestamp to, Long status, Users users) throws ApplicationContextException;
 
-    PagingRs getListLeadOnEmp(Pageable pageable, Timestamp from, Timestamp to, Long status, Users users, String key) throws ApplicationContextException;
+    PagingRs getListLeadOnEmp(Pageable pageable, Timestamp from, Timestamp to, Long status, Users users, String key, String role) throws ApplicationContextException;
 
     Lead insertLead(LeadRequest leadRequest, Users users) throws ApplicationContextException;
 
