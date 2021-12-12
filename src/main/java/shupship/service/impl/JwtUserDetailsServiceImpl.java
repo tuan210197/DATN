@@ -120,12 +120,9 @@ public class JwtUserDetailsServiceImpl extends BaseController implements JwtUser
             } else {
                 return false;
             }
-        }
-        else{
+        } else {
             return false;
         }
-
-
     }
 
     @Override
@@ -314,7 +311,7 @@ public class JwtUserDetailsServiceImpl extends BaseController implements JwtUser
         } else {
             Assert.hasText(userLoginDTO.getPassword(), "PASSWORD_NOT_FOUND");
             Assert.isTrue(bcryptEncoder.matches(userLoginDTO.getPassword(), basicLogin.getPassword()), "PASSWORD_KHÔNG_KHỚP");
-            Assert.isTrue(bcryptEncoder.matches( basicLogin.getPassword(),userLoginDTO.getNewPassword()), "PASSWORD MỚI KHÔNG ĐƯỢC GIỐNG PASSWORD CŨ");
+            Assert.isTrue(bcryptEncoder.matches(basicLogin.getPassword(), userLoginDTO.getNewPassword()), "PASSWORD MỚI KHÔNG ĐƯỢC GIỐNG PASSWORD CŨ");
             Assert.isTrue(userLoginDTO.getNewPassword().equals(userLoginDTO.getReNewPassword()), "NEW_RETYPE_PASSWORD_KHÔNG_KHỚP");
             basicLogin.setPassword(bcryptEncoder.encode(userLoginDTO.getNewPassword()));
             log.info("Start save Table basic_login at time: "
