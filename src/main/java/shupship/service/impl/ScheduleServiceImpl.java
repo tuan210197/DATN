@@ -23,7 +23,9 @@ import shupship.service.ScheduleService;
 import shupship.util.DateTimeUtils;
 import shupship.util.exception.*;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -186,7 +188,8 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     private void validateSchedule(LocalDateTime fromDate, LocalDateTime toDate) {
-        if (fromDate.plusMinutes(5).isBefore(LocalDateTime.now()) || toDate.isBefore(LocalDateTime.now())) {
+        LocalDateTime now = LocalDateTime.ofInstant(Instant.now(), ZoneId.of("Asia/Ho_Chi_Minh"));
+        if (fromDate.plusMinutes(5).isBefore(now) || toDate.isBefore(now)) {
             throw new HieuDzException("Không thể đặt thời gian trong quá khứ");
         }
         if (toDate.isBefore(fromDate)) {
@@ -198,7 +201,8 @@ public class ScheduleServiceImpl implements ScheduleService {
     }
 
     private void validateScheduleUpdate(LocalDateTime fromDate, LocalDateTime toDate) {
-        if (toDate.isBefore(LocalDateTime.now())) {
+        LocalDateTime now = LocalDateTime.ofInstant(Instant.now(), ZoneId.of("Asia/Ho_Chi_Minh"));
+        if (toDate.isBefore(now)) {
             throw new HieuDzException("Không thể đặt thời gian trong quá khứ");
         }
         if (toDate.isBefore(fromDate)) {
