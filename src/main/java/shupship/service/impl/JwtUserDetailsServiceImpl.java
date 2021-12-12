@@ -152,37 +152,39 @@ public class JwtUserDetailsServiceImpl extends BaseController implements JwtUser
     @Override
     public boolean banUser(UserLoginDTO userLoginDTO) {
 
-        String email = userLoginDTO.getEmail();
-        BasicLogin basicLogin = basicLoginRepo.findByEmail(email);
-        String uid = basicLogin.getUserUid();
-
-        if (uid != null) {
-            Users users = userRepo.findByUid(uid);
+//        String email = userLoginDTO.getEmail();
+        String uid = userLoginDTO.getUserUid();
+        Users users = userRepo.findByUid(uid);
+        Assert.notNull(users, "User không tôn tại");
+        Assert.isTrue(users.getIsActive()==1, "đã bị khóa");
+//        if (basicLogin != null) {
+//            Users users = userRepo.findByUid(uid);
             users.setIsActive(0);
             userRepo.save(users);
             return true;
 
-        } else {
-            return false;
-        }
+//        } else {
+//            return false;
+//        }
 
     }
 
     @Override
     public boolean unlockUser(UserLoginDTO userLoginDTO) {
-        String email = userLoginDTO.getEmail();
-        BasicLogin basicLogin = basicLoginRepo.findByEmail(email);
-        String uid = basicLogin.getUserUid();
+//        String email = userLoginDTO.getEmail();
+        String uid = userLoginDTO.getUserUid();
+        Users users = userRepo.findByUid(uid);
+        Assert.notNull(users, "User không tôn tại");
+        Assert.isTrue(users.getIsActive()==0, "user không bị khóa");
+//        if (basicLogin != null) {
+//            Users users = userRepo.findByUid(uid);
+        users.setIsActive(1);
+        userRepo.save(users);
+        return true;
 
-        if (uid != null) {
-            Users users = userRepo.findByUid(uid);
-            users.setIsActive(1);
-            userRepo.save(users);
-            return true;
-
-        } else {
-            return false;
-        }
+//        } else {
+//            return false;
+//        }
     }
 
 
