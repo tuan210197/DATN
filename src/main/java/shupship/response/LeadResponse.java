@@ -93,25 +93,20 @@ public class LeadResponse {
         response.setFullName(data.getFullName());
         response.setCustomerCode(data.getCustomerCode());
         response.setTitle(data.getTitle());
-        response.setExpectedRevenue(data.getExpectedRevenue() == null ? 0 :data.getExpectedRevenue());
-        response.setCompanyName(data.getCompanyName() == null ? "" :data.getCompanyName());
-        response.setRepresentation(data.getRepresentation() == null ? "" :data.getRepresentation());
+        response.setExpectedRevenue(data.getExpectedRevenue() == null ? 0 : data.getExpectedRevenue());
+        response.setCompanyName(data.getCompanyName() == null ? "" : data.getCompanyName());
+        response.setRepresentation(data.getRepresentation() == null ? "" : data.getRepresentation());
         response.setQuantityMonth(data.getQuantityMonth() == null ? 0 : data.getQuantityMonth());
-        response.setWeight(data.getWeight() == null ? 0 :data.getWeight());
-        response.setQuality(data.getQuality() == null ? "" :data.getQuality());
-        response.setCompensation(data.getCompensation() == null ? "" :data.getCompensation());
+        response.setWeight(data.getWeight() == null ? 0 : data.getWeight());
+        response.setQuality(data.getQuality() == null ? "" : data.getQuality());
+        response.setCompensation(data.getCompensation() == null ? "" : data.getCompensation());
         if (data.getType() != null)
             response.setType(LeadType.getByValue(data.getType()).name());
         response.setCustomerCode(data.getCustomerCode() == null ? "KH".concat(String.valueOf(data.getId())) : data.getCustomerCode());
-        response.setInProvincePrice(data.getInProvincePrice() == null ? 0 :data.getInProvincePrice());
+        response.setInProvincePrice(data.getInProvincePrice() == null ? 0 : data.getInProvincePrice());
         response.setOutProvincePrice(data.getOutProvincePrice() == null ? 0 : data.getOutProvincePrice());
-        if (data.getStatus().equals(LeadStatus.NOT_CONTACTED.getType())) {
-            response.setStatus(LeadStatus.NEW.name());
-            response.setStatusDescription(LeadStatusVi.valueOf(LeadStatus.getByValue(1L).name()).getType());
-        } else {
-            response.setStatus(LeadStatus.getByValue(data.getStatus()).name());
-            response.setStatusDescription(LeadStatusVi.valueOf(LeadStatus.getByValue(data.getStatus()).name()).getType());
-        }
+        response.setStatus(LeadStatus.getByValue(data.getStatus()).name());
+        response.setStatusDescription(LeadStatusVi.valueOf(LeadStatus.getByValue(data.getStatus()).name()).getType());
         if (data.getAddress() != null) {
             AddressResponse addressResponse = new AddressResponse();
             addressResponse.setId(data.getAddress().getId());
@@ -169,7 +164,8 @@ public class LeadResponse {
         if (CollectionUtils.isNotEmpty(data.getSchedules())) {
             List<ScheduleResponseDto> scheduleResponseDtos = data.getSchedules().stream().map(ScheduleResponseDto::scheduleModelToDto).collect(Collectors.toList());
             response.setSchedules(scheduleResponseDtos);
-        } response.setSchedules(new ArrayList<>());
+        }
+        response.setSchedules(new ArrayList<>());
         if (data.getStatus().equals(LeadStatus.SUCCESS.getType())) {
             Result result = data.getSchedules().stream().filter(e -> e.getStatus().equals(ScheduleStatus.SUCCESS.getType())).limit(1).map(Schedule::getResult).collect(Collectors.toList()).get(0);
             response.setSuccessCusCode(result.getCustomerCode());
