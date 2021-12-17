@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import shupship.domain.dto.ReportMonthlyEmployeeDto;
 import shupship.dto.ReportAllDepts;
 import shupship.dto.ReportMonthlyDeptDto;
+import shupship.response.ReportEmployeeOnApp;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -192,6 +193,62 @@ public class ReportDao {
                 report.setExpectedRevenue(BigDecimal.valueOf((Double) o[9]));
             else
                 report.setExpectedRevenue(BigDecimal.ZERO);
+            results.add(report);
+        }
+
+        return results;
+    }
+
+    public List<ReportEmployeeOnApp> reportOfEmployee(Timestamp startDate, Timestamp endDate, Long id) {
+
+        String query = "SELECT e.emp_system_id, " +
+                "       e.employee_code, " +
+                "       e.full_name, " +
+                "       po.postcode, " +
+                "       sum(case when la.lead_id is not null then 1 else 0 end)                      as total_assigns, " +
+                "       sum(case when la.status = 2 then 1 else 0 end)                               as contacting, " +
+                "       sum(case when la.status = 3 then 1 else 0 end)                               as successes, " +
+                "       sum(case when la.status = 4 then 1 else 0 end)                               as fails, " +
+                "       sum(case when la.user_assignee_id != la.user_recipient_id then 1 else 0 end) as assigned, " +
+                "       (select sum(l.expected_revenue) as expected_revenue), " +
+                "       sum(case when l.is_from_evtp is null then 1 else 0 end)                      as tuNhap, " +
+                "       sum(case when l.is_from_evtp = 1 then 1 else 0 end)                          as duocGiao" +
+                "   FROM users e " +
+                "         left join lead_assign la " +
+                "                   on e.emp_system_id = la.user_recipient_id and la.created_date between :startDate and :endDate " +
+                "         left join lead l on la.lead_id = l.id and l.deleted_status = 0 " +
+                "         left join post_office po on e.post_code = po.postcode " +
+                "         left join dept_office d on po.deptCode = d.code " +
+                "         where e.emp_system_id = :id " +
+                "   and e.is_active = 1 " +
+                "   group by (e.emp_system_id, e.employee_code, e.full_name, po.postcode) " +
+                "   order by po.postcode ";
+
+        Query nativeQuery = entityManager.createNativeQuery(query);
+        nativeQuery.setParameter("startDate", startDate);
+        nativeQuery.setParameter("endDate", endDate);
+        nativeQuery.setParameter("id", id);
+
+        List<Object[]> data = nativeQuery.getResultList();
+        List<ReportEmployeeOnApp> results = new ArrayList<>();
+        for (Object[] o : data) {
+            ReportEmployeeOnApp report = new ReportEmployeeOnApp();
+
+            report.setEmpSystemId((BigInteger) o[0]);
+            report.setEmpCode((String) o[1]);
+            report.setFullName((String) o[2]);
+            report.setPostCode((String) o[3]);
+            report.setTotalAssigns((BigInteger) o[4]);
+            report.setContacting((BigInteger) o[5]);
+            report.setSuccesses((BigInteger) o[6]);
+            report.setFails((BigInteger) o[7]);
+            report.setAssigned((BigInteger) o[8]);
+            if (o[9] != null)
+                report.setExpectedRevenue(BigDecimal.valueOf((Double) o[9]));
+            else
+                report.setExpectedRevenue(BigDecimal.ZERO);
+            report.setTuNhap((BigInteger) o[10]);
+            report.setDuocGiao((BigInteger) o[11]);
             results.add(report);
         }
 

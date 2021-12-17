@@ -3,7 +3,9 @@ package shupship.service;
 import org.springframework.data.domain.Pageable;
 import shupship.dto.SchedulesOfEmployeeMonthlyDto;
 import shupship.helper.PagingRs;
+import shupship.response.ReportEmployeeOnApp;
 
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
@@ -15,5 +17,7 @@ public interface IReportService {
     PagingRs reportOnEVTPByPostCode(Pageable pageRequest, Timestamp startDate, Timestamp endDate, String post) throws Exception;
 
     PagingRs reportAllEmpsInDept(Pageable pageRequest, Timestamp startTimestamp, Timestamp endTimestamp, String deptCode) throws Exception;
+
+    ReportEmployeeOnApp reportEmployeeOnApp(Timestamp from, Timestamp to, Long id);
 
 }
