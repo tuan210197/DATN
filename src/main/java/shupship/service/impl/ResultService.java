@@ -162,12 +162,16 @@ public class ResultService implements IResultService {
             result.setSchedule(schedule);
             outData = resultRepository.save(result);
             schedule.setResult(result);
+            schedule.setDeletedStatus(1L);
             if (schedule.getIsLatestResult() != 1) {
                 schedule.setIsLatestResult(1);
             }
             if (scheduleLatestResult != null) {
                 scheduleLatestResult.setIsLatestResult(0);
                 scheduleRepository.save(scheduleLatestResult);
+            }
+            if(result.getStatus() == 1){
+                schedule.setDeletedStatus(1L);
             }
             scheduleRepository.save(schedule);
 

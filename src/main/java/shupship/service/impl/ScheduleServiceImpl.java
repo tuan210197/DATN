@@ -153,7 +153,7 @@ public class ScheduleServiceImpl implements ScheduleService {
             Pageable pageRequest = PageRequest.of(0, Integer.MAX_VALUE);
             schedulePage = scheduleRepository.findAll(pageRequest, date, end, users.getEmpSystemId());
         } else {
-            schedulePage = scheduleRepository.findAll(pageable);
+            schedulePage = scheduleRepository.findAllScheduler(pageable);
         }
         Page<ScheduleLstResponse> scheduleResponseLeadDtoPage = schedulePage.map(ScheduleLstResponse::scheduleModelToDto);
 
