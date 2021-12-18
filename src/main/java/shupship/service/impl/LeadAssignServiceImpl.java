@@ -87,12 +87,14 @@ public class LeadAssignServiceImpl implements ILeadAssignService {
                 assign.setUserRecipientId(leadAssginReq.getUserRecipientId());
                 assign.setStatus(5L);
                 assign.setUsers(users);
+                assign.setCreatedBy(user.getEmpSystemId());
                 assign = leadAssignRepo.save(assign);
             } else {
                 LeadAssign data = LeadAssignRequest.leadAssignDtoToModel(leadAssginReq);
                 data.setStatus(5L);
                 data.setLeads(lead);
                 data.setUsers(users);
+                assign.setCreatedBy(user.getEmpSystemId());
                 assign = leadAssignRepo.save(data);
             }
         } else {
@@ -179,14 +181,12 @@ public class LeadAssignServiceImpl implements ILeadAssignService {
                         if (assign.getUsers() == null) {
                             assign.setUserAssigneeId(leadAssginReq.getUserAssigneeId());
                             assign.setUserRecipientId(leadAssginReq.getUserRecipientId());
-                            assign.setStatus(5L);
                             assign.setUsers(employee);
                             assign.setCreatedBy(user.getCreatedBy());
                             assign = leadAssignRepo.save(assign);
 
                         } else {
                             LeadAssign data = LeadAssignRequestV2.leadAssignDtoToModel(leadAssginReq);
-                            data.setStatus(5L);
                             data.setLeads(lead);
                             data.setUsers(employee);
                             data.setCreatedBy(user.getCreatedBy());
@@ -195,7 +195,6 @@ public class LeadAssignServiceImpl implements ILeadAssignService {
                         }
                     } else {
                         LeadAssign data = LeadAssignRequestV2.leadAssignDtoToModel(leadAssginReq);
-                        data.setStatus(5L);
                         data.setLeads(lead);
                         data.setUsers(employee);
                         data.setCreatedBy(user.getCreatedBy());
@@ -208,6 +207,7 @@ public class LeadAssignServiceImpl implements ILeadAssignService {
                 if (findLeadAssignById != null) {
                     findLeadAssignById.setDeletedStatus(1L);
                     leadAssignRepo.save(findLeadAssignById);
+                    log.info("gửi email");
 //                    sendEmailAssign(findLeadAssignById, leadAssginReq.getUserRecipientId(), leadAssginReq.getNote());
                 }
 
@@ -360,12 +360,11 @@ public class LeadAssignServiceImpl implements ILeadAssignService {
         BasicLogin basicLogin1 = basicLoginRepo.findByUserUid(users1.getUid().trim());
         Lead lead = iLeadRepository.findLeadById(leadAssign.getLeads().getId());
         String sub = "THÔNG BÁO TIẾP XÚC";
-        String content = "Hệ thống đã chuyển tiếp xúc khách hàng " + lead.getFullName() + "cho nhân viên khác. Lý do " + reason +
-                "GIAO TIẾP XÚC THÌ ĐÉO ĐẶT LỊCH CÒN OM";
+        String content = "Hệ thống đã chuyển tiếp xúc khách hàng " + lead.getFullName() + "cho nhân viên khác. Lý do " + reason;
         mailSenderService.sendSimpleMessage(basicLogin.getEmail(), sub, content);
 
         String sub1 = "THÔNG BÁO TIẾP XÚC";
-        String content1 = "Đồng chí vừa được chuyển tiếp xúc 1 khách hàng. Vui lòng kiểm tra lại. LO MÀ ĐẶT LỊCH KO THÌ BỐ XỬ";
+        String content1 = "Đồng chí vừa được chuyển tiếp xúc 1 khách hàng: " + lead.getFullName() + ". Vui lòng kiểm tra lại.";
         mailSenderService.sendSimpleMessage(basicLogin1.getEmail(), sub1, content1);
     }
 

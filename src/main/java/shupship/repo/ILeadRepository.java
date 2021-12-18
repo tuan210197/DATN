@@ -95,7 +95,7 @@ public interface ILeadRepository extends PagingAndSortingRepository<Lead, Long>,
 
     @Query("Select distinct a from Lead a left join LeadAssign b on a.id = b.leads " +
             " where " +
-            " (b.userRecipientId = :userId" +
+            " (b.userRecipientId = :userId and b.deletedStatus = 0" +
             " and (COALESCE(:status) is null or a.status = :status)" +
             " and " +
             " ( COALESCE(:start) is null or b.createdDate >= :start) " +
@@ -111,7 +111,6 @@ public interface ILeadRepository extends PagingAndSortingRepository<Lead, Long>,
             " ) " +
             " and a.deletedStatus = 0 and a.isFromEVTP is null" +
             " and (COALESCE(:key) is null or (a.phone = :key or a.customerCode = :key) )  " +
-            " and a.createdBy = :userId" +
             " and (COALESCE(:status) is null or a.status = :status)" +
             " )")
     Page<Lead> findAllLeadbyCriteriaOnApp(@Param("start") LocalDateTime start,
@@ -123,7 +122,7 @@ public interface ILeadRepository extends PagingAndSortingRepository<Lead, Long>,
 
     @Query("Select distinct a from Lead a left join LeadAssign b on a.id = b.leads " +
             " where " +
-            " (b.userRecipientId = :userId" +
+            " (b.userRecipientId = :userId and b.deletedStatus = 0 " +
             " and ((COALESCE(:status) is null or a.status = :status) or (COALESCE(:status1) is null or a.status = :status1) )" +
             " and " +
             " ( COALESCE(:start) is null or b.createdDate >= :start) " +
@@ -139,7 +138,6 @@ public interface ILeadRepository extends PagingAndSortingRepository<Lead, Long>,
             " ) " +
             " and a.deletedStatus = 0 and a.isFromEVTP is null" +
             " and (COALESCE(:key) is null or (a.phone = :key or a.customerCode = :key) )  " +
-            " and a.createdBy = :userId" +
             " and ((COALESCE(:status) is null or a.status = :status) or (COALESCE(:status1) is null or a.status = :status1))" +
             " )")
     Page<Lead> findAllLeadbyCriteriaOnAppNew(@Param("start") LocalDateTime start,
