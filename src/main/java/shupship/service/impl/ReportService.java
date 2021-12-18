@@ -22,6 +22,7 @@ import shupship.helper.PagingRs;
 import shupship.repo.BasicLoginRepo;
 import shupship.repo.IScheduleRepository;
 import shupship.repo.UserRepo;
+import shupship.response.ReportEmployeeOnApp;
 import shupship.service.IReportService;
 import shupship.util.CommonUtils;
 import shupship.util.exception.ApplicationException;
@@ -29,10 +30,7 @@ import shupship.util.exception.HieuDzException;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -121,9 +119,37 @@ public class ReportService implements IReportService {
             List<ReportMonthlyEmployeeDto> rs = reportDao.reportByPost(startDate, endDate, postCode);
 
             reportPage = new PageImpl<>(rs, pageRequest, rs.size());
+
+            Long countDept = 1L;
+            Long countPost = 1L;
+            Long totalEmployees = 0L;
+            Long totalAssigns = 0L;
+            Long successes = 0L;
+            Long contacting = 0L;
+            Long fails = 0L;
+            Long employeeNotAssigned = 0L;
+            Long assigned = 0L;
+            for (ReportMonthlyEmployeeDto model : rs){
+                totalAssigns += model.getTotalAssigns().longValue();
+                successes += model.getSuccesses().longValue();
+                contacting += model.getContacting().longValue();
+                fails += model.getFails().longValue();
+                employeeNotAssigned += model.getTotalAssigns().longValue() - model.getAssigned().longValue();
+                assigned += model.getAssigned().longValue();
+            }
+
             PagingRs pagingRs = new PagingRs();
             pagingRs.setData(reportPage.getContent());
             pagingRs.setTotalCount(reportPage.getTotalElements());
+            pagingRs.setTotalAssigned(assigned);
+            pagingRs.setTotalDept(countDept);
+            pagingRs.setTotalPost(countPost);
+            pagingRs.setTotalCountEmp(reportPage.getTotalElements());
+            pagingRs.setTotalAssigns(totalAssigns);
+            pagingRs.setTotalSuccesses(successes);
+            pagingRs.setTotalContacting(contacting);
+            pagingRs.setTotalFails(fails);
+            pagingRs.setTotalEmployeeNotAssigned(employeeNotAssigned);
             return pagingRs;
         } else throw new HieuDzException("Không có quyền xem!");
     }
@@ -144,10 +170,49 @@ public class ReportService implements IReportService {
 
         reportPage = new PageImpl<>(rs, pageRequest, rs.size());
 
+        Long countDept = 1L;
+        Long countPost = 0L;
+        Long totalEmployees = 0L;
+        Long totalAssigns = 0L;
+        Long successes = 0L;
+        Long contacting = 0L;
+        Long fails = 0L;
+        Long employeeNotAssigned = 0L;
+        Long assigned = 0L;
+        HashSet<String> listPost = new HashSet();
+
+        for (ReportMonthlyEmployeeDto model : rs){
+            countPost += 1;
+            totalAssigns += model.getTotalAssigns().longValue();
+            successes += model.getSuccesses().longValue();
+            contacting += model.getContacting().longValue();
+            fails += model.getFails().longValue();
+            employeeNotAssigned += model.getTotalAssigns().longValue() - model.getAssigned().longValue();
+            assigned += model.getAssigned().longValue();
+        }
+
         PagingRs pagingRs = new PagingRs();
         pagingRs.setData(reportPage.getContent());
         pagingRs.setTotalCount(reportPage.getTotalElements());
+        pagingRs.setTotalAssigned(assigned);
+        pagingRs.setTotalDept(countDept);
+        pagingRs.setTotalPost(countPost);
+        pagingRs.setTotalCountEmp(reportPage.getTotalElements());
+        pagingRs.setTotalAssigns(totalAssigns);
+        pagingRs.setTotalSuccesses(successes);
+        pagingRs.setTotalContacting(contacting);
+        pagingRs.setTotalFails(fails);
+        pagingRs.setTotalEmployeeNotAssigned(employeeNotAssigned);
         return pagingRs;
+    }
+
+    @Override
+    public ReportEmployeeOnApp reportEmployeeOnApp(Timestamp from, Timestamp to, Long id) {
+        List<ReportEmployeeOnApp> reportEmployeeOnAppList = reportDao.reportOfEmployee(from, to, id);
+        ReportEmployeeOnApp model = reportEmployeeOnAppList.get(0);
+        model.setTyLeHT((model.getSuccesses().doubleValue() + model.getFails().doubleValue()) * 100 / model.getTotalAssigns().doubleValue());
+        model.setTyLeTX(model.getContacting().doubleValue() * 100 / model.getTotalAssigns().doubleValue());
+        return model;
     }
 
     @Override

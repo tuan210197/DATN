@@ -9,11 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import shupship.domain.model.District;
-import shupship.domain.model.Industry;
-import shupship.domain.model.Province;
-import shupship.domain.model.Ward;
+import shupship.domain.model.*;
 import shupship.repo.IIndustryRepository;
+import shupship.repo.IPostOfficeRepository;
 import shupship.repo.IWardRepository;
 import shupship.response.*;
 import shupship.service.IDistrictService;
@@ -27,7 +25,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-public class PDWController {
+public class PDWController extends BaseController{
 
     @Autowired
     IProvinceService provinceService;
@@ -41,15 +39,18 @@ public class PDWController {
     @Autowired
     IIndustryRepository industryRepository;
 
+    @Autowired
+    IPostOfficeRepository postOfficeRepository;
+
     @GetMapping(value = "/province")
-    public ResponseEntity getListProvince(HttpServletRequest request){
+    public ResponseEntity getListProvince(HttpServletRequest request) {
         List<Province> list = provinceService.listProvince();
         List<ProvinceResponse> listProvinceResponses = list.stream().map(ProvinceResponse::leadModelToDto).collect(Collectors.toList());
         return new ResponseEntity<>(listProvinceResponses, HttpStatus.OK);
     }
 
     @GetMapping(value = "/district")
-    public ResponseEntity getDistrictbyProvince(HttpServletRequest request, @RequestParam(required = true) String provinceCode){
+    public ResponseEntity getDistrictbyProvince(HttpServletRequest request, @RequestParam(required = true) String provinceCode) {
 
         if (StringUtils.isEmpty(provinceCode))
             throw new HieuDzException("Bắt buộc phải chọn Tỉnh/TP");
@@ -59,7 +60,7 @@ public class PDWController {
     }
 
     @GetMapping(value = "/ward")
-    public ResponseEntity getWardByDistrict(HttpServletRequest request, @RequestParam(required = true) String districtCode){
+    public ResponseEntity getWardByDistrict(HttpServletRequest request, @RequestParam(required = true) String districtCode) {
 
         if (StringUtils.isEmpty(districtCode))
             throw new HieuDzException("Bắt buộc phải chọn Quận/Huyện");
@@ -69,10 +70,22 @@ public class PDWController {
     }
 
     @GetMapping(value = "/industry")
-    public ResponseEntity getIndustry(HttpServletRequest request){
+    public ResponseEntity getIndustry(HttpServletRequest request) {
         List<Industry> industries = industryRepository.findAll();
         List<IndustryResponse> industries1 = industries.stream().map(IndustryResponse::leadModelToDto).collect(Collectors.toList());
         return new ResponseEntity<>(industries1, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/fillCbx")
+    public ResponseEntity fillCombobox(){
+        Users users = getCurrentUser();
+        PostOffice postOffice = postOfficeRepository.findPostOfficeByCode(users.getPostCode());
+        FillCbx fillCbx = new FillCbx();
+        fillCbx.setDeptCode(postOffice.getDeptOffice().getCode());
+        fillCbx.setDeptId(postOffice.getDeptOffice().getId());
+        fillCbx.setPostCode(postOffice.getPostCode());
+        fillCbx.setPostId(postOffice.getId());
+        return new ResponseEntity<>(fillCbx, HttpStatus.OK);
     }
 
 }

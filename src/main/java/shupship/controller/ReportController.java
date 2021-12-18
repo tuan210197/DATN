@@ -19,10 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import shupship.common.Constants;
 import shupship.dao.ReportDao;
 import shupship.domain.dto.ReportMonthlyEmployeeDto;
@@ -34,6 +31,7 @@ import shupship.helper.PagingRs;
 import shupship.helper.ResponseUtil;
 import shupship.repo.BasicLoginRepo;
 import shupship.repo.UserRepo;
+import shupship.response.ReportEmployeeOnApp;
 import shupship.service.IExportService;
 import shupship.service.IReportService;
 import shupship.util.DateTimeUtils;
@@ -191,6 +189,32 @@ public class ReportController {
         return ResponseUtil.wrapOrNotFound(Optional.ofNullable(pagingRs));
     }
 
+    @GetMapping(value = "/emp/{idEpl}")
+    public ResponseEntity reportOfEmployee(@PageableDefault(page = 1)
+                                              @SortDefault.SortDefaults({@SortDefault(sort = "id", direction = Sort.Direction.DESC)}) Pageable pageable,
+                                              @RequestParam(required = false) String from, @RequestParam(required = false) String to, @PathVariable(name = "idEpl") Long id) throws Exception {
+
+        LocalDateTime startDate = null;
+        LocalDateTime endDate = null;
+        if (StringUtils.isBlank(from) && !DateTimeUtils.isValidDate(from) && StringUtils.isBlank(to) && !DateTimeUtils.isValidDate(to))
+            throw new HieuDzException("Ngày nhập vào không đúng định dạng!");
+
+        if (StringUtils.isNotBlank(from) && StringUtils.isNotBlank(to)) {
+            startDate = DateTimeUtils.StringToLocalDate(from).atStartOfDay();
+            endDate = DateTimeUtils.StringToLocalDate(to).plusDays(1).atStartOfDay();
+        }
+
+        assert startDate != null;
+        if (startDate.isAfter(endDate))
+            throw new HieuDzException("Ngày bắt đầu phải nhỏ hơn ngày kết thúc!");
+
+        Timestamp startTimestamp = Timestamp.valueOf(startDate);
+        Timestamp endTimestamp = Timestamp.valueOf(endDate);
+
+        ReportEmployeeOnApp pagingRs = reportService.reportEmployeeOnApp(startTimestamp, endTimestamp, id);
+        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(pagingRs));
+    }
+
     @GetMapping(value = "/export-excel")
     public ResponseEntity<Resource> exportExcel(HttpServletRequest request, @RequestParam(required = false) String from,
                                                 @RequestParam(required = false) String to,
@@ -215,6 +239,24 @@ public class ReportController {
     public ResponseEntity<Resource> exportRoute(HttpServletRequest request, @RequestParam(required = false) String from,
                                                 @RequestParam(required = false) String to,
                                                 @RequestParam(required = false) String dept) throws Exception {
+
+        LocalDateTime startDate = null;
+        LocalDateTime endDate = null;
+        if (StringUtils.isBlank(from) && !DateTimeUtils.isValidDate(from) && StringUtils.isBlank(to) && !DateTimeUtils.isValidDate(to))
+            throw new HieuDzException("Ngày nhập vào không đúng định dạng!");
+        if (StringUtils.isNotBlank(from) && StringUtils.isNotBlank(to)) {
+            startDate = DateTimeUtils.StringToLocalDate(from).atStartOfDay();
+            endDate = DateTimeUtils.StringToLocalDate(to).plusDays(1).atStartOfDay();
+        }
+        assert startDate != null;
+        if (startDate.isAfter(endDate))
+            throw new HieuDzException("Ngày bắt đầu phải nhỏ hơn ngày kết thúc!");
+        Timestamp startTimestamp = Timestamp.valueOf(startDate);
+        Timestamp endTimestamp = Timestamp.valueOf(endDate);
+        Users user = getCurrentUser();
+
+
+
         Resource resource = new ClassPathResource("Giao-tiep-xuc-khach-hang-mau-sup-ship.xlsx");
         String contentType = null;
         try {
