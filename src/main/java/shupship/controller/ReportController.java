@@ -304,7 +304,29 @@ public class ReportController {
     public ResponseEntity<Resource> exportExcel(HttpServletRequest request, @RequestParam(required = false) String from,
                                                 @RequestParam(required = false) String to,
                                                 @RequestParam(required = false) String dept) throws Exception {
-        Resource resource = new ClassPathResource("Giao-tiep-xuc-khach-hang-mau-sup-ship.xlsx");
+        LocalDateTime startDate = null;
+        LocalDateTime endDate = null;
+        if (StringUtils.isBlank(from) && !DateTimeUtils.isValidDate(from) && StringUtils.isBlank(to) && !DateTimeUtils.isValidDate(to))
+            throw new HieuDzException("Ngày nhập vào không đúng định dạng!");
+        if (StringUtils.isNotBlank(from) && StringUtils.isNotBlank(to)) {
+            startDate = DateTimeUtils.StringToLocalDate(from).atStartOfDay();
+            endDate = DateTimeUtils.StringToLocalDate(to).plusDays(1).atStartOfDay();
+        }
+        assert startDate != null;
+        if (startDate.isAfter(endDate))
+            throw new HieuDzException("Ngày bắt đầu phải nhỏ hơn ngày kết thúc!");
+        Timestamp startTimestamp = Timestamp.valueOf(startDate);
+        Timestamp endTimestamp = Timestamp.valueOf(endDate);
+        Users user = getCurrentUser();
+        ByteArrayInputStream bais = null;
+        if (user.getRoles().equals("TCT") || user.getRoles().equals("CN") || user.getRoles().equals("BC")){
+             bais = exportService.exportDataToExcel(startTimestamp, endTimestamp, user);
+        }
+        String fileName = "BaoCaoTXKH" + ".xlsx";
+        File targetFile = new File("data/" + fileName);
+        assert bais != null;
+        FileUtils.copyInputStreamToFile(bais, targetFile);
+        Resource resource = fileStorageService.loadFileAsResource(fileName);
         String contentType = null;
         try {
             contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
@@ -340,9 +362,20 @@ public class ReportController {
         Timestamp endTimestamp = Timestamp.valueOf(endDate);
         Users user = getCurrentUser();
 
+        List<ReportMonthlyEmployeeDto> list = new ArrayList<>();
+        if (user.getRoles().equals("TCT")){
+            list = reportDao.reportAllEmpsInDept(startTimestamp, endTimestamp, dept);
+        } else if (user.getRoles().equals("CN")){
+            list = reportDao.reportAllEmpsInDept(startTimestamp, endTimestamp, user.getDeptCode());
+        } else if (user.getRoles().equals("BC")){
+            list = reportDao.reportByPost(startTimestamp, endTimestamp, user.getPostCode());
+        }
 
-
-        Resource resource = new ClassPathResource("Giao-tiep-xuc-khach-hang-mau-sup-ship.xlsx");
+        ByteArrayInputStream bais = exportService.exportNhanVien(list);
+        String fileName = "BaoCaoTXNhan-vien" + ".xlsx";
+        File targetFile = new File("data/" + fileName);
+        FileUtils.copyInputStreamToFile(bais, targetFile);
+        Resource resource = fileStorageService.loadFileAsResource(fileName);
         String contentType = null;
         try {
             contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
