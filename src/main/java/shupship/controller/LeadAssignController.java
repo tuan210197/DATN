@@ -182,7 +182,8 @@ public class LeadAssignController extends BaseController {
 
     @GetMapping(value = "/export-excel")
     public ResponseEntity<Resource> exportExcel(@RequestParam(required = true) Long fileId,
-                                                @RequestParam(required = false) String status) throws Exception {
+                                                @RequestParam(required = false) String status,
+                                                @RequestParam(required = false) String filename) throws Exception {
 
         LeadAssignHisResponse leadAssignHisResponse = leadAssignService.getDetailFile(fileId);
         Collection<LeadAssignExcelResponse> leadAssignExcelResponses = leadAssignHisResponse.getLeadsAssignByExcel();

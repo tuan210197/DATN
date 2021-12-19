@@ -11,7 +11,7 @@ import java.util.List;
 @Service
 public interface UserService extends CrudService<Users, java.lang.String> {
 
-    List<Users> searchUser(String keyword);
+    List<Users> searchUser(String role, String deptCode, String postCode, String keyword);
 
     List<Users> getUsersByPostCode(String postCode);
 

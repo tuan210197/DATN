@@ -52,7 +52,8 @@ public class UserController extends BaseController {
 
     @GetMapping()
     public ResponseEntity<?> searchUser( @RequestParam("keyword") String keyword) {
-        List<Users> users = userService.searchUser(keyword);
+        Users user = getCurrentUser();
+        List<Users> users = userService.searchUser(user.getRoles(), user.getDeptCode(),user.getPostCode(),keyword);
         List<UserInfoDTO> list = users.stream().map(mapper::toDto).collect(Collectors.toList());
 
         return ResponseEntity.ok(list);

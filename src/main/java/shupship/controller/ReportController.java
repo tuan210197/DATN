@@ -97,17 +97,11 @@ public class ReportController {
         assert startDate != null;
         if (startDate.isAfter(endDate))
             throw new HieuDzException("Ngày bắt đầu phải nhỏ hơn ngày kết thúc!");
-
         Timestamp startTimestamp = Timestamp.valueOf(startDate);
         Timestamp endTimestamp = Timestamp.valueOf(endDate);
-
-
         Pageable pageRequest = PageRequest.of(pageable.getPageNumber() - 1, Constants.PAGE_SIZE, pageable.getSort());
-
         PagingRs pagingRs = reportService.reportAllPageable(pageRequest, startTimestamp, endTimestamp, dept);
-
         return ResponseUtil.wrapOrNotFound(Optional.ofNullable(pagingRs));
-
     }
 
     @GetMapping(value = "/export-cn")

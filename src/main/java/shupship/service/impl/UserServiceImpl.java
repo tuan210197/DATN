@@ -56,15 +56,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<Users> searchUser(String keyword) {
-        if (keyword != null) {
+    public List<Users> searchUser(String role, String deptCode, String postCode, String keyword) {
+//        Users users = getCurrentUser();
+//        String role = users.getRoles();
+
+        if (role.equals("TCT") && keyword != null) {
             return repository.search(keyword);
+        } else if (role.equals("CN") && keyword != null) {
+//            String CN = users.getDeptCode();
+            return repository.searchCN(deptCode, keyword);
+        } else if (role.equals("BC") && keyword != null) {
+//            String BC = users.getPostCode();
+            return repository.searchBC(postCode, keyword);
         } else {
             return repository.findAll();
         }
     }
 
-    @Override
+        @Override
     public List<Users> getUsersByPostCode(String postCode) {
         return repository.getUsersByPostCode(postCode);
     }

@@ -21,6 +21,16 @@ public interface UserRepository extends JpaRepository<Users, String> {
     @Query("select a from Users a where a.isActive = 1 and a.postCode = :postCode")
     List<Users> getUsersByPostCode(String postCode);
 
+    @Query(value = "SELECT u FROM Users u WHERE u.deptCode = :cn and "
+            + " u.employeeCode like %:keyword% "
+            + " OR u.mobile like %:keyword% "
+    )
+    List<Users> searchCN( String cn,@Param("keyword") String keyword);
 
+    @Query(value = "SELECT u FROM Users u WHERE u.postCode = :bc AND "
+            + " u.employeeCode like %:keyword% "
+            + " OR u.mobile like %:keyword% "
+    )
+    List<Users> searchBC( String bc,@Param("keyword") String keyword);
 
 }
