@@ -26,6 +26,7 @@ import shupship.domain.dto.ReportMonthlyEmployeeDto;
 import shupship.domain.model.BasicLogin;
 import shupship.domain.model.Users;
 import shupship.dto.ReportMonthlyDeptDto;
+import shupship.dto.ReportMonthlyPostOfficeDto;
 import shupship.dto.SchedulesOfEmployeeMonthlyDto;
 import shupship.helper.PagingRs;
 import shupship.helper.ResponseUtil;
@@ -107,6 +108,85 @@ public class ReportController {
 
         return ResponseUtil.wrapOrNotFound(Optional.ofNullable(pagingRs));
 
+    }
+
+    @GetMapping(value = "/export-cn")
+    public ResponseEntity<Resource> exportCN(HttpServletRequest request, @RequestParam(required = false) String from,
+                                             @RequestParam(required = false) String to,
+                                             @RequestParam(required = false) String dept) throws Exception {
+        LocalDateTime startDate = null;
+        LocalDateTime endDate = null;
+        if (StringUtils.isBlank(from) && !DateTimeUtils.isValidDate(from) && StringUtils.isBlank(to) && !DateTimeUtils.isValidDate(to))
+            throw new HieuDzException("Ngày nhập vào không đúng định dạng!");
+        if (StringUtils.isNotBlank(from) && StringUtils.isNotBlank(to)) {
+            startDate = DateTimeUtils.StringToLocalDate(from).atStartOfDay();
+            endDate = DateTimeUtils.StringToLocalDate(to).plusDays(1).atStartOfDay();
+        }
+        assert startDate != null;
+        if (startDate.isAfter(endDate))
+            throw new HieuDzException("Ngày bắt đầu phải nhỏ hơn ngày kết thúc!");
+        Timestamp startTimestamp = Timestamp.valueOf(startDate);
+        Timestamp endTimestamp = Timestamp.valueOf(endDate);
+        Users user = getCurrentUser();
+        List<ReportMonthlyDeptDto> rs = new ArrayList<>();
+        if (user.getRoles().equals("TCT") || user.getRoles().equals("CN") || user.getRoles().equals("BC")) {
+            rs = reportDao.reportAllCrm(startTimestamp, endTimestamp);
+            if (StringUtils.isNotEmpty(dept))
+                rs = rs.stream().filter(Objects::nonNull).filter(e -> e.getDeptCode().equals(dept)).collect(Collectors.toList());
+            else if (user.getRoles().equals("CN"))
+                rs = rs.stream().filter(Objects::nonNull).filter(e -> e.getDeptCode().equals(user.getDeptCode())).collect(Collectors.toList());
+        }
+
+
+        for(ReportMonthlyDeptDto data : rs){
+            Long countPost = 0L;
+            Long totalEmployees = 0L;
+            Long totalAssigns = 0L;
+            Long successes = 0L;
+            Long contacting = 0L;
+            Long fails = 0L;
+            Long employeeNotAssigned = 0L;
+            Long assigned = 0L;
+
+            List<ReportMonthlyPostOfficeDto> post = data.getReportMonthlyPostOfficeDtos();
+            for (ReportMonthlyPostOfficeDto postOffice : post) {
+                countPost += 1;
+                totalEmployees += postOffice.getTotalEmployees();
+                totalAssigns += postOffice.getTotalAssigns();
+                successes += postOffice.getSuccesses();
+                contacting += postOffice.getContacting();
+                fails += postOffice.getFails();
+                employeeNotAssigned += postOffice.getEmployeeNotAssigned();
+                assigned += postOffice.getAssigned();
+            }
+            data.setTotalPost(countPost);
+            data.setTotalCountEmp(totalEmployees);
+            data.setTotalAssigns(totalAssigns);
+            data.setTotalSuccesses(successes);
+            data.setTotalContacting(contacting);
+            data.setTotalFails(fails);
+            data.setTotalEmployeeNotAssigned(employeeNotAssigned);
+            if (totalAssigns != 0){
+                data.setTyHT((fails + successes) * 100 / totalAssigns);
+                data.setTyTX((contacting) * 100 / totalAssigns);
+            }
+            data.setTotalLeadNotTX(totalAssigns - assigned);
+            data.setTotalAssigned(assigned);
+        }
+
+        ByteArrayInputStream bais = exportService.exportChiNhanh(rs);
+        String fileName = "BaoCaoTXChiNhanh" + ".xlsx";
+        File targetFile = new File("data/" + fileName);
+        FileUtils.copyInputStreamToFile(bais, targetFile);
+        Resource resource = fileStorageService.loadFileAsResource(fileName);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=" + resource.getFilename() + "");
+        headers.add("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .body(resource);
     }
 
 
@@ -318,26 +398,6 @@ public class ReportController {
                 .contentType(MediaType.parseMediaType("application/octet-stream"))
                 .body(resource);
     }
-
-
-    @GetMapping(value = "/export-cn")
-    public ResponseEntity<Resource> exportCN(HttpServletRequest request) throws Exception {
-        Resource resource = new ClassPathResource("Giao-tiep-xuc-khach-hang-mau-sup-ship.xlsx");
-        String contentType = null;
-        try {
-            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
-        } catch (IOException ex) {
-            log.info("Lỗi");
-        }
-        if (contentType == null) {
-            contentType = "application/octet-stream";
-        }
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename() + "")
-                .body(resource);
-    }
-
 
     protected Users getCurrentUser() throws Exception {
         UserDetails user = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

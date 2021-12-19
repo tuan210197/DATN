@@ -12,4 +12,5 @@ public interface IExportService {
 
     ByteArrayInputStream exportBuuCuc(List<ReportMonthlyDeptDto> list) throws IOException, InvalidFormatException;
 
+    ByteArrayInputStream exportChiNhanh(List<ReportMonthlyDeptDto> list) throws IOException, InvalidFormatException;
 }

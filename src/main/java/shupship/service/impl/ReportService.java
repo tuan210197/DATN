@@ -76,10 +76,19 @@ public class ReportService implements IReportService {
         Long employeeNotAssigned = 0L;
         Long assigned = 0L;
         for (ReportMonthlyDeptDto data : rs) {
+            Long countPost1 = 0L;
+            Long totalEmployees1 = 0L;
+            Long totalAssigns1 = 0L;
+            Long successes1 = 0L;
+            Long contacting1 = 0L;
+            Long fails1 = 0L;
+            Long employeeNotAssigned1 = 0L;
+            Long assigned1 = 0L;
             countDept += 1;
             List<ReportMonthlyPostOfficeDto> post = data.getReportMonthlyPostOfficeDtos();
-            for(ReportMonthlyPostOfficeDto postOffice : post){
+            for (ReportMonthlyPostOfficeDto postOffice : post) {
                 countPost += 1;
+                countPost1 += 1;
                 totalEmployees += postOffice.getTotalEmployees();
                 totalAssigns += postOffice.getTotalAssigns();
                 successes += postOffice.getSuccesses();
@@ -87,7 +96,28 @@ public class ReportService implements IReportService {
                 fails += postOffice.getFails();
                 employeeNotAssigned += postOffice.getEmployeeNotAssigned();
                 assigned += postOffice.getAssigned();
+
+                totalEmployees1 += postOffice.getTotalEmployees();
+                totalAssigns1 += postOffice.getTotalAssigns();
+                successes1 += postOffice.getSuccesses();
+                contacting1 += postOffice.getContacting();
+                fails1 += postOffice.getFails();
+                employeeNotAssigned1 += postOffice.getEmployeeNotAssigned();
+                assigned1 += postOffice.getAssigned();
             }
+            data.setTotalPost(countPost1);
+            data.setTotalCountEmp(totalEmployees1);
+            data.setTotalAssigns(totalAssigns1);
+            data.setTotalSuccesses(successes1);
+            data.setTotalContacting(contacting1);
+            data.setTotalFails(fails1);
+            data.setTotalEmployeeNotAssigned(employeeNotAssigned1);
+            if (totalAssigns1 != 0){
+                data.setTyHT((fails1 + successes1) * 100 / totalAssigns1);
+                data.setTyTX((contacting1) * 100 / totalAssigns1);
+            }
+            data.setTotalLeadNotTX(totalAssigns1 - assigned1);
+            data.setTotalAssigned(assigned1);
         }
 
         PagingRs pagingRs = new PagingRs();
@@ -129,7 +159,7 @@ public class ReportService implements IReportService {
             Long fails = 0L;
             Long employeeNotAssigned = 0L;
             Long assigned = 0L;
-            for (ReportMonthlyEmployeeDto model : rs){
+            for (ReportMonthlyEmployeeDto model : rs) {
                 totalAssigns += model.getTotalAssigns().longValue();
                 successes += model.getSuccesses().longValue();
                 contacting += model.getContacting().longValue();
@@ -181,7 +211,7 @@ public class ReportService implements IReportService {
         Long assigned = 0L;
         HashSet<String> listPost = new HashSet();
 
-        for (ReportMonthlyEmployeeDto model : rs){
+        for (ReportMonthlyEmployeeDto model : rs) {
             countPost += 1;
             totalAssigns += model.getTotalAssigns().longValue();
             successes += model.getSuccesses().longValue();

@@ -112,7 +112,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         Users user = getCurrentUser();
         Schedule existData = scheduleRepository.getScheduleById(id, user.getEmpSystemId());
         if (existData == null) {
-            throw new NotFoundException(new ErrorMessage("ERR_001", "Lịch không tồn tại"));
+            throw new HieuDzException("Lịch không tồn tại");
         }
 
         LocalDateTime fromDate = DateTimeUtils.StringToLocalDateTime(inputData.getFromDate());

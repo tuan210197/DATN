@@ -10,6 +10,17 @@ import java.util.List;
 public class ReportMonthlyDeptDto {
 
     private String deptCode;
+    private Long totalPost;
+    private Long totalCountEmp;
+    private Long totalAssigns;
+    private Long totalSuccesses;
+    private Long totalContacting;
+    private Long totalFails;
+    private Long totalEmployeeNotAssigned;
+    private Long tyHT;
+    private Long totalLeadNotTX;
+    private Long tyTX;
+    private Long totalAssigned;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<ReportMonthlyPostOfficeDto> reportMonthlyPostOfficeDtos;
@@ -24,4 +35,12 @@ public class ReportMonthlyDeptDto {
         }
         return responses;
     }
+
+    public static ReportMonthlyDeptDto convertToDto(ReportMonthlyDeptDto model){
+        ReportMonthlyDeptDto data = new ReportMonthlyDeptDto();
+
+
+        return data;
+    }
+
 }

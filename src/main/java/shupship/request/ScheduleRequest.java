@@ -19,7 +19,4 @@ public class ScheduleRequest extends BaseRequest {
     @NotBlank
     private String toDate;
 
-    private String description;
-
-    private Long nextScheduleId;
 }
