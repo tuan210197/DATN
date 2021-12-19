@@ -43,10 +43,11 @@ public class UserController extends BaseController {
             @RequestParam("size") Integer size,
             @RequestParam(value = "asc", required = false) String asc,
             @RequestParam(value = "desc", required = false) String desc) {
-//        securityService.checkPermission(getUserRoles(), Constant.Function.USER_LIST);
+
 
         Pageable pageable = PageRequest.of(page, size, CriteriaUtil.sort(asc, desc));
-        Page<UserInfoDTO> pages = userService.list(pageable).map(mapper::toDto);
+        Users user = getCurrentUser();
+        Page<UserInfoDTO> pages = userService.list(user.getRoles(), user.getDeptCode(),user.getPostCode(),pageable).map(mapper::toDto);
         return ResponseEntity.ok(pages);
     }
 

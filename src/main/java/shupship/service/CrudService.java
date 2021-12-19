@@ -4,7 +4,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
-import shupship.domain.model.Users;
 
 public interface CrudService<E, P> {
 
@@ -13,7 +12,7 @@ public interface CrudService<E, P> {
     E save(E entity);
 
     @Transactional
-    Page<E> list(Pageable pageable);
+    Page<E> list(String role, String deptCode,String postCode,Pageable pageable);
 
     @Transactional
     Page<E> search(Specification<E> specification, Pageable pageable);

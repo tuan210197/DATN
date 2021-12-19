@@ -1,5 +1,7 @@
 package shupship.repo;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -32,5 +34,12 @@ public interface UserRepository extends JpaRepository<Users, String> {
             + " OR u.mobile like %:keyword% "
     )
     List<Users> searchBC( String bc,@Param("keyword") String keyword);
+
+
+    @Query("select u from Users u where u.deptCode= ?1")
+    Page findByCN(@Param("deptCode")String deptCode, Pageable pageable);
+
+    @Query("select u from Users u where u.postCode= ?1")
+    Page findByBC(@Param("postCode")String postCode ,Pageable pageable);
 
 }

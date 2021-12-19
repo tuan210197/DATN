@@ -181,29 +181,45 @@ public class LeadAssignController extends BaseController {
     }
 
     @GetMapping(value = "/export-excel")
-    public ResponseEntity<Resource> exportExcel(@RequestParam(required = true) Long fileId,
+    public ResponseEntity<Resource> exportExcel(HttpServletRequest request,
+                                                @RequestParam(required = true) Long fileId,
                                                 @RequestParam(required = false) String status,
                                                 @RequestParam(required = false) String filename) throws Exception {
 
         LeadAssignHisResponse leadAssignHisResponse = leadAssignService.getDetailFile(fileId);
         Collection<LeadAssignExcelResponse> leadAssignExcelResponses = leadAssignHisResponse.getLeadsAssignByExcel();
-        if (Long.parseLong(status) == 0)
+        if (status != null && Long.parseLong(status) == 0)
             leadAssignExcelResponses = leadAssignExcelResponses.stream().filter(e -> e.getStatus() == 0).collect(Collectors.toList());
-        else if (Long.parseLong(status) == 1)
+        else if (status != null && Long.parseLong(status) == 1)
             leadAssignExcelResponses = leadAssignExcelResponses.stream().filter(e -> e.getStatus() == 1).collect(Collectors.toList());
         ByteArrayInputStream in = leadAssignService.exportExcel(leadAssignExcelResponses);
         String fileName = "CHIIETFILE" + ".xlsx";
         File targetFile = new File("data/" + fileName);
         FileUtils.copyInputStreamToFile(in, targetFile);
         Resource resource = fileStorageService.loadFileAsResource(fileName);
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Disposition", "attachment; filename=" + resource.getFilename() + "");
-        headers.add("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
-        return ResponseEntity
-                .ok()
-                .headers(headers)
-                .contentType(MediaType.parseMediaType("application/octet-stream"))
+
+        String contentType = null;
+        try {
+            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+        } catch (IOException ex) {
+            log.info("Lỗi");
+        }
+        if (contentType == null) {
+            contentType = "application/octet-stream";
+        }
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename() + "")
                 .body(resource);
+
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.add("Content-Disposition", "attachment; filename=" + resource.getFilename() + "");
+//        headers.add("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+//        return ResponseEntity
+//                .ok()
+//                .headers(headers)
+//                .contentType(MediaType.parseMediaType("application/octet-stream"))
+//                .body(resource);
     }
 
 }

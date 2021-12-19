@@ -4,18 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import shupship.domain.model.BasicLogin;
 import shupship.domain.model.Users;
 import shupship.repo.BasicLoginRepo;
 import shupship.repo.UserRepo;
 import shupship.repo.UserRepository;
 import shupship.service.UserService;
-import shupship.util.exception.ApplicationException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -36,8 +31,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page list(Pageable pageable) {
-        return repository.findAll(pageable);
+    public Page list(String role, String deptCode,String postCode,Pageable pageable) {
+//        return repository.findAll(pageable);
+        if (role.equals("TCT")) {
+            return repository.findAll(pageable);
+        } else if (role.equals("CN")) {
+            return  repository.findByCN(deptCode, pageable);
+        } else if (role.equals("BC")) {
+            return repository.findByBC(postCode,pageable);
+        } else {
+            return null;
+        }
     }
 
     @Override
