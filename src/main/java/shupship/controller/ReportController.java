@@ -189,29 +189,33 @@ public class ReportController {
         return ResponseUtil.wrapOrNotFound(Optional.ofNullable(pagingRs));
     }
 
-    @GetMapping(value = "/emp/{idEpl}")
+    @GetMapping(value = "/reportEmp")
     public ResponseEntity reportOfEmployee(@PageableDefault(page = 1)
                                               @SortDefault.SortDefaults({@SortDefault(sort = "id", direction = Sort.Direction.DESC)}) Pageable pageable,
-                                              @RequestParam(required = false) String from, @RequestParam(required = false) String to, @PathVariable(name = "idEpl") Long id) throws Exception {
+                                              @RequestParam(required = false) String month) throws Exception {
+
+        Users users = getCurrentUser();
 
         LocalDateTime startDate = null;
         LocalDateTime endDate = null;
-        if (StringUtils.isBlank(from) && !DateTimeUtils.isValidDate(from) && StringUtils.isBlank(to) && !DateTimeUtils.isValidDate(to))
-            throw new HieuDzException("Ngày nhập vào không đúng định dạng!");
+        String from = "01-".concat(month);
 
-        if (StringUtils.isNotBlank(from) && StringUtils.isNotBlank(to)) {
+        if (StringUtils.isBlank(month))
+            throw new HieuDzException("Tháng không được để trống!");
+
+        if (StringUtils.isNotBlank(from)) {
             startDate = DateTimeUtils.StringToLocalDate(from).atStartOfDay();
-            endDate = DateTimeUtils.StringToLocalDate(to).plusDays(1).atStartOfDay();
+            endDate = startDate.plusDays(1).toLocalDate().atStartOfDay();
         }
 
-        assert startDate != null;
+        assert endDate != null;
         if (startDate.isAfter(endDate))
             throw new HieuDzException("Ngày bắt đầu phải nhỏ hơn ngày kết thúc!");
 
         Timestamp startTimestamp = Timestamp.valueOf(startDate);
         Timestamp endTimestamp = Timestamp.valueOf(endDate);
 
-        ReportEmployeeOnApp pagingRs = reportService.reportEmployeeOnApp(startTimestamp, endTimestamp, id);
+        ReportEmployeeOnApp pagingRs = reportService.reportEmployeeOnApp(startTimestamp, endTimestamp, users.getEmpSystemId());
         return ResponseUtil.wrapOrNotFound(Optional.ofNullable(pagingRs));
     }
 

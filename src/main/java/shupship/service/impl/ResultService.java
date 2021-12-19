@@ -170,7 +170,7 @@ public class ResultService implements IResultService {
                 scheduleLatestResult.setIsLatestResult(0);
                 scheduleRepository.save(scheduleLatestResult);
             }
-            if(result.getStatus() == 1){
+            if (resultRequest.getStatus() == 1){
                 schedule.setDeletedStatus(1L);
             }
             scheduleRepository.save(schedule);
