@@ -135,6 +135,13 @@ public class ReportService implements IReportService {
         pagingRs.setTotalContacting(contacting);
         pagingRs.setTotalFails(fails);
         pagingRs.setTotalEmployeeNotAssigned(employeeNotAssigned);
+        if (totalAssigns != 0){
+            pagingRs.setTyLeHT((fails + successes) * 100 / totalAssigns );
+            pagingRs.setTyLeTX((contacting) * 100 / totalAssigns);
+        } else {
+            pagingRs.setTyLeTX(0L);
+            pagingRs.setTyLeTX(0L);
+        }
         return pagingRs;
     }
 

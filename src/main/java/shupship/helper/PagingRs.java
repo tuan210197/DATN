@@ -18,6 +18,8 @@ public class PagingRs {
     private Long totalFails;
     private Long totalEmployeeNotAssigned;
     private Long totalAssigned;
+    private Long tyLeHT;
+    private Long tyLeTX;
     private Collection<?> data;
     private NavigationInfo paging;
 

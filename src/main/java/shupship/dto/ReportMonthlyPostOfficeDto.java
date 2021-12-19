@@ -23,17 +23,29 @@ public class ReportMonthlyPostOfficeDto {
 
     private Long assigned;
 
+    private Long tyLeHT;
+
+    private Long tyLeTX;
+
     public static ReportMonthlyPostOfficeDto convertObject(ReportAllDepts reportAllDept) {
 
         ReportMonthlyPostOfficeDto reportMonthlyPostOfficeDto = new ReportMonthlyPostOfficeDto();
-        reportMonthlyPostOfficeDto.setPostCode(reportAllDept.getPostCode());
-        reportMonthlyPostOfficeDto.setTotalEmployees(reportAllDept.getEmployees());
-        reportMonthlyPostOfficeDto.setTotalAssigns(reportAllDept.getTotalAssigns());
-        reportMonthlyPostOfficeDto.setAssigned(reportAllDept.getAssigned());
-        reportMonthlyPostOfficeDto.setSuccesses(reportAllDept.getSuccesses());
-        reportMonthlyPostOfficeDto.setContacting(reportAllDept.getContacting());
-        reportMonthlyPostOfficeDto.setFails(reportAllDept.getFails());
-        reportMonthlyPostOfficeDto.setEmployeeNotAssigned(reportAllDept.getEmployeeNotAssigned());
+        reportMonthlyPostOfficeDto.setPostCode(reportAllDept.getPostCode() != null ? reportAllDept.getPostCode() : "" );
+        reportMonthlyPostOfficeDto.setTotalEmployees(reportAllDept.getEmployees() != null ? reportAllDept.getEmployees() : 0L);
+        reportMonthlyPostOfficeDto.setTotalAssigns(reportAllDept.getTotalAssigns() != null ? reportAllDept.getTotalAssigns() : 0L);
+        reportMonthlyPostOfficeDto.setAssigned(reportAllDept.getAssigned() != null ? reportAllDept.getAssigned() : 0L);
+        reportMonthlyPostOfficeDto.setSuccesses(reportAllDept.getSuccesses() != null ? reportAllDept.getSuccesses() : 0L);
+        reportMonthlyPostOfficeDto.setContacting(reportAllDept.getContacting() != null ? reportAllDept.getContacting() : 0L);
+        reportMonthlyPostOfficeDto.setFails(reportAllDept.getFails() != null ? reportAllDept.getFails() : 0L);
+        reportMonthlyPostOfficeDto.setEmployeeNotAssigned(reportAllDept.getEmployeeNotAssigned() != null ? reportAllDept.getEmployeeNotAssigned() : 0L);
+
+        if (reportAllDept.getTotalAssigns() != null) {
+            reportMonthlyPostOfficeDto.setTyLeHT((reportAllDept.getSuccesses() + reportAllDept.getFails() ) * 100 / reportAllDept.getTotalAssigns());
+            reportMonthlyPostOfficeDto.setTyLeTX((reportAllDept.getContacting() ) * 100 / reportAllDept.getTotalAssigns());
+        } else {
+            reportMonthlyPostOfficeDto.setTyLeTX(0L);
+            reportMonthlyPostOfficeDto.setTyLeHT(0L);
+        }
 
         return reportMonthlyPostOfficeDto;
     }
