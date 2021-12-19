@@ -102,6 +102,66 @@ public class LeadAssignController extends BaseController {
         return new ResponseEntity<>((Optional.ofNullable(leadAssignHisResponse)), HttpStatus.OK);
     }
 
+
+    @GetMapping(value = "/exportDetailFile/{fileId}")
+    public ResponseEntity<Resource> exportDetailFile(HttpServletRequest request,
+                                                     @PathVariable(name = "fileId") Long fileId) throws Exception {
+        Resource resource = new ClassPathResource("Giao-tiep-xuc-khach-hang-mau-sup-ship.xlsx");
+        String contentType = null;
+        try {
+            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+        } catch (IOException ex) {
+            log.info("Lỗi");
+        }
+        if (contentType == null) {
+            contentType = "application/octet-stream";
+        }
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename() + "")
+                .body(resource);
+    }
+
+    @GetMapping(value = "/exportDetailFileError/{fileId}")
+    public ResponseEntity<Resource> exportDetailFileError(HttpServletRequest request,
+                                                          @RequestParam(required = true) String type,
+                                                          @PathVariable(name = "fileId") Long fileId) throws Exception {
+        Resource resource = new ClassPathResource("Giao-tiep-xuc-khach-hang-mau-sup-ship.xlsx");
+        String contentType = null;
+        try {
+            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+        } catch (IOException ex) {
+            log.info("Lỗi");
+        }
+        if (contentType == null) {
+            contentType = "application/octet-stream";
+        }
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename() + "")
+                .body(resource);
+    }
+
+    @GetMapping(value = "/exportDetailFileSus/{fileId}")
+    public ResponseEntity<Resource> exportDetailFileSus(HttpServletRequest request,
+                                                        @RequestParam(required = true) String type,
+                                                        @PathVariable(name = "fileId") Long fileId) throws Exception {
+        Resource resource = new ClassPathResource("Giao-tiep-xuc-khach-hang-mau-sup-ship.xlsx");
+        String contentType = null;
+        try {
+            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+        } catch (IOException ex) {
+            log.info("Lỗi");
+        }
+        if (contentType == null) {
+            contentType = "application/octet-stream";
+        }
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename() + "")
+                .body(resource);
+    }
+
     @GetMapping(value = "/templates/download")
     public ResponseEntity<Resource> fileUpload(HttpServletRequest request) throws Exception {
         Resource resource = new ClassPathResource("Giao-tiep-xuc-khach-hang-mau-sup-ship.xlsx");

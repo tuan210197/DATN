@@ -39,7 +39,7 @@ public class ReportMonthlyPostOfficeDto {
         reportMonthlyPostOfficeDto.setFails(reportAllDept.getFails() != null ? reportAllDept.getFails() : 0L);
         reportMonthlyPostOfficeDto.setEmployeeNotAssigned(reportAllDept.getEmployeeNotAssigned() != null ? reportAllDept.getEmployeeNotAssigned() : 0L);
 
-        if (reportAllDept.getTotalAssigns() != null) {
+        if (reportAllDept.getTotalAssigns() != null && reportAllDept.getTotalAssigns() > 0) {
             reportMonthlyPostOfficeDto.setTyLeHT((reportAllDept.getSuccesses() + reportAllDept.getFails() ) * 100 / reportAllDept.getTotalAssigns());
             reportMonthlyPostOfficeDto.setTyLeTX((reportAllDept.getContacting() ) * 100 / reportAllDept.getTotalAssigns());
         } else {
