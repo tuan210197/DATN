@@ -337,6 +337,8 @@ public class ReportController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename() + "")
                 .body(resource);
     }
+
+
     protected Users getCurrentUser() throws Exception {
         UserDetails user = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String email = user.getUsername();

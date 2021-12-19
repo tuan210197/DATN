@@ -139,10 +139,12 @@ public class LeadResponse {
             } else if (model.getStatus() == 3 || model.getStatus() == 4) {
                 List<Result> listResult = null;
                 listResult = model.getLeads().getSchedules().stream().map(Schedule::getResult).collect(Collectors.toList());
-                Result result = listResult.get(listResult.size() - 1);
-                response.setCreatedDate(model.getCreatedDate());
-                if (result != null) {
-                    response.setImpactDate(result.getCreatedDate());
+                if(CollectionUtils.isNotEmpty(listResult)){
+                    Result result = listResult.get(listResult.size() - 1);
+                    response.setCreatedDate(model.getCreatedDate());
+                    if (result != null) {
+                        response.setImpactDate(result.getCreatedDate());
+                    }
                 }
             } else {
                 if (CollectionUtils.isNotEmpty(model.getLeads().getSchedules())) {

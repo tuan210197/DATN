@@ -136,11 +136,6 @@ public class LeadServiceImpl implements ILeadService {
                             || (Objects.nonNull(e.getCustomerCode()) && e.getCustomerCode().toLowerCase().contains(key.toLowerCase()))).collect(Collectors.toList()));
         }
 
-        for (Lead model : leadPage) {
-            if (model.getStatus() == 4)
-                model.setStatus(1L);
-
-        }
         Page<LeadResponse> page = leadPage.map(LeadResponse::leadModelToDto);
         PagingRs pagingRs = new PagingRs();
         pagingRs.setData(page.getContent());
