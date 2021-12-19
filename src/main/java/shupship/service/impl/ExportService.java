@@ -115,9 +115,9 @@ public class ExportService implements IExportService {
             row.createCell((short) 0).setCellValue(String.valueOf(model.getEmpCode()));
             row.createCell((short) 1).setCellValue(Optional.ofNullable(model.getTotalAssigns()).isPresent() ? String.valueOf(model.getTotalAssigns()) : "");
             row.createCell((short) 2).setCellValue(Optional.ofNullable(model.getSuccesses()).isPresent() ? String.valueOf(model.getSuccesses()) : "");
-            row.createCell((short) 4).setCellValue(Optional.ofNullable(model.getContacting()).isPresent() ? String.valueOf(model.getContacting()) : "");
-            row.createCell((short) 5).setCellValue(Optional.ofNullable(model.getFails()).isPresent() ? String.valueOf(model.getFails()) : "");
-            row.createCell((short) 7).setCellValue(Optional.ofNullable(model.getAssigned()).isPresent() ? String.valueOf(model.getAssigned()) : "");
+            row.createCell((short) 3).setCellValue(Optional.ofNullable(model.getContacting()).isPresent() ? String.valueOf(model.getContacting()) : "");
+            row.createCell((short) 4).setCellValue(Optional.ofNullable(model.getFails()).isPresent() ? String.valueOf(model.getFails()) : "");
+            row.createCell((short) 5).setCellValue(Optional.ofNullable(model.getAssigned()).isPresent() ? String.valueOf(model.getAssigned()) : "");
             i++;
         }
         workbook.write(out);
