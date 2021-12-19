@@ -213,7 +213,8 @@ public class ReportDao {
         Query nativeQuery = entityManager.createNativeQuery(query);
         nativeQuery.setParameter("startDate", startDate);
         nativeQuery.setParameter("endDate", endDate);
-        nativeQuery.setParameter("deptCode", deptCode);
+        if (deptCode != null)
+            nativeQuery.setParameter("deptCode", deptCode);
 
         List<Object[]> data = nativeQuery.getResultList();
         List<ReportMonthlyEmployeeDto> results = new ArrayList<>();
@@ -298,7 +299,7 @@ public class ReportDao {
 
     @Transactional
     public List<ReportResponse> exportDataToExcelFile(Timestamp startTime, Timestamp endTime, Users user) throws IOException, InvalidFormatException {
-        InputStream resource = new ClassPathResource("ThongTinKHMT.xlsx").getInputStream();
+        InputStream resource = new ClassPathResource("BaoCao.xlsx").getInputStream();
         Workbook workbook = WorkbookFactory.create(resource);
 
         Sheet sheet = workbook.getSheetAt(0);
@@ -323,7 +324,7 @@ public class ReportDao {
                     "                       on (s1.lead_id = s2.lead_id and s1.created_date < s2.created_date)" +
                     "    WHERE s2.created_date is null" +
                     " ) s on l.id = s.lead_id" +
-                    "         left join (select * from result where created_date >= ?) r on s.result_id = r.id" +
+                    "         left join (select * from result r3 where r3.created_date >= ?) r on s.result_id = r.id" +
                     "         left join address a2 on a2.id = r.address_id" +
                     " where la.deleted_status = 0 and la.created_date >= ? and  la.created_date <= ?" +
                     " group by (e.employee_code, po.postcode, po.deptcode, l.customer_code, l.full_name, l.representation, a2.home_no , a2.fomataddress," +
@@ -355,7 +356,7 @@ public class ReportDao {
                     "                       on (s1.lead_id = s2.lead_id and s1.created_date < s2.created_date)" +
                     "    WHERE s2.created_date is null" +
                     " ) s on l.id = s.lead_id" +
-                    "         left join (select * from result where created_date >= ?) r on s.result_id = r.id" +
+                    "         left join (select * from result r3 where r3.created_date >= ?) r on s.result_id = r.id" +
                     "         left join address a2 on a2.id = r.address_id" +
                     " where la.deleted_status = 0 and la.created_date >= ? and  la.created_date <= ? and po.deptcode = ?  " +
                     " group by (e.employee_code, po.postcode, po.deptcode, l.customer_code, l.full_name, l.representation, a2.home_no , a2.fomataddress," +
@@ -386,7 +387,7 @@ public class ReportDao {
                     "                       on (s1.lead_id = s2.lead_id and s1.created_date < s2.created_date)" +
                     "    WHERE s2.created_date is null" +
                     " ) s on l.id = s.lead_id" +
-                    "         left join (select * from result where created_date >= ?) r on s.result_id = r.id" +
+                    "         left join (select * from result r3 where r3.created_date >= ?) r on s.result_id = r.id" +
                     "         left join address a2 on a2.id = r.address_id" +
                     " where la.deleted_status = 0 and la.created_date >= ? and  la.created_date <= ? and po.postcode = ?" +
                     " group by (e.employee_code, po.postcode, po.deptcode, l.customer_code, l.full_name, l.representation, a2.home_no , a2.fomataddress," +

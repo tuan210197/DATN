@@ -113,11 +113,12 @@ public class ExportService implements IExportService {
         for (ReportMonthlyEmployeeDto model : list) {
             Row row = sheet.createRow(i);
             row.createCell((short) 0).setCellValue(String.valueOf(model.getEmpCode()));
-            row.createCell((short) 1).setCellValue(Optional.ofNullable(model.getTotalAssigns()).isPresent() ? String.valueOf(model.getTotalAssigns()) : "");
-            row.createCell((short) 2).setCellValue(Optional.ofNullable(model.getSuccesses()).isPresent() ? String.valueOf(model.getSuccesses()) : "");
-            row.createCell((short) 3).setCellValue(Optional.ofNullable(model.getContacting()).isPresent() ? String.valueOf(model.getContacting()) : "");
-            row.createCell((short) 4).setCellValue(Optional.ofNullable(model.getFails()).isPresent() ? String.valueOf(model.getFails()) : "");
-            row.createCell((short) 5).setCellValue(Optional.ofNullable(model.getAssigned()).isPresent() ? String.valueOf(model.getAssigned()) : "");
+            row.createCell((short) 1).setCellValue(String.valueOf(model.getFullName()));
+            row.createCell((short) 2).setCellValue(Optional.ofNullable(model.getTotalAssigns()).isPresent() ? String.valueOf(model.getTotalAssigns()) : "");
+            row.createCell((short) 3).setCellValue(Optional.ofNullable(model.getSuccesses()).isPresent() ? String.valueOf(model.getSuccesses()) : "");
+            row.createCell((short) 4).setCellValue(Optional.ofNullable(model.getContacting()).isPresent() ? String.valueOf(model.getContacting()) : "");
+            row.createCell((short) 5).setCellValue(Optional.ofNullable(model.getFails()).isPresent() ? String.valueOf(model.getFails()) : "");
+            row.createCell((short) 6).setCellValue(Optional.ofNullable(model.getAssigned()).isPresent() ? String.valueOf(model.getAssigned()) : "");
             i++;
         }
         workbook.write(out);
@@ -135,15 +136,46 @@ public class ExportService implements IExportService {
 
         List<ReportResponse> reportResponses = reportDao.exportDataToExcelFile(startTimestamp, endTimestamp, users);
         int i = 1;
+        int k = 0;
         for (ReportResponse model : reportResponses) {
             Row row = sheet.createRow(i);
-
-            // xuats exxcel ow dya
-
+            row.createCell((short) k).setCellValue(String.valueOf(model.getEmployeeCode()) != null ? String.valueOf(model.getEmployeeCode()) : "");
+            row.createCell((short) ++k).setCellValue(String.valueOf(model.getPostCode()) != null ? String.valueOf(model.getPostCode()) : "");
+            row.createCell((short) ++k).setCellValue(String.valueOf(model.getDeptCode()) != null ? String.valueOf(model.getDeptCode())  : "");
+            row.createCell((short) ++k).setCellValue(String.valueOf(model.getCustomorCode()) != null ? String.valueOf(model.getCustomorCode()) : "");
+            row.createCell((short) ++k).setCellValue(String.valueOf(model.getFullName()) != null ? String.valueOf(model.getFullName()) : "");
+            row.createCell((short) ++k).setCellValue(model.getFomataddress() != null ? String.valueOf(model.getHomeNo()) + " " + String.valueOf(model.getFomataddress()): "");
+            row.createCell((short) ++k).setCellValue(model.getRepresentation() != null ? String.valueOf(model.getRepresentation()) : "");
+            row.createCell((short) ++k).setCellValue(model.getPhone() != null ? String.valueOf(model.getPhone()) : "");
+            row.createCell((short) ++k).setCellValue(model.getLeadSource() != null ? getType(model.getLeadSource()) : "");
+            row.createCell((short) ++k).setCellValue(model.getSchedulerDate() != null ? String.valueOf(model.getSchedulerDate()) : "");
+            row.createCell((short) ++k).setCellValue(model.getResultDate() != null ? String.valueOf(model.getResultDate()) : "");
+            row.createCell((short) ++k).setCellValue(Optional.ofNullable(model.getStatus()).isPresent() ? getStatus(model.getStatus()) : "");
+            row.createCell((short) ++k).setCellValue(Optional.ofNullable(model.getDiscout()).isPresent() ? String.valueOf(model.getDiscout()) : "");
+            row.createCell((short) ++k).setCellValue(Optional.ofNullable(model.getInProvincePrice()).isPresent() ? String.valueOf(model.getInProvincePrice()) : "");
+            row.createCell((short) ++k).setCellValue(Optional.ofNullable(model.getOutProvincePrice()).isPresent() ? String.valueOf(model.getOutProvincePrice()) : "");
+            row.createCell((short) ++k).setCellValue(model.getProposal() != null ? String.valueOf(model.getProposal()) : "");
+            row.createCell((short) ++k).setCellValue(model.getLeadAssignTime() != null ? String.valueOf(model.getLeadAssignTime()) : "");
             i++;
+            k = 0;
         }
         workbook.write(out);
         out.close();
         return new ByteArrayInputStream(out.toByteArray());
     }
+
+    public String getType(String type){
+        if (type.equals("PRIVATE")){
+            return "Cá nhân";
+        } else return "Doanh nghiệp";
+    }
+
+    public String getStatus(Long status){
+        if (status == 1)
+            return "Gửi báo giá";
+        else if (status == 3)
+            return "Thành công";
+        else return "Thất bại";
+    }
+
 }
