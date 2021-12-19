@@ -113,8 +113,11 @@ public class ReportService implements IReportService {
             data.setTotalFails(fails1);
             data.setTotalEmployeeNotAssigned(employeeNotAssigned1);
             if (totalAssigns1 != 0){
-                data.setTyHT((fails1 + successes1) * 100 / totalAssigns1);
+                data.setTyHT((fails1 + successes1) * 100 / totalAssigns1 );
                 data.setTyTX((contacting1) * 100 / totalAssigns1);
+            } else {
+                data.setTyTX(0L);
+                data.setTyHT(0L);
             }
             data.setTotalLeadNotTX(totalAssigns1 - assigned1);
             data.setTotalAssigned(assigned1);

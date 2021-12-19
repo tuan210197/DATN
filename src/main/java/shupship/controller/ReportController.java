@@ -137,7 +137,6 @@ public class ReportController {
                 rs = rs.stream().filter(Objects::nonNull).filter(e -> e.getDeptCode().equals(user.getDeptCode())).collect(Collectors.toList());
         }
 
-
         for(ReportMonthlyDeptDto data : rs){
             Long countPost = 0L;
             Long totalEmployees = 0L;
@@ -169,6 +168,9 @@ public class ReportController {
             if (totalAssigns != 0){
                 data.setTyHT((fails + successes) * 100 / totalAssigns);
                 data.setTyTX((contacting) * 100 / totalAssigns);
+            } else {
+                data.setTyTX(0L);
+                data.setTyHT(0L);
             }
             data.setTotalLeadNotTX(totalAssigns - assigned);
             data.setTotalAssigned(assigned);
