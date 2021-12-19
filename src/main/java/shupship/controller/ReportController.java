@@ -175,13 +175,18 @@ public class ReportController {
         File targetFile = new File("data/" + fileName);
         FileUtils.copyInputStreamToFile(bais, targetFile);
         Resource resource = fileStorageService.loadFileAsResource(fileName);
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Disposition", "attachment; filename=" + resource.getFilename() + "");
-        headers.add("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
-        return ResponseEntity
-                .ok()
-                .headers(headers)
-                .contentType(MediaType.parseMediaType("application/octet-stream"))
+        String contentType = null;
+        try {
+            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+        } catch (IOException ex) {
+            log.info("Lỗi");
+        }
+        if (contentType == null) {
+            contentType = "application/octet-stream";
+        }
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename() + "")
                 .body(resource);
     }
 
@@ -385,13 +390,18 @@ public class ReportController {
         File targetFile = new File("data/" + fileName);
         FileUtils.copyInputStreamToFile(bais, targetFile);
         Resource resource = fileStorageService.loadFileAsResource(fileName);
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Disposition", "attachment; filename=" + resource.getFilename() + "");
-        headers.add("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
-        return ResponseEntity
-                .ok()
-                .headers(headers)
-                .contentType(MediaType.parseMediaType("application/octet-stream"))
+        String contentType = null;
+        try {
+            contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
+        } catch (IOException ex) {
+            log.info("Lỗi");
+        }
+        if (contentType == null) {
+            contentType = "application/octet-stream";
+        }
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + resource.getFilename() + "")
                 .body(resource);
     }
 
