@@ -213,7 +213,7 @@ public class LeadAssignServiceImpl implements ILeadAssignService {
 
                 if (lead.getIsFromEVTP() == null || lead.getIsFromEVTP() != null && lead.getIsFromEVTP() == 1) {
                     lead.setType(1L);
-                    lead.setStatus(5L);
+//                    lead.setStatus(5L);
                 }
 
                 // chuyển tiếp xúc (thêm tiếp xúc mới)
