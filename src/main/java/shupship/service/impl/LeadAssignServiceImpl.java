@@ -184,6 +184,7 @@ public class LeadAssignServiceImpl implements ILeadAssignService {
                             assign.setUserRecipientId(leadAssginReq.getUserRecipientId());
                             assign.setUsers(employee);
                             assign.setCreatedBy(user.getCreatedBy());
+                            assign.setStatus(1L);
                             assign = leadAssignRepo.save(assign);
 
                         } else {
@@ -191,6 +192,7 @@ public class LeadAssignServiceImpl implements ILeadAssignService {
                             data.setLeads(lead);
                             data.setUsers(employee);
                             data.setCreatedBy(user.getCreatedBy());
+                            data.setStatus(1L);
                             assign = leadAssignRepo.save(data);
 
                         }
@@ -199,6 +201,7 @@ public class LeadAssignServiceImpl implements ILeadAssignService {
                         data.setLeads(lead);
                         data.setUsers(employee);
                         data.setCreatedBy(user.getCreatedBy());
+                        data.setStatus(1L);
                         assign = leadAssignRepo.save(data);
                     }
                 }
