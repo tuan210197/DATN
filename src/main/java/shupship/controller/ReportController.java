@@ -320,7 +320,7 @@ public class ReportController {
         Users user = getCurrentUser();
         ByteArrayInputStream bais = null;
         if (user.getRoles().equals("TCT") || user.getRoles().equals("CN") || user.getRoles().equals("BC")){
-             bais = exportService.exportDataToExcel(startTimestamp, endTimestamp, user);
+             bais = exportService.exportDataToExcel(startTimestamp, endTimestamp, user, dept);
         }
         String fileName = "BaoCaoTXKH" + ".xlsx";
         File targetFile = new File("data/" + fileName);

@@ -18,5 +18,5 @@ public interface IExportService {
 
     ByteArrayInputStream exportNhanVien(List<ReportMonthlyEmployeeDto> list) throws IOException, InvalidFormatException;
 
-    ByteArrayInputStream exportDataToExcel(Timestamp startTimestamp, Timestamp endTimestamp, Users user) throws IOException, InvalidFormatException;
+    ByteArrayInputStream exportDataToExcel(Timestamp startTimestamp, Timestamp endTimestamp, Users user, String deptCode) throws IOException, InvalidFormatException;
 }

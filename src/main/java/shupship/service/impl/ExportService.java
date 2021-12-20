@@ -127,14 +127,14 @@ public class ExportService implements IExportService {
     }
 
     @Override
-    public ByteArrayInputStream exportDataToExcel(Timestamp startTimestamp, Timestamp endTimestamp, Users users) throws IOException, InvalidFormatException {
+    public ByteArrayInputStream exportDataToExcel(Timestamp startTimestamp, Timestamp endTimestamp, Users users, String deptCode) throws IOException, InvalidFormatException {
         InputStream resource = new ClassPathResource("BaoCao.xlsx").getInputStream();
         Workbook workbook = WorkbookFactory.create(resource);
 
         Sheet sheet = workbook.getSheetAt(0);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        List<ReportResponse> reportResponses = reportDao.exportDataToExcelFile(startTimestamp, endTimestamp, users);
+        List<ReportResponse> reportResponses = reportDao.exportDataToExcelFile(startTimestamp, endTimestamp, users, deptCode);
         int i = 1;
         int k = 0;
         for (ReportResponse model : reportResponses) {
@@ -144,9 +144,10 @@ public class ExportService implements IExportService {
             row.createCell((short) ++k).setCellValue(String.valueOf(model.getDeptCode()) != null ? String.valueOf(model.getDeptCode())  : "");
             row.createCell((short) ++k).setCellValue(String.valueOf(model.getCustomorCode()) != null ? String.valueOf(model.getCustomorCode()) : "");
             row.createCell((short) ++k).setCellValue(String.valueOf(model.getFullName()) != null ? String.valueOf(model.getFullName()) : "");
-            row.createCell((short) ++k).setCellValue(model.getFomataddress() != null ? String.valueOf(model.getHomeNo()) + " " + String.valueOf(model.getFomataddress()): "");
             row.createCell((short) ++k).setCellValue(model.getRepresentation() != null ? String.valueOf(model.getRepresentation()) : "");
+            row.createCell((short) ++k).setCellValue(model.getFomataddress() != null || model.getHomeNo() != null ? model.getHomeNo() + " " + model.getFomataddress(): "");
             row.createCell((short) ++k).setCellValue(model.getPhone() != null ? String.valueOf(model.getPhone()) : "");
+            row.createCell((short) ++k).setCellValue(model.getTitle() != null ? String.valueOf(model.getTitle()) : "");
             row.createCell((short) ++k).setCellValue(model.getLeadSource() != null ? getType(model.getLeadSource()) : "");
             row.createCell((short) ++k).setCellValue(model.getSchedulerDate() != null ? String.valueOf(model.getSchedulerDate()) : "");
             row.createCell((short) ++k).setCellValue(model.getResultDate() != null ? String.valueOf(model.getResultDate()) : "");

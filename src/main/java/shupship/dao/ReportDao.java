@@ -298,50 +298,68 @@ public class ReportDao {
 
 
     @Transactional
-    public List<ReportResponse> exportDataToExcelFile(Timestamp startTime, Timestamp endTime, Users user) throws IOException, InvalidFormatException {
-        InputStream resource = new ClassPathResource("BaoCao.xlsx").getInputStream();
-        Workbook workbook = WorkbookFactory.create(resource);
-
-        Sheet sheet = workbook.getSheetAt(0);
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
+    public List<ReportResponse> exportDataToExcelFile(Timestamp startTime, Timestamp endTime, Users user, String deptCode) throws IOException, InvalidFormatException {
         String query = "";
         Query nativeQuery = null;
         if (user.getRoles().equals("TCT")) {
-            query = "select e.employee_code, po.postcode, po.deptcode, l.customer_code, l.full_name, l.representation, a2.home_no , a2.fomataddress," +
-                    "       l.title, l.phone, l.lead_source, s.created_date, r.created_date, r.status, r.discount, r.in_province_price, r.out_province_price," +
-                    "       r.proposal, la.created_date" +
-                    " from lead l left join ( select la1.* from lead_assign la1 LEFT JOIN lead_assign la2 on (la1.lead_id = la2.lead_id and la1.created_date < la2.created_date)" +
-                    "    WHERE la2.created_date is null) la on l.id = la.lead_id" +
-                    "         left join users e on la.user_recipient_id = e.emp_system_id" +
-                    "         left join post_office po on e.post_code = po.postcode" +
-                    "         left join address a on l.address_id = a.id and a.deleted_status = 0" +
-                    "         left join industry_detail id on l.id = id.related_to_id" +
-                    "         left join industry i on id.industry_id = i.id" +
-                    "         left join (" +
-                    "    select s1.*" +
-                    "    from (select * from schedule where result_id is not null) s1" +
-                    "             LEFT JOIN (select * from schedule where result_id is not null) s2" +
-                    "                       on (s1.lead_id = s2.lead_id and s1.created_date < s2.created_date)" +
-                    "    WHERE s2.created_date is null" +
-                    " ) s on l.id = s.lead_id" +
-                    "         left join (select * from result r3 where r3.created_date >= ?) r on s.result_id = r.id" +
-                    "         left join address a2 on a2.id = r.address_id" +
-                    " where la.deleted_status = 0 and la.created_date >= ? and  la.created_date <= ?" +
-                    " group by (e.employee_code, po.postcode, po.deptcode, l.customer_code, l.full_name, l.representation, a2.home_no , a2.fomataddress," +
-                    "       l.title, l.phone, l.lead_source, s.created_date, r.created_date, r.status, r.discount, r.in_province_price, r.out_province_price," +
-                    "       r.proposal, la.created_date)";
+            if (deptCode == null){
+                query = "select e.employee_code, po.postcode, po.deptcode, l.customer_code, l.full_name, l.representation, a.home_no , a.fomataddress," +
+                        "       l.title, l.phone, l.lead_source, s.created_date as schedu_create_date, r.created_date as result_craete_date, r.status, r.discount, r.in_province_price, r.out_province_price," +
+                        "       r.proposal , la.created_date as la_createddate " +
+                        " from lead l left join  lead_assign la on l.id = la.lead_id" +
+                        "         left join users e on la.user_recipient_id = e.emp_system_id" +
+                        "         left join post_office po on e.post_code = po.postcode" +
+                        "         left join address a on l.address_id = a.id and a.deleted_status = 0" +
+                        "         left join (" +
+                        "    select s1.*" +
+                        "    from (select * from schedule where result_id is not null) s1" +
+                        "             LEFT JOIN (select * from schedule where result_id is not null) s2" +
+                        "                       on (s1.lead_id = s2.lead_id and s1.created_date < s2.created_date)" +
+                        "    WHERE s2.created_date is null" +
+                        ") s on l.id = s.lead_id" +
+                        "         left join (select * from result r3 where r3.created_date >= ?) r on s.result_id = r.id" +
+                        "         left join address a2 on a2.id = r.address_id" +
+                        " where la.deleted_status = 0 and la.created_date >= ? and  la.created_date <= ? " +
+                        "group by (e.employee_code, po.postcode, po.deptcode, l.customer_code, l.full_name, l.representation, a.home_no , a.fomataddress," +
+                        "       l.title, l.phone, l.lead_source, s.created_date, r.created_date, r.status, r.discount, r.in_province_price, r.out_province_price," +
+                        "       r.proposal, la.created_date)";
+            } else {
+                query = "select e.employee_code, po.postcode, po.deptcode, l.customer_code, l.full_name, l.representation, a.home_no , a.fomataddress," +
+                        "       l.title, l.phone, l.lead_source, s.created_date as schedu_create_date, r.created_date as result_craete_date, r.status, r.discount, r.in_province_price, r.out_province_price," +
+                        "       r.proposal, la.created_date as la_createddate " +
+                        " from lead l left join  lead_assign la on l.id = la.lead_id" +
+                        "         left join users e on la.user_recipient_id = e.emp_system_id" +
+                        "         left join post_office po on e.post_code = po.postcode" +
+                        "         left join address a on l.address_id = a.id and a.deleted_status = 0" +
+                        "         left join (" +
+                        "    select s1.*" +
+                        "    from (select * from schedule where result_id is not null) s1" +
+                        "             LEFT JOIN (select * from schedule where result_id is not null) s2" +
+                        "                       on (s1.lead_id = s2.lead_id and s1.created_date < s2.created_date)" +
+                        "    WHERE s2.created_date is null" +
+                        ") s on l.id = s.lead_id" +
+                        "         left join (select * from result r3 where r3.created_date >= ?) r on s.result_id = r.id" +
+                        "         left join address a2 on a2.id = r.address_id" +
+                        " where la.deleted_status = 0 and la.created_date >= ? and  la.created_date <= ? and po.deptcode = ?" +
+                        "group by (e.employee_code, po.postcode, po.deptcode, l.customer_code, l.full_name, l.representation, a.home_no , a.fomataddress," +
+                        "       l.title, l.phone, l.lead_source, s.created_date, r.created_date, r.status, r.discount, r.in_province_price, r.out_province_price," +
+                        "       r.proposal, la.created_date )";
+            }
+
 
             nativeQuery = entityManager.createNativeQuery(query)
                     .setParameter(1, startTime)
                     .setParameter(2, startTime)
                     .setParameter(3, endTime);
+            if (deptCode != null)
+                nativeQuery.setParameter(4, deptCode);
 
         } else if (user.getRoles().equals("CN")) {
             String dept = user.getDeptCode();
 
             query = " select e.employee_code, po.postcode, po.deptcode, l.customer_code, l.full_name, l.representation, a2.home_no , a2.fomataddress," +
-                    "       l.title, l.phone, l.lead_source, s.created_date, r.created_date, r.status, r.discount, r.in_province_price, r.out_province_price," +
-                    "       r.proposal, la.created_date" +
+                    "       l.title, l.phone, l.lead_source, s.created_date as schedu_create_date, r.created_date as result_craete_date, r.status, r.discount, r.in_province_price, r.out_province_price," +
+                    "       r.proposal, la.created_date as la_createddate " +
                     " from lead l left join ( select la1.* from lead_assign la1 LEFT JOIN lead_assign la2 on (la1.lead_id = la2.lead_id and la1.created_date < la2.created_date)" +
                     "    WHERE la2.created_date is null) la on l.id = la.lead_id" +
                     "         left join users e on la.user_recipient_id = e.emp_system_id" +
@@ -361,7 +379,7 @@ public class ReportDao {
                     " where la.deleted_status = 0 and la.created_date >= ? and  la.created_date <= ? and po.deptcode = ?  " +
                     " group by (e.employee_code, po.postcode, po.deptcode, l.customer_code, l.full_name, l.representation, a2.home_no , a2.fomataddress," +
                     "       l.title, l.phone, l.lead_source, s.created_date, r.created_date, r.status, r.discount, r.in_province_price, r.out_province_price," +
-                    "       r.proposal, la.created_date) ";
+                    "       r.proposal, la.created_date ) ";
 
             nativeQuery = entityManager.createNativeQuery(query)
                     .setParameter(1, startTime)
@@ -371,8 +389,8 @@ public class ReportDao {
         } else {
             String post = user.getPostCode();
             query = " select e.employee_code, po.postcode, po.deptcode, l.customer_code, l.full_name, l.representation, a2.home_no , a2.fomataddress," +
-                    "       l.title, l.phone, l.lead_source, s.created_date, r.created_date, r.status, r.discount, r.in_province_price, r.out_province_price," +
-                    "       r.proposal, la.created_date " +
+                    "       l.title, l.phone, l.lead_source, s.created_date as schedu_create_date, r.created_date as result_craete_date, r.status, r.discount, r.in_province_price, r.out_province_price," +
+                    "       r.proposal, la.created_date as la_createddate " +
                     " from lead l left join ( select la1.* from lead_assign la1 LEFT JOIN lead_assign la2 on (la1.lead_id = la2.lead_id and la1.created_date < la2.created_date)" +
                     "    WHERE la2.created_date is null) la on l.id = la.lead_id" +
                     "         left join users e on la.user_recipient_id = e.emp_system_id" +
@@ -392,7 +410,7 @@ public class ReportDao {
                     " where la.deleted_status = 0 and la.created_date >= ? and  la.created_date <= ? and po.postcode = ?" +
                     " group by (e.employee_code, po.postcode, po.deptcode, l.customer_code, l.full_name, l.representation, a2.home_no , a2.fomataddress," +
                     "       l.title, l.phone, l.lead_source, s.created_date, r.created_date, r.status, r.discount, r.in_province_price, r.out_province_price," +
-                    "       r.proposal, la.created_date)";
+                    "       r.proposal, la.created_date )";
 
             nativeQuery = entityManager.createNativeQuery(query)
                     .setParameter(1, startTime)
