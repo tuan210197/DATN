@@ -140,7 +140,7 @@ public class ReportService implements IReportService {
             pagingRs.setTyLeTX((contacting) * 100 / totalAssigns);
         } else {
             pagingRs.setTyLeTX(0L);
-            pagingRs.setTyLeTX(0L);
+            pagingRs.setTyLeHT(0L);
         }
         return pagingRs;
     }
