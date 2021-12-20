@@ -209,7 +209,8 @@ public class LeadAssignServiceImpl implements ILeadAssignService {
                     findLeadAssignById.setDeletedStatus(1L);
                     leadAssignRepo.save(findLeadAssignById);
                     log.info("gửi email");
-//                    sendEmailAssign(findLeadAssignById, leadAssginReq.getUserRecipientId(), leadAssginReq.getNote());
+                    sendEmailAssign(findLeadAssignById, leadAssginReq.getUserRecipientId(), leadAssginReq.getNote());
+                    log.info("gửi xong");
                 }
 
                 if (lead.getIsFromEVTP() == null || lead.getIsFromEVTP() != null && lead.getIsFromEVTP() == 1) {
