@@ -250,8 +250,14 @@ public class ReportService implements IReportService {
     public ReportEmployeeOnApp reportEmployeeOnApp(Timestamp from, Timestamp to, Long id) {
         List<ReportEmployeeOnApp> reportEmployeeOnAppList = reportDao.reportOfEmployee(from, to, id);
         ReportEmployeeOnApp model = reportEmployeeOnAppList.get(0);
-        model.setTyLeHT((model.getSuccesses().doubleValue() + model.getFails().doubleValue()) * 100 / model.getTotalAssigns().doubleValue());
-        model.setTyLeTX(model.getContacting().doubleValue() * 100 / model.getTotalAssigns().doubleValue());
+        if (model.getTotalAssigns().longValue() > 0){
+            model.setTyLeHT((model.getSuccesses().longValue() + model.getFails().longValue()) * 100 / model.getTotalAssigns().longValue());
+            model.setTyLeTX(model.getContacting().longValue() * 100 / model.getTotalAssigns().longValue());
+        } else {
+            model.setTyLeHT(0L);
+            model.setTyLeTX(0L);
+        }
+
         return model;
     }
 

@@ -41,6 +41,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -273,6 +274,17 @@ public class LeadServiceImpl implements ILeadService {
         existData.setDeletedBy(user.getEmpSystemId());
         existData.setDeletedStatus(Constants.DELETE_LEAD);
         Lead lead = iLeadRepository.save(existData);
+
+        lead.getIndustries().forEach(e ->
+                industryDetailRepository.deleteByRelatedToIdAndIndustryId(existData.getId(), e.getId()));
+
+        lead.getSchedules().forEach(e ->
+                scheduleRepository.deleteSchedule(e.getId(), user.getEmpSystemId()));
+        Collection<LeadAssign> leadAssigns = lead.getLeadAssigns();
+        for (LeadAssign leadAssign : leadAssigns){
+            leadAssign.setDeletedStatus(1L);
+            iLeadAssignRepository.save(leadAssign);
+        }
         return lead;
     }
 

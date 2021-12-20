@@ -19,8 +19,7 @@ public interface ILeadAssignRepository extends PagingAndSortingRepository<LeadAs
     @Query("select a from LeadAssign a where a.leads.id = :id and a.deletedStatus = 0")
     LeadAssign getLeadAssignById(Long id);
 
-    @Query("delete from LeadAssign la where la.leads.id = :leadId")
-
     @Modifying
+    @Query("delete from LeadAssign la where la.leads.id = :leadId")
     void deleteAssign(long leadId);
 }

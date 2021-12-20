@@ -104,6 +104,10 @@ public class ResultService implements IResultService {
                 scheduleLatestResult.setIsLatestResult(0);
                 scheduleRepository.save(scheduleLatestResult);
             }
+            if (resultRequest.getStatus() == 1){
+                schedule.setDeletedStatus(1L);
+                scheduleRepository.save(schedule);
+            }
             //Check update address
             if (resultRequest.getPickupAddress() != null) {
                 Address addressUpdate = AddressRequest.addressDtoToModel(resultRequest.getPickupAddress());
@@ -162,13 +166,16 @@ public class ResultService implements IResultService {
             result.setSchedule(schedule);
             outData = resultRepository.save(result);
             schedule.setResult(result);
-            schedule.setDeletedStatus(1L);
             if (schedule.getIsLatestResult() != 1) {
                 schedule.setIsLatestResult(1);
             }
             if (scheduleLatestResult != null) {
                 scheduleLatestResult.setIsLatestResult(0);
                 scheduleRepository.save(scheduleLatestResult);
+            }
+
+            if (resultRequest.getStatus() == 1){
+                schedule.setDeletedStatus(1L);
             }
 
             scheduleRepository.save(schedule);

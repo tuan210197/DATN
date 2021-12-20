@@ -109,7 +109,7 @@ public interface ILeadRepository extends PagingAndSortingRepository<Lead, Long>,
             " and " +
             " ( COALESCE(:end) is null or a.createdDate <= :end)" +
             " ) " +
-            " and a.deletedStatus = 0 and a.isFromEVTP is null" +
+            " and (a.deletedStatus = 0) and (a.isFromEVTP is null)" +
             " and (COALESCE(:key) is null or (a.phone = :key or a.customerCode = :key) )  " +
             " and (COALESCE(:status) is null or a.status = :status)" +
             " )")

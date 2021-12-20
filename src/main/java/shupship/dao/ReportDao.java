@@ -252,7 +252,7 @@ public class ReportDao {
                 "       sum(case when la.status = 4 then 1 else 0 end)                               as fails, " +
                 "       sum(case when la.user_assignee_id != la.user_recipient_id then 1 else 0 end) as assigned, " +
                 "       (select sum(l.expected_revenue) as expected_revenue), " +
-                "       sum(case when l.is_from_evtp is null then 1 else 0 end)                      as tuNhap, " +
+                "       sum(case when l.is_from_evtp != 1 then 1 else 0 end)                      as tuNhap, " +
                 "       sum(case when l.is_from_evtp = 1 then 1 else 0 end)                          as duocGiao" +
                 "   FROM users e " +
                 "         left join lead_assign la " +

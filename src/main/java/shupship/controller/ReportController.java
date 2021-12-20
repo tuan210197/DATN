@@ -286,7 +286,7 @@ public class ReportController {
 
         if (StringUtils.isNotBlank(from)) {
             startDate = DateTimeUtils.StringToLocalDate(from).atStartOfDay();
-            endDate = startDate.plusDays(1).toLocalDate().atStartOfDay();
+            endDate = startDate.plusMonths(1).toLocalDate().atStartOfDay();
         }
 
         assert endDate != null;

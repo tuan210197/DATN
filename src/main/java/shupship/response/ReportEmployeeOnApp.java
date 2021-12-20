@@ -31,9 +31,9 @@ public class ReportEmployeeOnApp {
 
     private BigDecimal expectedRevenue;
 
-    private Double tyLeTX;
+    private Long tyLeTX;
 
-    private Double tyLeHT;
+    private Long tyLeHT;
 
     private BigInteger tuNhap;
 

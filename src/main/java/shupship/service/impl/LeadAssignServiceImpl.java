@@ -226,7 +226,7 @@ public class LeadAssignServiceImpl implements ILeadAssignService {
                 data.setStatus(5L);
                 data.setLeads(lead);
                 data.setUsers(employee);
-                data.setCreatedBy(user.getCreatedBy());
+                data.setCreatedBy(user.getEmpSystemId());
                 assign = leadAssignRepo.save(data);
 
                 assigns.add(assign);
